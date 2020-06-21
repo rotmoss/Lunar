@@ -10,7 +10,7 @@ using OpenGL;
 
 namespace Lunar
 {
-    partial class Graphics
+    partial class GraphicsController
     {
         private Dictionary<uint, List<uint>> _texture;
         private Dictionary<uint, int> _selectedTexture;

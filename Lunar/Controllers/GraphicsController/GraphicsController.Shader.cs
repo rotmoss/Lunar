@@ -6,7 +6,7 @@ using System.Linq;
 
 namespace Lunar
 {
-    partial class Graphics
+    partial class GraphicsController
     {
         private Dictionary<uint, uint> _shader;
 
@@ -97,7 +97,7 @@ namespace Lunar
             "out vec2 TexCoord;\n",
             "void main()\n",
             "{\n",
-            "   gl_Position = uProjection * (uModelView * vec4(aPos, 1.0));\n",
+            "   gl_Position = uProjection * vec4(aPos, 1.0);\n",
             "   TexCoord = vec2(aTexCoord.x, aTexCoord.y);\n",
             "}\n"
         };

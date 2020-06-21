@@ -99,8 +99,4 @@
     <None Include="$(SolutionDir)\Lunar\GameData\**" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="C:\Users\Jonatan\Documents\GitHub\Lunar\Lunar\GameData\Scripts\Movement.cs" />
-  </ItemGroup>
-
 </Project>

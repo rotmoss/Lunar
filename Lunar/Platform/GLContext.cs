@@ -1,15 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using SDL2;
 using OpenGL;
-using System.Data;
 
 namespace Lunar
 {
-    class Context
+    class GLContext
     {
         public const float GameW = 3840;
         public const float GameH = 2160;
@@ -29,7 +24,7 @@ namespace Lunar
         private bool _stretch;
 
         /// <summary> Initializes SDL and creates window and renderer. </summary>
-        public Context(int w, int h, bool stretch)
+        public GLContext(int w, int h, bool stretch)
         {
             _stretch = stretch;
             _width = w; _height = h;
@@ -41,13 +36,13 @@ namespace Lunar
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
 
             _window = SDL.SDL_CreateWindow("Game", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, _width, _height, SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
+            //_window = SDL.SDL_CreateWindow("Game", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, _width, _height, SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN);
 
             Gl.Initialize();
 
             _context = SDL.SDL_GL_CreateContext(_window);
-            SetCurrentContext();
 
-            SDL.SDL_GL_SetSwapInterval(2);
+            SDL.SDL_GL_SetSwapInterval(1);
             Gl.ClearColor(0.2f, 0.2f, 0.2f, 1f);
             SetViewport(_width, _height);
 
@@ -59,19 +54,13 @@ namespace Lunar
             Gl.Enable(EnableCap.Blend);
         }
 
-        public void SetCurrentContext()
-        {
-            SDL.SDL_GL_MakeCurrent(_window, _context);
-        }
-
         private void SetViewport(float w, float h)
         {
-            SetCurrentContext();
             Gl.LoadIdentity();
             Gl.Viewport(0, 0, (int)w, (int)h);
 
             _scaling = Matrix4x4f.Identity;
-            if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); } 
+            if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
             else { _scaling.Scale(1f / (GameW * (w / h) / 2), 1f / GameH, 1); }
         }
 
@@ -83,14 +72,12 @@ namespace Lunar
 
         public void SwapBuffer()
         {
-            SetCurrentContext();
             SDL.SDL_GL_SwapWindow(_window);
             Gl.Clear(ClearBufferMask.ColorBufferBit);
         }
 
         public void Dispose()
         {
-            SetCurrentContext();
             SDL.SDL_GL_DeleteContext(_context);
         }
     }

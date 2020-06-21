@@ -1,12 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lunar
 {
-    class SceneController
+    public partial class SceneController
     {
         private static SceneController instance = null;
         public static SceneController Instance { get { instance = instance == null ? new SceneController() : instance; return instance; } }
@@ -77,13 +75,6 @@ namespace Lunar
                 if (!_scene.ContainsKey(id)) _scene.Add(id, 0);
                 _scene[id] = scene;
             }
-        }
-
-        public uint GetEntityID(string name)
-        {
-            foreach (uint id in _enteties)
-                if (_name[id] == name) return id;
-            return 0;
         }
 
         public void ForEach(Action<uint> action) => _enteties.Values.ForEach(action);

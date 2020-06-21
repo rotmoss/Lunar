@@ -1,10 +1,10 @@
 ﻿using System.Collections.Generic;
 using OpenGL;
-using System.Linq;
+using System;
 
 namespace Lunar
 {
-    partial class Graphics
+    partial class GraphicsController
     {
         private Dictionary<uint, List<Buffer>> _buffer;
 
@@ -16,6 +16,7 @@ namespace Lunar
             public uint id;
             public string name;
             public int size;
+            public float[] data;
         }
 
         public Buffer CreateBuffer(float[] bufferData, string attributeName, int size)
@@ -25,7 +26,13 @@ namespace Lunar
             Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer);
             Gl.BufferData(BufferTarget.ArrayBuffer, (uint)(4 * bufferData.Length), bufferData, BufferUsage.StreamDraw);
 
-            return new Buffer { id = buffer, name = attributeName, size = size };
+            return new Buffer { id = buffer, name = attributeName, size = size, data = bufferData };
+        }
+
+        public void UpdateBuffer(Buffer buffer, float[] bufferData)
+        {
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer.id);
+            Gl.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, (uint)(4 * bufferData.Length), bufferData);
         }
 
         public void BindBuffer(uint id) => Gl.BindBuffer(BufferTarget.ArrayBuffer, id);

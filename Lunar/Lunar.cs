@@ -12,35 +12,41 @@ namespace Lunar
 {
     class Lunar
     {
-        private static Context _context;
+        private static GLContext _context;
+        private static SceneController _sceneController = SceneController.Instance;
+        private static ScriptController _scriptController = ScriptController.Instance;
+        private static GraphicsController _graphicsController = GraphicsController.Instance;
+        private static InputController _inputController = InputController.Instance;
 
         static void Main(string[] args)
         {
             var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
-            InputManager.WindowChange += OnWindowChange;
+            _inputController.WindowChange += OnWindowChange;
 
-            _context = new Context(640, 480, false);
+            _context = new GLContext(640, 480, false);
             _context.Init();
 
             assemblyAwaiter.Wait();
-            ScriptController.Instance.Assembly = assemblyAwaiter.Result;
+            _scriptController.Assembly = assemblyAwaiter.Result;
 
-            SceneController.Instance.LoadScene("start.ini");
+            _sceneController.LoadScene("start.ini");
 
-            ScriptController.Instance.InitScripts();
-            Graphics.Instance.ForeachShader(x => Graphics.Instance.SetUniform(x, _context.Scaling, "uProjection"));
+            _scriptController.InitScripts();
+            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _context.Scaling, "uProjection"));
 
             while (true)
             {
-                InputManager.InvokeInputEvents(null);
+                Time.StartFrameTimer();
+                _inputController.InvokeInputEvents(null);
 
-                ScriptController.Instance.UpdateScripts();
-                ScriptController.Instance.LateUpdateScripts();
+                _scriptController.UpdateScripts();
+                _scriptController.LateUpdateScripts();
 
-                Graphics.Instance.UpdateMatrix(ScriptController.Instance.GetTransforms());
-                Graphics.Instance.Render(ScriptController.Instance.GetRenderQueue());
+                _graphicsController.TranslateBuffers(_scriptController.GetEntityTransforms());
+                _graphicsController.Render(_scriptController.GetRenderQueue());
 
                 _context.SwapBuffer();
+                Time.StopFrameTimer();
             }
         }
 
@@ -49,13 +55,13 @@ namespace Lunar
             if(eventArgs.EventTypes.Contains(WindowEvent.EXIT))
             { 
                 _context.Dispose();
-                Graphics.Instance.Dispose();
+                _graphicsController.Dispose();
                 Environment.Exit(0); 
             }
             if(eventArgs.EventTypes.Contains(WindowEvent.RESIZE))
             {
                 _context.UpdateWindowSize();
-                Graphics.Instance.ForeachShader(x => Graphics.Instance.SetUniform(x, _context.Scaling, "uProjection"));
+                _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _context.Scaling, "uProjection"));
             }
         }
     }

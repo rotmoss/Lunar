@@ -2,28 +2,10 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lunar
 {
-    public abstract class Script
-    {
-        public uint _id;
-        public bool _render;
-
-        public Transform _transform;
-
-        abstract public void Init();
-        abstract public void Update();
-        abstract public void LateUpdate();
-
-
-        public void CreateSprite(string texture, string vShader, string fShader) => Graphics.Instance.CreateSprite(_id, texture, vShader, fShader);
-        public void ScaleSprite(float w, float h) => Graphics.Instance.ScaleMatrix(_id, w, h);
-    }
-
-    class ScriptController
+    public partial class ScriptController
     {
         private static ScriptController instance = null;
         public static ScriptController Instance { get { instance = instance == null ? new ScriptController() : instance; return instance; } }
@@ -61,33 +43,7 @@ namespace Lunar
             _scripts[id] = _scripts[id].Add((Script)script);
         }
 
-        public uint GetId(Script script)
-        {
-            foreach(KeyValuePair<uint, Script[]> pair in _scripts)
-            {
-                foreach(Script value in pair.Value)
-                    if (script.Equals(value)) return pair.Key;
-            }
-            return 0;
-        }
-
-        public Transform GetTransform(uint id)
-        {
-            if (_transform.ContainsKey(id)) return _transform[id];
-            return null;
-        }
-
-        public void UpdateTransforms(Dictionary<uint, Transform> transforms)
-        {
-            foreach (KeyValuePair<uint, Transform> pair in transforms) {
-                if (_scripts.ContainsKey(pair.Key)) {
-                    foreach(Script script in _scripts[pair.Key])
-                        script._transform = pair.Value;
-                }
-            }
-        }
-
-        public Dictionary<uint, Transform> GetTransforms()
+        public Dictionary<uint, Transform> GetEntityTransforms()
         {
             Dictionary<uint, Transform> temp = new Dictionary<uint, Transform>();
 

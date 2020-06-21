@@ -1,6 +1,5 @@
 ﻿using System;
 using System.Collections.Generic;
-using SDL2;
 using static SDL2.SDL;
 
 namespace Lunar
@@ -43,28 +42,31 @@ namespace Lunar
         public List<KeyEvent> EventTypes;
     }
 
-    public static class InputManager
+    public class InputController
     {
-        public static event EventHandler<MouseEventArgs> MouseDown;
-        public static event EventHandler<MouseEventArgs> MouseUp;
-        public static event EventHandler<MouseEventArgs> MouseMove;
-        public static event EventHandler<MouseEventArgs> MouseWheel;
+        private static InputController instance = null;
+        public static InputController Instance { get { instance = instance == null ? new InputController() : instance; return instance; } }
 
-        public static event EventHandler<KeyboardEventArgs> KeyDown;
-        public static event EventHandler<KeyboardEventArgs> KeyUp;
+        public event EventHandler<MouseEventArgs> MouseDown;
+        public event EventHandler<MouseEventArgs> MouseUp;
+        public event EventHandler<MouseEventArgs> MouseMove;
+        public event EventHandler<MouseEventArgs> MouseWheel;
 
-        public static event EventHandler<WindowEventArgs> WindowChange;
+        public event EventHandler<KeyboardEventArgs> KeyDown;
+        public event EventHandler<KeyboardEventArgs> KeyUp;
 
-        private static SDL_Event input_event;
+        public event EventHandler<WindowEventArgs> WindowChange;
 
-        private static List<MouseEvent> mouseEvents = new List<MouseEvent>();
-        private static List<KeyEvent> keyboardEvents = new List<KeyEvent>();
-        private static List<WindowEvent> windowEvents = new List<WindowEvent>();
+        private SDL_Event input_event;
 
-        private static int x;
-        private static int y;
+        private List<MouseEvent> mouseEvents = new List<MouseEvent>();
+        private List<KeyEvent> keyboardEvents = new List<KeyEvent>();
+        private List<WindowEvent> windowEvents = new List<WindowEvent>();
 
-        public static void Clear()
+        private int x;
+        private int y;
+
+        public void Clear()
         {
             if (MouseDown != null)
             {
@@ -102,7 +104,7 @@ namespace Lunar
         /// apropriate events. </summary>
         /// <param name="instance"> The GameObject that will be affected by the event 
         /// invoke. inserting null makes the event affect all gameobjects. </param>
-        public static void InvokeInputEvents(object instance)
+        public void InvokeInputEvents(object instance)
         {
             mouseEvents.Remove(MouseEvent.WHEEL);
             windowEvents.Remove(WindowEvent.RESIZE);
@@ -352,7 +354,7 @@ namespace Lunar
             }
         }
 
-        private static void OnMouseDown(MouseEventArgs e, object instance)
+        private void OnMouseDown(MouseEventArgs e, object instance)
         {
             EventHandler<MouseEventArgs> handler = MouseDown;
             if (handler == null) { return; }
@@ -366,7 +368,7 @@ namespace Lunar
             handler?.Invoke(null, e);
         }
 
-        private static void OnMouseUp(MouseEventArgs e, object instance)
+        private void OnMouseUp(MouseEventArgs e, object instance)
         {
             EventHandler<MouseEventArgs> handler = MouseUp;
             if (handler == null) { return; }
@@ -380,7 +382,7 @@ namespace Lunar
             handler?.Invoke(null, e);
         }
 
-        private static void OnMouseWheel(MouseEventArgs e, object instance)
+        private void OnMouseWheel(MouseEventArgs e, object instance)
         {
             EventHandler<MouseEventArgs> handler = MouseWheel;
             if (handler == null) { return; }
@@ -394,7 +396,7 @@ namespace Lunar
             handler?.Invoke(null, e);
         }
 
-        private static void OnMouseMove(MouseEventArgs e, object instance)
+        private void OnMouseMove(MouseEventArgs e, object instance)
         {
             EventHandler<MouseEventArgs> handler = MouseMove;
             if (handler == null) { return; }
@@ -408,7 +410,7 @@ namespace Lunar
             handler?.Invoke(null, e);
         }
 
-        private static void OnKeyDown(KeyboardEventArgs e, object instance)
+        private void OnKeyDown(KeyboardEventArgs e, object instance)
         {
             EventHandler<KeyboardEventArgs> handler = KeyDown;
             if (handler == null) { return; }
@@ -422,7 +424,7 @@ namespace Lunar
             handler?.Invoke(null, e);
         }
 
-        private static void OnKeyUp(KeyboardEventArgs e, object instance)
+        private void OnKeyUp(KeyboardEventArgs e, object instance)
         {
             EventHandler<KeyboardEventArgs> handler = KeyUp;
             if (handler == null) { return; }
@@ -435,7 +437,7 @@ namespace Lunar
 
             handler?.Invoke(null, e);
         }
-        private static void OnWindowCange(WindowEventArgs e, object instance)
+        private void OnWindowCange(WindowEventArgs e, object instance)
         {
             EventHandler<WindowEventArgs> handler = WindowChange;
             if (handler == null) { return; }
@@ -449,17 +451,17 @@ namespace Lunar
             handler?.Invoke(null, e);
         }
 
-        private static void SetEvent(List<MouseEvent> list, MouseEvent entry)
+        private void SetEvent(List<MouseEvent> list, MouseEvent entry)
         { if (!list.Contains(entry)) { list.Add(entry); } }
-        private static void RemoveEvent(List<MouseEvent> list, MouseEvent entry)
+        private void RemoveEvent(List<MouseEvent> list, MouseEvent entry)
         { if (list.Contains(entry)) { list.Remove(entry); } }
-        private static void SetEvent(List<WindowEvent> list, WindowEvent entry)
+        private void SetEvent(List<WindowEvent> list, WindowEvent entry)
         { if (!list.Contains(entry)) { list.Add(entry); } }
-        private static void RemoveEvent(List<WindowEvent> list, WindowEvent entry)
+        private void RemoveEvent(List<WindowEvent> list, WindowEvent entry)
         { if (list.Contains(entry)) { list.Remove(entry); } }
-        private static void SetEvent(List<KeyEvent> list, KeyEvent entry)
+        private void SetEvent(List<KeyEvent> list, KeyEvent entry)
         { if (!list.Contains(entry)) { list.Add(entry); } }
-        private static void RemoveEvent(List<KeyEvent> list, KeyEvent entry)
+        private void RemoveEvent(List<KeyEvent> list, KeyEvent entry)
         { if (list.Contains(entry)) { list.Remove(entry); } }
     }
 }

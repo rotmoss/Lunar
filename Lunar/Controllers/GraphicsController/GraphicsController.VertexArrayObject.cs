@@ -1,13 +1,10 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using OpenGL;
 
 namespace Lunar
 {
-    partial class Graphics
+    partial class GraphicsController
     {
         private Dictionary<uint, uint> _vertexArray;
 
