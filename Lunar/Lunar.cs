@@ -16,7 +16,9 @@ namespace Lunar
         private static SceneController _sceneController = SceneController.Instance;
         private static ScriptController _scriptController = ScriptController.Instance;
         private static GraphicsController _graphicsController = GraphicsController.Instance;
+        private static PhysicsController _physicsController = PhysicsController.Instance;
         private static InputController _inputController = InputController.Instance;
+        private static Dictionary<uint, Transform> _transforms;  
 
         static void Main(string[] args)
         {
@@ -37,13 +39,22 @@ namespace Lunar
             while (true)
             {
                 Time.StartFrameTimer();
+
                 _inputController.InvokeInputEvents(null);
 
                 _scriptController.UpdateScripts();
-                _scriptController.LateUpdateScripts();
 
-                _graphicsController.TranslateBuffers(_scriptController.GetEntityTransforms());
+                _transforms = _scriptController.GetTransforms();
+
+                _graphicsController.TranslateBuffers(_transforms);
                 _graphicsController.Render(_scriptController.GetRenderQueue());
+
+                _physicsController.ApplyForces(ref _transforms);
+
+                _scriptController.UpdateTransforms(_transforms);
+                _scriptController.UpdateDeltaTime(Time.DeltaTime);
+
+                _scriptController.LateUpdateScripts();
 
                 _context.SwapBuffer();
                 Time.StopFrameTimer();

@@ -12,7 +12,10 @@ namespace Lunar
         protected GraphicsController GraphicsController;
         protected SceneController SceneController;
         protected ScriptController ScriptController;
+        protected PhysicsController PhysicsController;
         protected InputController InputController;
+
+        public float DeltaTime;
 
         public Script()
         {
@@ -20,6 +23,7 @@ namespace Lunar
             SceneController = SceneController.Instance;
             ScriptController = ScriptController.Instance;
             InputController = InputController.Instance;
+            PhysicsController = PhysicsController.Instance;
         }
 
         abstract public void Init();

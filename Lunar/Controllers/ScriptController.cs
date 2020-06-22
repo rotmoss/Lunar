@@ -43,7 +43,7 @@ namespace Lunar
             _scripts[id] = _scripts[id].Add((Script)script);
         }
 
-        public Dictionary<uint, Transform> GetEntityTransforms()
+        public Dictionary<uint, Transform> GetTransforms()
         {
             Dictionary<uint, Transform> temp = new Dictionary<uint, Transform>();
 
@@ -58,8 +58,24 @@ namespace Lunar
         public List<uint> GetRenderQueue()
         {
             List<uint> result = new List<uint>();
-            _scripts.Values.ToList().ForEach(x => result.AddRange(x.Where(x => x._render).Select(x => x._id).ToArray()));
+
+            foreach(Script[] scripts in _scripts.Values)
+                result.AddRange(scripts.Where(x => x._render).Select(x => x._id));
+            
             return result;
+        }
+
+        public void UpdateDeltaTime(float deltaTime)
+        {
+            foreach (Script[] scripts in _scripts.Values)
+                scripts.ToList().ForEach(x => x.DeltaTime = deltaTime);
+        }
+
+        public void UpdateTransforms(Dictionary<uint, Transform> transforms)
+        {
+            foreach (KeyValuePair<uint, Script[]> pair in _scripts)
+                foreach (Script script in pair.Value)
+                    script._transform = transforms[pair.Key];
         }
 
         public void InitScripts() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));

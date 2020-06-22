@@ -1,6 +1,6 @@
 ﻿namespace Lunar
 {
-    public class Transform
+    public struct Transform
     {
         public float x;
         public float y;
@@ -18,5 +18,7 @@
         }
 
         public static Transform operator +(Transform a, Transform b) => new Transform(a.x + b.x, a.y + b.y, a.z + b.z, a.w * b.w, a.h * b.h);
+        public static Transform operator +(Transform a, Vector b) => new Transform(a.x + b.X, a.y + b.Y, a.z, a.w, a.h);
+        public static Transform operator +(Vector a, Transform b) => new Transform(b.x + a.X, b.y + a.Y, b.z, b.w, b.h);
     }
 }
