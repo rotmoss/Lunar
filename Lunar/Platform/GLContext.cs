@@ -72,7 +72,7 @@ namespace Lunar
 
         public void SwapBuffer()
         {
-            SDL.SDL_GL_SwapWindow(_window);
+             SDL.SDL_GL_SwapWindow(_window);
             Gl.Clear(ClearBufferMask.ColorBufferBit);
         }
 

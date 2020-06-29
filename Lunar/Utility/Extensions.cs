@@ -8,13 +8,6 @@ namespace Lunar
 {
     public static class Extensions
     {
-        public static float[] Multiply(this float[] a, float b) 
-        {
-            for (int i = 0; i < a.Length; i++) 
-            { a[i] *= b; }
-
-            return a;
-        }
 
         public static T[] Add<T>(this T[] a, T b)
         {

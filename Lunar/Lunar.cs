@@ -28,6 +28,8 @@ namespace Lunar
             _context = new GLContext(640, 480, false);
             _context.Init();
 
+            FastMath.Init();
+
             assemblyAwaiter.Wait();
             _scriptController.Assembly = assemblyAwaiter.Result;
 
@@ -36,27 +38,44 @@ namespace Lunar
             _scriptController.InitScripts();
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _context.Scaling, "uProjection"));
 
+            assemblyAwaiter.Dispose();
+            GC.Collect();
+
+
             while (true)
             {
                 Time.StartFrameTimer();
 
+                //Invoke Input-Events
                 _inputController.InvokeInputEvents(null);
 
+                //Update all scripts
                 _scriptController.UpdateScripts();
 
+                //Retrieve Transforms from script
                 _transforms = _scriptController.GetTransforms();
 
+                //Update Transforms
+                _physicsController.ApplyForces(_transforms);
+
+                //Use Transfroms to Translate Graphics Data
                 _graphicsController.TranslateBuffers(_transforms);
+
+                //Send back Transforms to Script
+                _scriptController.UpdateTransforms(_transforms);
+
+                //Render Graphics
                 _graphicsController.Render(_scriptController.GetRenderQueue());
 
-                _physicsController.ApplyForces(ref _transforms);
-
-                _scriptController.UpdateTransforms(_transforms);
-                _scriptController.UpdateDeltaTime(Time.DeltaTime);
-
+                //Update all scripts again
                 _scriptController.LateUpdateScripts();
 
+                //Send DeltaTime to scripts
+                _scriptController.UpdateDeltaTime(Time.DeltaTime);
+
+                //Present FrameBuffer
                 _context.SwapBuffer();
+
                 Time.StopFrameTimer();
             }
         }
