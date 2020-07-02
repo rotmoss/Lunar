@@ -36,7 +36,7 @@ namespace Lunar
 
             ((Script)script)._id = id;
 
-            if (!_transform.ContainsKey(id)) _transform.Add(id, new Transform(0, 0, 0, 1, 1));
+            if (!_transform.ContainsKey(id)) _transform.Add(id, new Transform(0, 0, 1, 1));
             ((Script)script)._transform = _transform[id];
 
             if (!_scripts.ContainsKey(id)) _scripts.Add(id, new Script[0]);

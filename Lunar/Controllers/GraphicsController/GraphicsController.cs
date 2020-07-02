@@ -63,15 +63,15 @@ namespace Lunar
             float[] bufferData = new float[buffer.data.Length];
             for (int i = 0; i < bufferData.Length; i++) bufferData[i] = buffer.data[i];
 
-            bufferData[0] = (bufferData[0] + transform.x) * transform.w;
-            bufferData[3] = (bufferData[3] + transform.x) * transform.w;
-            bufferData[6] = (bufferData[6] + transform.x) * transform.w;
-            bufferData[9] = (bufferData[9] + transform.x) * transform.w;
+            bufferData[0] = (bufferData[0] + transform.position.X) * transform.scale.X;
+            bufferData[3] = (bufferData[3] + transform.position.X) * transform.scale.X;
+            bufferData[6] = (bufferData[6] + transform.position.X) * transform.scale.X;
+            bufferData[9] = (bufferData[9] + transform.position.X) * transform.scale.X;
 
-            bufferData[1] = (bufferData[1] + transform.y) * transform.h;
-            bufferData[4] = (bufferData[4] + transform.y) * transform.h;
-            bufferData[7] = (bufferData[7] + transform.y) * transform.h;
-            bufferData[10] = (bufferData[10] + transform.y) * transform.h;
+            bufferData[1] = (bufferData[1] + transform.position.Y) * transform.scale.Y;
+            bufferData[4] = (bufferData[4] + transform.position.Y) * transform.scale.Y;
+            bufferData[7] = (bufferData[7] + transform.position.Y) * transform.scale.Y;
+            bufferData[10] = (bufferData[10] + transform.position.Y) * transform.scale.Y;
 
             UpdateBuffer(buffer, bufferData);
         }

@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using System.Numerics;
 
 namespace Lunar
 {
@@ -13,8 +11,9 @@ namespace Lunar
 
         private PhysicsController()
         {
-            _activeForces = new Dictionary<uint, List<Vector2D>>();
+            _activeForces = new Dictionary<uint, List<Vector2>>();
             _drag = new Dictionary<uint, float>();
+            _colliders = new Dictionary<uint, Point[]>();
         }
     }
 }

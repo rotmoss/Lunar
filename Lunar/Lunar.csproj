@@ -132,6 +132,7 @@
     <None Include="GameData\Scenes\Menus\Start.ini" />
     <None Include="GameData\Scenes\Menus\Sub_menu.ini" />
     <None Include="GameData\Scenes\Room_1.ini" />
+    <None Include="GameData\Scripts\Room.cs" />
   </ItemGroup>
 
 </Project>
