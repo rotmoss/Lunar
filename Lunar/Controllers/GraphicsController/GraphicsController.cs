@@ -81,14 +81,14 @@ namespace Lunar
             Gl.UseProgram(_shader[id]);
             Gl.Enable(EnableCap.Texture2d);
             Gl.BindVertexArray(_vertexArray[id]);
-            Gl.BindTextures(_texture[id][_selectedTexture[id]]);
+            Gl.BindTexture(TextureTarget.Texture2d, _texture[id][_selectedTexture[id]]);
 
             Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
 
             Gl.UseProgram(0);
             Gl.BindVertexArray(0);
+            Gl.BindTexture(TextureTarget.Texture2d, 0);
             Gl.Disable(EnableCap.Texture2d);
-            Gl.BindTextures(0);
         }
 
         public void Render(List<uint> renderQueue) => renderQueue.ForEach(x => RenderQuad(x));

@@ -22,6 +22,7 @@ namespace Lunar
             }
 
             Gl.BindVertexArray(0);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             return vertexArray;
         }

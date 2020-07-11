@@ -25,10 +25,8 @@ namespace Lunar
             var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
             _inputController.WindowChange += OnWindowChange;
 
-            _context = new GLContext(640, 480, false);
+            _context = new GLContext(1920, 1080, false);
             _context.Init();
-
-            FastMath.Init();
 
             assemblyAwaiter.Wait();
             _scriptController.Assembly = assemblyAwaiter.Result;
@@ -40,7 +38,6 @@ namespace Lunar
 
             assemblyAwaiter.Dispose();
             GC.Collect();
-
 
             while (true)
             {

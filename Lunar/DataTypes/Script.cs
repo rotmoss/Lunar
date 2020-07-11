@@ -6,6 +6,7 @@ namespace Lunar
     {
         public uint _id;
         public bool _render;
+        public string _name;
 
         public Transform _transform;
 

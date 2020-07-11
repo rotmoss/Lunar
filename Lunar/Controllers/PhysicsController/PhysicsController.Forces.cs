@@ -47,10 +47,14 @@ namespace Lunar
                 for (int i = 0; i < _activeForces[id].Count; i++)
                     if (_activeForces[id][i].Length().AlmostEquals(0)) { _activeForces[id].RemoveAt(i); i--; }
 
-                if (isColliding(transforms[id], id)) continue;
+                //calculate new transform from forces
+                Transform result = transforms[id] + FastMath.SumVectors(_activeForces[id]) * Time.DeltaTime;
 
-                //Apply the vectors to the transform
-                transforms[id] += FastMath.SumVectors(_activeForces[id]) * Time.DeltaTime;
+                //Skip applying the transform if it will result in a collission
+                if (isColliding(result, id)) continue;
+
+                //Set transfrom to new value
+                transforms[id] = result;          
             }
         }
     }

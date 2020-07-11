@@ -25,6 +25,7 @@ namespace Lunar
 
             Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer);
             Gl.BufferData(BufferTarget.ArrayBuffer, (uint)(4 * bufferData.Length), bufferData, BufferUsage.StreamDraw);
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             return new Buffer { id = buffer, name = attributeName, size = size, data = bufferData };
         }
@@ -33,6 +34,8 @@ namespace Lunar
         {
             Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer.id);
             Gl.BufferSubData(BufferTarget.ArrayBuffer, IntPtr.Zero, (uint)(4 * bufferData.Length), bufferData);
+
+            Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
         }
 
         public void BindBuffer(uint id) => Gl.BindBuffer(BufferTarget.ArrayBuffer, id);

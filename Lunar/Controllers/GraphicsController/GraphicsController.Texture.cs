@@ -36,9 +36,8 @@ namespace Lunar
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
 
-            Gl.Disable(EnableCap.Texture2d);
-
             SDL_FreeSurface(surface);
+            Gl.Disable(EnableCap.Texture2d);
 
             return texture;
         }

@@ -18,7 +18,7 @@ namespace Lunar
         Dictionary<uint, Transform> _colliderOffset;
         EventHandler<CollisionEventArgs> _collisionEvent;
 
-        public void AddHitBox(uint id, Point[] polygon)
+        public void AddHitBox(uint id, params Point[] polygon)
         {
             if (!_colliders.ContainsKey(id)) _colliders.Add(id, new Point[0]);
             _colliders[id] = polygon;
@@ -31,6 +31,7 @@ namespace Lunar
 
         public bool isColliding(Transform transform, uint id)
         {
+            if (!_colliders.ContainsKey(id)) return false;
             bool result = false;
             Transform offset;
 
@@ -45,6 +46,7 @@ namespace Lunar
                 {
                     if (!(p + offset).isInside(_colliders[collider])) continue;
                     OnCollision(new CollisionEventArgs { id = collider }, id);
+                    _activeForces[id].Clear();
                     result = true;
                 }
             }

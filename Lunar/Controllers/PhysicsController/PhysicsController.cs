@@ -14,6 +14,7 @@ namespace Lunar
             _activeForces = new Dictionary<uint, List<Vector2>>();
             _drag = new Dictionary<uint, float>();
             _colliders = new Dictionary<uint, Point[]>();
+            _colliderOffset = new Dictionary<uint, Transform>();
         }
     }
 }
