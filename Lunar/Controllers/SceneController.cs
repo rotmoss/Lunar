@@ -35,7 +35,7 @@ namespace Lunar
             _visible = new Dictionary<uint, bool>();
         }
 
-        public void LoadScene(string file)
+        internal void LoadScene(string file)
         {
             if (!FileManager.ReadLines(file, "Scenes", out string[] result))
             { Console.WriteLine("Could not find scene " + file); return; }
@@ -50,7 +50,7 @@ namespace Lunar
             LoadEntites(result, id);
         }
 
-        public void LoadEntites(string[] file, uint scene)
+        internal void LoadEntites(string[] file, uint scene)
         {
             List<uint> ids = new List<uint>();
 
@@ -93,7 +93,6 @@ namespace Lunar
         }
         public Transform GetEntityTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : default;
         public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
-
         public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
         public void SetEntityVisibility(uint id, bool value) { if (_visible.ContainsKey(id)) _visible[id] = value; }
         public void ForEach(Action<uint> action) => _enteties.Values.ForEach(action);

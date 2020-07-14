@@ -20,7 +20,7 @@ namespace Lunar
             _scripts = new Dictionary<uint, Script[]>();
         }
 
-        public void AddScript(uint id, string className)
+        internal void AddScript(uint id, string className)
         {
             object script;
 
@@ -38,7 +38,7 @@ namespace Lunar
             _scripts[id] = _scripts[id].Add((Script)script);
         }
 
-        public Dictionary<uint, Transform> GetTransforms()
+        internal Dictionary<uint, Transform> GetTransforms()
         {
             Dictionary<uint, Transform> temp = new Dictionary<uint, Transform>();
 
@@ -50,7 +50,7 @@ namespace Lunar
             return temp;
         }
 
-        public List<uint> GetRenderQueue()
+        internal List<uint> GetRenderQueue()
         {
             List<uint> result = new List<uint>();
 
@@ -60,14 +60,15 @@ namespace Lunar
             return result;
         }
 
-        public void UpdateDeltaTime(float deltaTime)
+        internal void UpdateDeltaTime(float deltaTime)
         {
             foreach (Script[] scripts in _scripts.Values)
                 scripts.ToList().ForEach(x => x.DeltaTime = deltaTime);
         }
 
-        public void Init() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));
-        public void Update() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Update()));
-        public void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.LateUpdate()));
+        internal void Init() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));
+        internal void Update() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Update()));
+        internal void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.LateUpdate()));
+        internal void PostRender() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.PostRender()));
     }
 }

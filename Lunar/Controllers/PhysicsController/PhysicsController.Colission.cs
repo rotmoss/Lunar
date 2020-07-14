@@ -27,23 +27,24 @@ namespace Lunar
         public EventHandler<CollisionEventArgs> CollisionEvent { get => _collisionEvent; set => _collisionEvent = value; }
         private EventHandler<CollisionEventArgs> _collisionEvent;
 
-        public void AddHitBox(uint id, Vector2 size, Vector2 offset)
+        public void AddHitBox(uint id, bool isMovable, Vector2 size, Vector2 offset)
         {
             if (!_colliders.ContainsKey(id)) _colliders.Add(id, new Transform(0,0));
             _colliders[id] = new Transform(offset, size);
+
+            if (!_movable.ContainsKey(id)) _movable.Add(id, isMovable);
+            _movable[id] = isMovable;
         }
-        public void AddHitBox(uint id, Transform collider)
+        public void AddHitBox(uint id, bool isMovable, Transform collider)
         {
             if (!_colliders.ContainsKey(id)) _colliders.Add(id, new Transform(0, 0));
             _colliders[id] = collider;
-        }
-        public void IsMovable(uint id, bool movable)
-        {
-            if (!_movable.ContainsKey(id)) _movable.Add(id, movable);
-            _movable[id] = true;
+
+            if (!_movable.ContainsKey(id)) _movable.Add(id, isMovable);
+            _movable[id] = isMovable;
         }
 
-        public void CheckColission(Dictionary<uint, Transform> transforms)
+        internal void CheckColission(Dictionary<uint, Transform> transforms)
         {
             foreach (uint id in transforms.Keys)
             {
@@ -89,7 +90,7 @@ namespace Lunar
             }
         }
 
-        public Side isColliding(uint id, Dictionary<uint, Transform> transforms, out uint colliderId)
+        private Side isColliding(uint id, Dictionary<uint, Transform> transforms, out uint colliderId)
         {
             colliderId = 0;
             //Check if the enitity has a collider
@@ -112,7 +113,7 @@ namespace Lunar
             return Side.NONE;
         }
 
-        public Side CalculateSide(Vector2 a, Vector2 b)
+        private Side CalculateSide(Vector2 a, Vector2 b)
         {
             float angleBetween = (a - b).Angle();
 

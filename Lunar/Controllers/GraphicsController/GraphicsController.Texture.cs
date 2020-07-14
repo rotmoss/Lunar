@@ -15,7 +15,7 @@ namespace Lunar
         private Dictionary<uint, List<uint>> _texture;
         private Dictionary<uint, int> _selectedTexture;
 
-        public uint CreateTexture(string file, out int w, out int h)
+        internal uint CreateTexture(string file, out int w, out int h)
         {
             if(!LoadSurface(file, out IntPtr surface))
             { w = 0; h = 0; return 0; }
@@ -69,8 +69,8 @@ namespace Lunar
             return false;
         }
 
-        public void BindTexture(uint id) { Gl.Enable(EnableCap.Texture2d); Gl.BindTexture(TextureTarget.Texture2d, _texture[id][_selectedTexture[id]]); }
-        public void UnBindTexture() { Gl.BindTexture(TextureTarget.Texture2d, 0); Gl.Disable(EnableCap.Texture2d); }
-        public void DeleteTexture(uint id) => Gl.DeleteTextures(_texture[id][_selectedTexture[id]]);
+        internal void BindTexture(uint id) { Gl.Enable(EnableCap.Texture2d); Gl.BindTexture(TextureTarget.Texture2d, _texture[id][_selectedTexture[id]]); }
+        internal void UnBindTexture() { Gl.BindTexture(TextureTarget.Texture2d, 0); Gl.Disable(EnableCap.Texture2d); }
+        internal void DeleteTexture(uint id) => Gl.DeleteTextures(_texture[id][_selectedTexture[id]]);
     }
 }

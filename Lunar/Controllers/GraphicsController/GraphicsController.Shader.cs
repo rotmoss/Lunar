@@ -8,7 +8,7 @@ namespace Lunar
 {
     partial class GraphicsController
     {
-        private Dictionary<uint, uint> _shader;
+        private Dictionary<uint, uint> _shaders;
 
         public uint CreateShader(string vertexShader, string fragmentShader)
         {
@@ -28,7 +28,7 @@ namespace Lunar
             return shaderprogram;
         }
 
-        public string[] LoadShader(string file, ShaderType type)
+        internal string[] LoadShader(string file, ShaderType type)
         {
             if (!FileManager.ReadLines(file, "Shaders", out string[] shaderSource))
             {
@@ -38,7 +38,7 @@ namespace Lunar
             return shaderSource;
         }
 
-        public bool AttachShader(uint vs, uint fs, uint shader)
+        internal bool AttachShader(uint vs, uint fs, uint shader)
         {
             Gl.AttachShader(shader, vs); Gl.AttachShader(shader, fs);
             Gl.LinkProgram(shader); Gl.ValidateProgram(shader);
@@ -47,7 +47,7 @@ namespace Lunar
             return true;
         }
 
-        uint CompileShader(string[] source, ShaderType type)
+        internal uint CompileShader(string[] source, ShaderType type)
         {
             uint id = Gl.CreateShader(type);
             Gl.ShaderSource(id, source);
@@ -57,14 +57,14 @@ namespace Lunar
             return id;
         }
 
-        public string GetShaderInfo(uint id)
+        internal string GetShaderInfo(uint id)
         {
             StringBuilder infolog = new StringBuilder(1024);
             Gl.GetShaderInfoLog(id, 1024, out int infologLength, infolog);
             return infolog.ToString();
         }
 
-        public string GetProgramInfo(uint id)
+        internal string GetProgramInfo(uint id)
         {
             StringBuilder infolog = new StringBuilder(1024);
             Gl.GetProgramInfoLog(id, 1024, out int infologLength, infolog);
@@ -73,19 +73,18 @@ namespace Lunar
 
         public void SetUniform<T>(uint id, T data, string uniformName) where T : struct
         {
-            Gl.UseProgram(_shader[id]);
+            Gl.UseProgram(_shaders[id]);
 
-            if (data.GetType() == typeof(Matrix4x4f)) { Gl.UniformMatrix4f(Gl.GetUniformLocation(_shader[id], uniformName), 1, false, data); }
+            if (data.GetType() == typeof(Matrix4x4f)) { Gl.UniformMatrix4f(Gl.GetUniformLocation(_shaders[id], uniformName), 1, false, data); }
             else { throw new Exception(); }
 
             Gl.UseProgram(0);
         }
 
-        public void UnBindShader() => Gl.UseProgram(0);
-        public void BindShader(uint id) => Gl.UseProgram(_shader[id]);
-        public void DeleteShader(uint id) => Gl.DeleteProgram(_shader[id]);
-
-        public void ForeachShader(Action<uint> actions) => _shader.Keys.ToList().ForEach(actions);
+        internal void UnBindShader() => Gl.UseProgram(0);
+        internal void BindShader(uint id) => Gl.UseProgram(_shaders[id]);
+        internal void DeleteShader(uint id) => Gl.DeleteProgram(_shaders[id]);
+        public void ForeachShader(Action<uint> actions) => _shaders.Keys.ToList().ForEach(actions);
 
         string[] _vsDefault =
         {

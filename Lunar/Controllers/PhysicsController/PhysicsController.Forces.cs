@@ -31,7 +31,7 @@ namespace Lunar
             else _drag[id] = drag;
         }
 
-        public void ApplyForces(Dictionary<uint, Transform> transforms)
+        internal void ApplyForces(Dictionary<uint, Transform> transforms)
         {
             foreach (uint id in transforms.Keys)
             {
@@ -50,7 +50,7 @@ namespace Lunar
             }
         }
 
-        public void DrawColliders(Dictionary<uint, Transform> transforms)
+        internal void DrawColliders(Dictionary<uint, Transform> transforms)
         {
             Gl.LineWidth(2);
 

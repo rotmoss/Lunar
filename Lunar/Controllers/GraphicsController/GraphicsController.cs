@@ -11,18 +11,18 @@ namespace Lunar
         public static GraphicsController Instance { get { instance = instance == null ? new GraphicsController() : instance; return instance; } }
         private GraphicsController()
         {
-            _shader = new Dictionary<uint, uint>();
+            _shaders = new Dictionary<uint, uint>();
             _texture = new Dictionary<uint, List<uint>>();
             _selectedTexture = new Dictionary<uint, int>();
             _vertexArray = new Dictionary<uint, uint>();
-            _buffer = new Dictionary<uint, List<Buffer>>();
+            _buffers = new Dictionary<uint, List<Buffer>>();
             _graphicsTransform = new Dictionary<uint, Transform>();
         }
 
         public void AddShader(uint id, string vs, string fs)
         {
-            if (_shader.ContainsKey(id)) { Gl.DeleteProgram(_shader[id]); _shader.Remove(id); }
-            _shader.Add(id, CreateShader(vs, fs));
+            if (_shaders.ContainsKey(id)) { Gl.DeleteProgram(_shaders[id]); _shaders.Remove(id); }
+            _shaders.Add(id, CreateShader(vs, fs));
         }
 
         public void AddTexture(uint id, string texture, out int w, out int h)
@@ -34,31 +34,39 @@ namespace Lunar
 
         public void AddBuffer(uint id, int w, int h, int textureX = 0, int textureY = 0, int textureW = 1, int textureH = 1)
         {
-            if (_buffer.ContainsKey(id)) { _buffer[id].ForEach(x => Gl.DeleteProgram(x.id)); _buffer.Remove(id); }
-            _buffer.Add(id, new List<Buffer>());
+            if (_buffers.ContainsKey(id)) { _buffers[id].ForEach(x => Gl.DeleteProgram(x.id)); _buffers.Remove(id); }
+            _buffers.Add(id, new List<Buffer>());
 
-            _buffer[id].Add(CreateBuffer(GenVertexSquare(w, h), "aPos", 3));
-            _buffer[id].Add(CreateBuffer(GenTextureSquare(textureX, textureY, textureW, textureH), "aTexCoord", 2));
+            _buffers[id].Add(CreateBuffer(GenVertexSquare(w, h), "aPos", 3));
+            _buffers[id].Add(CreateBuffer(GenTextureSquare(textureX, textureY, textureW, textureH), "aTexCoord", 2));
 
             if (_vertexArray.ContainsKey(id)) { Gl.DeleteVertexArrays(_vertexArray[id]); _vertexArray.Remove(id); }
-            _vertexArray.Add(id, CreateVertexArray(_shader[id], _buffer[id]));
+            _vertexArray.Add(id, CreateVertexArray(_shaders[id], _buffers[id]));
+        }
+
+        public void CreateSprite(uint id, string file, string vertexShader, string fragmentShader, out int w, out int h)
+        {
+            AddShader(id, null, null);
+            AddTexture(id, file, out w, out h);
+            AddBuffer(id, w, h);
+            AddTransform(id);
         }
 
         /// <summary> Uses the graphics transform aswell as the entity transform to translate the vertexbuffer linked to the spcified id. </summary>
         /// <param name="transforms"> A dictionary containing all entity ids and their respective entity transform </param>
-        public void TranslateBuffers(Dictionary<uint, Transform> transforms)
+        internal void TranslateBuffers(Dictionary<uint, Transform> transforms)
         {
             foreach (KeyValuePair<uint, Transform> pair in transforms)
             {
-                if (_graphicsTransform.ContainsKey(pair.Key) && _buffer.ContainsKey(pair.Key)) {
+                if (_graphicsTransform.ContainsKey(pair.Key) && _buffers.ContainsKey(pair.Key)) {
                     TranslateBuffer(pair.Key, pair.Value + _graphicsTransform[pair.Key]);
                 }               
             }
         }
 
-        private void TranslateBuffer(uint id, Transform transform)
+        internal void TranslateBuffer(uint id, Transform transform)
         {
-            Buffer buffer = _buffer[id].Where(x => x.name == "aPos").FirstOrDefault();
+            Buffer buffer = _buffers[id].Where(x => x.name == "aPos").FirstOrDefault();
 
             float[] bufferData = new float[buffer.data.Length];
             for (int i = 0; i < bufferData.Length; i++) bufferData[i] = buffer.data[i];
@@ -76,9 +84,9 @@ namespace Lunar
             UpdateBuffer(buffer, bufferData);
         }
 
-        public void RenderQuad(uint id)
+        internal void RenderQuad(uint id)
         {
-            Gl.UseProgram(_shader[id]);
+            Gl.UseProgram(_shaders[id]);
             Gl.Enable(EnableCap.Texture2d);
             Gl.BindVertexArray(_vertexArray[id]);
             Gl.BindTexture(TextureTarget.Texture2d, _texture[id][_selectedTexture[id]]);
@@ -91,27 +99,27 @@ namespace Lunar
             Gl.Disable(EnableCap.Texture2d);
         }
 
-        public void Render(List<uint> renderQueue) => renderQueue.ForEach(x => RenderQuad(x));
+        internal void Render(List<uint> renderQueue) => renderQueue.ForEach(x => RenderQuad(x));
 
-        public void Dispose()
+        internal void Dispose()
         {
-            _buffer.Values.ToList().ForEach(x => Gl.DeleteBuffers(x.Select(y => y.id).ToArray()));
+            _buffers.Values.ToList().ForEach(x => Gl.DeleteBuffers(x.Select(y => y.id).ToArray()));
             _vertexArray.Values.ToList().ForEach(x => Gl.DeleteVertexArrays(x));
             _texture.Values.ToList().ForEach(x => x.ForEach(y => Gl.DeleteTextures(y)));
-            _shader.Values.ToList().ForEach(x => Gl.DeleteProgram(x));
-            _buffer.Clear();
+            _shaders.Values.ToList().ForEach(x => Gl.DeleteProgram(x));
+            _buffers.Clear();
             _vertexArray.Clear();
             _texture.Clear();
-            _shader.Clear();
+            _shaders.Clear();
             _graphicsTransform.Clear();
         }
 
-        public void Dispose(uint id)
+        internal void Dispose(uint id)
         {
-            if (_buffer.ContainsKey(id)) _buffer[id].Select(x => x.id).ToList().ForEach(y => Gl.DeleteBuffers(y)); _buffer.Remove(id);
+            if (_buffers.ContainsKey(id)) _buffers[id].Select(x => x.id).ToList().ForEach(y => Gl.DeleteBuffers(y)); _buffers.Remove(id);
             if (_vertexArray.ContainsKey(id)) Gl.DeleteBuffers(_vertexArray[id]); _vertexArray.Remove(id);
             if (_texture.ContainsKey(id)) _texture[id].ForEach(y => Gl.DeleteBuffers(y)); _texture.Remove(id);
-            if (_shader.ContainsKey(id)) Gl.DeleteBuffers(_shader[id]); _shader.Remove(id);
+            if (_shaders.ContainsKey(id)) Gl.DeleteBuffers(_shaders[id]); _shaders.Remove(id);
             if (_graphicsTransform.ContainsKey(id)) _graphicsTransform.Remove(id);
         }
     }

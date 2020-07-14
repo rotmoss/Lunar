@@ -35,8 +35,9 @@ namespace Lunar
             PhysicsController = PhysicsController.Instance;
         }
 
-        abstract public void Init();
-        abstract public void Update();
-        abstract public void LateUpdate();
+        virtual public void Init() { }
+        virtual public void Update() { }
+        virtual public void LateUpdate() { }
+        virtual public void PostRender() { }
     }
 }

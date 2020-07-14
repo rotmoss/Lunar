@@ -8,7 +8,7 @@ namespace Lunar
     {
         private Dictionary<uint, uint> _vertexArray;
 
-        public uint CreateVertexArray(uint shaderProgram, List<Buffer> buffers)
+        internal uint CreateVertexArray(uint shaderProgram, List<Buffer> buffers)
         {
             uint vertexArray = Gl.GenVertexArray();
 
@@ -27,8 +27,8 @@ namespace Lunar
             return vertexArray;
         }
 
-        public void BindVertexArray(uint id) => Gl.BindVertexArray(_vertexArray[id]);
-        public void UnBindVertexArray() => Gl.BindVertexArray(0);
-        public void DeleteVertexArray(uint id) => Gl.DeleteVertexArrays(_vertexArray[id]);
+        internal void BindVertexArray(uint id) => Gl.BindVertexArray(_vertexArray[id]);
+        internal void UnBindVertexArray() => Gl.BindVertexArray(0);
+        internal void DeleteVertexArray(uint id) => Gl.DeleteVertexArrays(_vertexArray[id]);
     }
 }
