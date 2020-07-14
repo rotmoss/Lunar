@@ -5,10 +5,18 @@ namespace Lunar
     public abstract class Script
     {
         public uint _id;
-        public bool _render;
         public string _name;
 
-        public Transform _transform;
+        public Transform _transform 
+        { 
+            get { return SceneController.GetEntityTransform(_id); } 
+            set { SceneController.SetEntityTransform(_id, value); } 
+        }
+        public bool _visible 
+        { 
+            get { return SceneController.GetEntityVisibility(_id); } 
+            set { SceneController.SetEntityVisibility(_id, value); } 
+        }
 
         protected GraphicsController GraphicsController;
         protected SceneController SceneController;

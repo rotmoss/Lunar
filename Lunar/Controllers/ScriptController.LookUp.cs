@@ -14,18 +14,6 @@ namespace Lunar
             return 0;
         }
 
-        public Transform GetTransform(uint id)
-        {
-            if (_transform.ContainsKey(id)) return _transform[id];
-            return default;
-        }
-
-        public Transform GetTransform(Script script)
-        {
-            if (_transform.ContainsKey(script._id)) return _transform[script._id];
-            return default;
-        }
-
         public Script[] GetScriptsByType<T>()
         {
             List<Script> scripts = new List<Script>();

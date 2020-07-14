@@ -49,20 +49,22 @@ namespace Lunar
                 //Update all scripts
                 _scriptController.UpdateScripts();
 
-                //Retrieve Transforms from script
-                _transforms = _scriptController.GetTransforms();
+                Dictionary<uint, Transform> transforms = _sceneController.Transforms;
 
                 //Update Transforms
-                _physicsController.ApplyForces(_transforms);
+                _physicsController.ApplyForces(transforms);
+
+                //Check Colissions
+                _physicsController.CheckColission(transforms);
 
                 //Use Transfroms to Translate Graphics Data
-                _graphicsController.TranslateBuffers(_transforms);
-
-                //Send back Transforms to Script
-                _scriptController.UpdateTransforms(_transforms);
+                _graphicsController.TranslateBuffers(transforms);
 
                 //Render Graphics
-                _graphicsController.Render(_scriptController.GetRenderQueue());
+                _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());
+
+                //Draw colliders as an outline on top of everything else
+                _physicsController.DrawColliders(transforms);
 
                 //Update all scripts again
                 _scriptController.LateUpdateScripts();

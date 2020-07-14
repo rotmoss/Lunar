@@ -16,7 +16,13 @@ namespace Lunar
         private Dictionary<uint, uint> _parent;
         private Dictionary<uint, uint> _scene;
 
-        public SceneController()
+        public Dictionary<uint, Transform> Transforms { get { return _transforms; } }
+        private Dictionary<uint, Transform> _transforms;
+
+        public Dictionary<uint, bool> Visible { get { return _visible; } }
+        private Dictionary<uint, bool> _visible;
+
+        private SceneController()
         {
             _enteties = new IdCollection();
 
@@ -24,6 +30,9 @@ namespace Lunar
             _enabled = new Dictionary<uint, bool>();
             _parent = new Dictionary<uint, uint>();
             _scene = new Dictionary<uint, uint>();
+
+            _transforms = new Dictionary<uint, Transform>();
+            _visible = new Dictionary<uint, bool>();
         }
 
         public void LoadScene(string file)
@@ -55,18 +64,18 @@ namespace Lunar
                 foreach (string token in tokens)
                 {
                     string[] values = token.Split(new char[] { '=', '"' }).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                    if (values[0] == "name") { 
-                        if (!_name.ContainsKey(id)) _name.Add(id, ""); 
-                        _name[id] = values[1]; 
+                    if (values[0] == "name") {
+                        if (!_name.ContainsKey(id)) _name.Add(id, "");
+                        _name[id] = values[1];
                     }
-                    if (values[0] == "enabled") { 
-                        if (!_enabled.ContainsKey(id)) _enabled.Add(id, true); 
+                    if (values[0] == "enabled") {
+                        if (!_enabled.ContainsKey(id)) _enabled.Add(id, true);
                         bool.TryParse(values[1], out bool enabled);
                         _enabled[id] = enabled;
                     }
-                    if (values[0] == "parent") { 
-                        if (!_parent.ContainsKey(id)) _parent.Add(id, 0); 
-                        _parent[id] = GetEntityID(values[1]); 
+                    if (values[0] == "parent") {
+                        if (!_parent.ContainsKey(id)) _parent.Add(id, 0);
+                        _parent[id] = GetEntityID(values[1]);
                     }
                     if (values[0] == "script") {
                         ScriptController.Instance.AddScript(id, values[1]);
@@ -74,9 +83,19 @@ namespace Lunar
                 }
                 if (!_scene.ContainsKey(id)) _scene.Add(id, 0);
                 _scene[id] = scene;
+
+                if (!_transforms.ContainsKey(id)) _transforms.Add(id, new Transform(0, 0, 1, 1));
+                else { _transforms[id] = new Transform(0, 0, 1, 1); }
+
+                if (!_visible.ContainsKey(id)) _visible.Add(id, true);
+                else { _visible[id] = true; }
             }
         }
+        public Transform GetEntityTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : default;
+        public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
 
+        public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
+        public void SetEntityVisibility(uint id, bool value) { if (_visible.ContainsKey(id)) _visible[id] = value; }
         public void ForEach(Action<uint> action) => _enteties.Values.ForEach(action);
     }
 }

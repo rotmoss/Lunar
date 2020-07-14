@@ -6,8 +6,8 @@ namespace Lunar
 {
     class GLContext
     {
-        public const float GameW = 3840;
-        public const float GameH = 2160;
+        public const float GameW = 1920;
+        public const float GameH = 1080;
 
         private int _width;
         private int _height;
@@ -22,6 +22,7 @@ namespace Lunar
         public float Height => _height;
 
         private bool _stretch;
+        private const float ASPECT_RATIO = 16.0f / 9.0f;
 
         /// <summary> Initializes SDL and creates window and renderer. </summary>
         public GLContext(int w, int h, bool stretch)
@@ -61,7 +62,7 @@ namespace Lunar
 
             _scaling = Matrix4x4f.Identity;
             if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
-            else { _scaling.Scale(1f / (GameW * (w / h) / 2), 1f / GameH, 1); }
+            else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / (w / h))), 1f / GameH, 1); }
         }
 
         public void UpdateWindowSize()

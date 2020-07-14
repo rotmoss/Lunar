@@ -132,6 +132,8 @@
     <None Include="GameData\Scenes\Menus\Start.ini" />
     <None Include="GameData\Scenes\Menus\Sub_menu.ini" />
     <None Include="GameData\Scenes\Room_1.ini" />
+    <None Include="GameData\Scripts\Fluga.cs" />
+    <Compile Include="GameData\Scripts\Sprite.cs" />
     <Compile Include="GameData\Scripts\TestRoom.cs" />
     <Compile Include="GameData\Scripts\Room.cs" />
   </ItemGroup>

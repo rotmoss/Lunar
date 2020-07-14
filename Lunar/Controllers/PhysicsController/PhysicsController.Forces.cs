@@ -2,9 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using System.Runtime.Intrinsics;
-using System.Text;
-using System.Threading.Tasks;
+using OpenGL;
 
 namespace Lunar
 {
@@ -47,14 +45,25 @@ namespace Lunar
                 for (int i = 0; i < _activeForces[id].Count; i++)
                     if (_activeForces[id][i].Length().AlmostEquals(0)) { _activeForces[id].RemoveAt(i); i--; }
 
-                //calculate new transform from forces
-                Transform result = transforms[id] + FastMath.SumVectors(_activeForces[id]) * Time.DeltaTime;
+                //calculate new transform from forces and add it
+                transforms[id] += FastMath.SumVectors(_activeForces[id]) * Time.DeltaTime;  
+            }
+        }
 
-                //Skip applying the transform if it will result in a collission
-                if (isColliding(result, id)) continue;
+        public void DrawColliders(Dictionary<uint, Transform> transforms)
+        {
+            Gl.LineWidth(2);
 
-                //Set transfrom to new value
-                transforms[id] = result;          
+            foreach (uint id in transforms.Keys)
+            {
+                if (!_colliders.ContainsKey(id)) continue;
+
+                Gl.Begin(PrimitiveType.LineLoop);
+                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X - _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y - _colliders[id].scale.Y) / 270);
+                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X - _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y + _colliders[id].scale.Y) / 270);
+                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X + _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y + _colliders[id].scale.Y) / 270);
+                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X + _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y - _colliders[id].scale.Y) / 270);
+                Gl.End();
             }
         }
     }

@@ -11,7 +11,6 @@ namespace Lunar
         public static ScriptController Instance { get { instance = instance == null ? new ScriptController() : instance; return instance; } }
 
         private Dictionary<uint, Script[]> _scripts;
-        private Dictionary<uint, Transform> _transform;
 
         private Assembly _assembly;
         public Assembly Assembly { set { _assembly = value; } }
@@ -19,7 +18,6 @@ namespace Lunar
         public ScriptController()
         {
             _scripts = new Dictionary<uint, Script[]>();
-            _transform = new Dictionary<uint, Transform>();
         }
 
         public void AddScript(uint id, string className)
@@ -35,10 +33,7 @@ namespace Lunar
             { Console.WriteLine("Script " + className + " does not inherit from script"); return; }
 
             ((Script)script)._id = id;
-
-            if (!_transform.ContainsKey(id)) _transform.Add(id, new Transform(0, 0, 1, 1));
-            ((Script)script)._transform = _transform[id];
-
+   
             if (!_scripts.ContainsKey(id)) _scripts.Add(id, new Script[0]);
             _scripts[id] = _scripts[id].Add((Script)script);
         }
@@ -60,7 +55,7 @@ namespace Lunar
             List<uint> result = new List<uint>();
 
             foreach(Script[] scripts in _scripts.Values)
-                result.AddRange(scripts.Where(x => x._render).Select(x => x._id));
+                result.AddRange(scripts.Where(x => x._visible).Select(x => x._id));
             
             return result;
         }
@@ -69,13 +64,6 @@ namespace Lunar
         {
             foreach (Script[] scripts in _scripts.Values)
                 scripts.ToList().ForEach(x => x.DeltaTime = deltaTime);
-        }
-
-        public void UpdateTransforms(Dictionary<uint, Transform> transforms)
-        {
-            foreach (KeyValuePair<uint, Script[]> pair in _scripts)
-                foreach (Script script in pair.Value)
-                    script._transform = transforms[pair.Key];
         }
 
         public void InitScripts() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));
