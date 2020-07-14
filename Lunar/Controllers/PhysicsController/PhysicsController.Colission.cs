@@ -19,6 +19,7 @@ namespace Lunar
         public class CollisionEventArgs : EventArgs
         {
             public uint id;
+            public Side side;
         }
 
         private Dictionary<uint, bool> _movable;
@@ -49,54 +50,62 @@ namespace Lunar
                 //We dont want to move stationary objects
                 if (!_movable.ContainsKey(id) || _movable[id] == false) continue;
 
+                float topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
+
                 switch (isColliding(id, transforms, out uint colliderId))
                 {
                     case Side.TOP:
-                        float bottomA = transforms[id].position.Y + _colliders[id].position.Y - _colliders[id].scale.Y;
-                        float topB = transforms[colliderId].position.Y + _colliders[colliderId].position.Y + _colliders[colliderId].scale.Y;
+                        bottomA = transforms[id].position.Y + _colliders[id].position.Y - _colliders[id].scale.Y;
+                        topB = transforms[colliderId].position.Y + _colliders[colliderId].position.Y + _colliders[colliderId].scale.Y;
 
                         transforms[id] += new Vector2(0, topB - bottomA);
+                        OnCollision(new CollisionEventArgs { id = colliderId, side = Side.TOP }, id);
                         break;
+
                     case Side.BOTTOM:
-                        float topA = transforms[id].position.Y + _colliders[id].position.Y + _colliders[id].scale.Y;
-                        float bottomB = transforms[colliderId].position.Y + _colliders[colliderId].position.Y - _colliders[colliderId].scale.Y;
+                        topA = transforms[id].position.Y + _colliders[id].position.Y + _colliders[id].scale.Y;
+                        bottomB = transforms[colliderId].position.Y + _colliders[colliderId].position.Y - _colliders[colliderId].scale.Y;
 
                         transforms[id] += new Vector2(0, bottomB - topA);
+                        OnCollision(new CollisionEventArgs { id = colliderId, side = Side.BOTTOM }, id);
                         break;
+
                     case Side.LEFT:
-                        float rightA = transforms[id].position.X + _colliders[id].position.X + _colliders[id].scale.X;
-                        float leftB = transforms[colliderId].position.X + _colliders[colliderId].position.X - _colliders[colliderId].scale.X;
+                        rightA = transforms[id].position.X + _colliders[id].position.X + _colliders[id].scale.X;
+                        leftB = transforms[colliderId].position.X + _colliders[colliderId].position.X - _colliders[colliderId].scale.X;
 
                         transforms[id] += new Vector2(leftB - rightA, 0);
+                        OnCollision(new CollisionEventArgs { id = colliderId, side = Side.LEFT }, id);
                         break;
+
                     case Side.RIGHT:
-                        float leftA = transforms[id].position.X + _colliders[id].position.X - _colliders[id].scale.X;
-                        float rightB = transforms[colliderId].position.X + _colliders[colliderId].position.X + _colliders[colliderId].scale.X;
+                        leftA = transforms[id].position.X + _colliders[id].position.X - _colliders[id].scale.X;
+                        rightB = transforms[colliderId].position.X + _colliders[colliderId].position.X + _colliders[colliderId].scale.X;
 
                         transforms[id] += new Vector2(rightB - leftA, 0);
+                        OnCollision(new CollisionEventArgs { id = colliderId, side = Side.RIGHT }, id);
                         break;
                 }
             }
         }
 
-        public Side isColliding(uint id, Dictionary<uint, Transform> transforms, out uint collider)
+        public Side isColliding(uint id, Dictionary<uint, Transform> transforms, out uint colliderId)
         {
-            collider = 0;
+            colliderId = 0;
             //Check if the enitity has a collider
             if (!_colliders.ContainsKey(id))  return Side.NONE;
 
-            foreach (uint colliderID in _colliders.Keys)
+            foreach (uint collider in _colliders.Keys)
             {
                 //The collider shouldn't collide withn itself
-                if (id == colliderID) continue;
+                if (id == collider) continue;
 
                 Transform a = _colliders[id] + transforms[id];
-                Transform b = _colliders[colliderID] + transforms[colliderID];
+                Transform b = _colliders[collider] + transforms[collider];
 
                 if (DoesOverlap(a, b))
                 {
-                    collider = colliderID;
-                    OnCollision(new CollisionEventArgs { id = colliderID }, id);
+                    colliderId = collider;
                     return CalculateSide(a.position, b.position);
                 }
             }
@@ -141,35 +150,17 @@ namespace Lunar
 
         private bool DoesOverlap(Transform a, Transform b)
         {
-            //The sides of the rectangles
-            float leftA, leftB;
-            float rightA, rightB;
-            float topA, topB;
-            float bottomA, bottomB;
-
-            //Calculate the sides of rect A
-            leftA = a.position.X - a.scale.X;
-            rightA = a.position.X + a.scale.X;
-            bottomA = a.position.Y - a.scale.Y;
-            topA = a.position.Y + a.scale.Y;
-
-            //Calculate the sides of rect B
-            leftB = b.position.X - b.scale.X; ;
-            rightB = b.position.X + b.scale.X;
-            bottomB = b.position.Y - b.scale.Y;
-            topB = b.position.Y + b.scale.Y;
-
             //If any of the sides from A are outside of B
-            if (bottomA >= topB)
+            if (a.position.Y - a.scale.Y >= b.position.Y + b.scale.Y)
                 return false;
 
-            if (topA <= bottomB)
+            if (a.position.Y + a.scale.Y <= b.position.Y - b.scale.Y)
                 return false;
 
-            if (rightA <= leftB)
+            if (a.position.X + a.scale.X <= b.position.X - b.scale.X)
                 return false;
 
-            if (leftA >= rightB)
+            if (a.position.X - a.scale.X >= b.position.X + b.scale.X)
                 return false;
 
             //If none of the sides from A are outside B
