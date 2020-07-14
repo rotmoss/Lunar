@@ -66,8 +66,8 @@ namespace Lunar
                 scripts.ToList().ForEach(x => x.DeltaTime = deltaTime);
         }
 
-        public void InitScripts() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));
-        public void UpdateScripts() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Update()));
-        public void LateUpdateScripts() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.LateUpdate()));
+        public void Init() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));
+        public void Update() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Update()));
+        public void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.LateUpdate()));
     }
 }

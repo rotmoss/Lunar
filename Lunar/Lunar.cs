@@ -33,7 +33,7 @@ namespace Lunar
 
             _sceneController.LoadScene("start.ini");
 
-            _scriptController.InitScripts();
+            _scriptController.Init();
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _context.Scaling, "uProjection"));
 
             assemblyAwaiter.Dispose();
@@ -47,7 +47,7 @@ namespace Lunar
                 _inputController.InvokeInputEvents(null);
 
                 //Update all scripts
-                _scriptController.UpdateScripts();
+                _scriptController.Update();
 
                 Dictionary<uint, Transform> transforms = _sceneController.Transforms;
 
@@ -67,10 +67,12 @@ namespace Lunar
                 _physicsController.DrawColliders(transforms);
 
                 //Update all scripts again
-                _scriptController.LateUpdateScripts();
+                _scriptController.LateUpdate();
 
                 //Send DeltaTime to scripts
                 _scriptController.UpdateDeltaTime(Time.DeltaTime);
+
+                _scriptController.PostRender();
 
                 //Present FrameBuffer
                 _context.SwapBuffer();
