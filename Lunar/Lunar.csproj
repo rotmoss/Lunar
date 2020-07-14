@@ -121,19 +121,4 @@
     <None Remove="C:\Users\Jonatan\Documents\GitHub\Lunar\Lunar\GameData\Scripts\Movement.cs" />
   </ItemGroup>
 
-  <ItemGroup>
-    <Compile Include="C:\Users\Jonatan\Documents\GitHub\Lunar\Lunar\GameData\Scripts\Movement.cs">
-      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
-    </Compile>
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Include="GameData\Scenes\Menus\CharacterSelect.ini" />
-    <None Include="GameData\Scenes\Menus\Start.ini" />
-    <None Include="GameData\Scenes\Menus\Sub_menu.ini" />
-    <None Include="GameData\Scenes\Room_1.ini" />
-    <None Include="GameData\Scripts\Fluga.cs" />
-    <Compile Include="GameData\Scripts\TestRoom.cs" />
-  </ItemGroup>
-
 </Project>

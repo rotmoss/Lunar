@@ -39,7 +39,10 @@ namespace Lunar
 
         public SyntaxTree[] LoadScripts()
         {
-            string[] scripts = Directory.GetFiles(FileManager.Path + "Scripts" + FileManager.Seperator, "*.*", SearchOption.AllDirectories);
+            string path = FileManager.Path + "Scripts" + FileManager.Seperator;
+            if (!Directory.Exists(path)) return null;
+
+            string[] scripts = Directory.GetFiles(path, "*.*", SearchOption.AllDirectories);
 
             List<SyntaxTree> syntaxTrees = new List<SyntaxTree>();
 
