@@ -15,7 +15,7 @@ namespace Lunar
         private Assembly _assembly;
         public Assembly Assembly { set { _assembly = value; } }
 
-        public ScriptController()
+        private ScriptController()
         {
             _scripts = new Dictionary<uint, Script[]>();
         }

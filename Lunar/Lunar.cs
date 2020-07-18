@@ -10,23 +10,26 @@ using System.Threading.Tasks;
 
 namespace Lunar
 {
-    class Lunar
+    public class Lunar
     {
-        private static GLContext _context;
+        private static WindowController _windowController = WindowController.Instance;
         private static SceneController _sceneController = SceneController.Instance;
         private static ScriptController _scriptController = ScriptController.Instance;
         private static GraphicsController _graphicsController = GraphicsController.Instance;
         private static PhysicsController _physicsController = PhysicsController.Instance;
         private static InputController _inputController = InputController.Instance;
-        private static Dictionary<uint, Transform> _transforms;  
 
         static void Main(string[] args)
         {
             var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
             _inputController.WindowChange += OnWindowChange;
+            _inputController.KeyDown += OnKeyDown;
 
-            _context = new GLContext(1920, 1080, false);
-            _context.Init();
+            _windowController.Init();
+            _windowController.Fullscreen = false;
+            _windowController.Width = 960;
+            _windowController.Height = 540;
+            _windowController.CreateWindowAndContext();
 
             assemblyAwaiter.Wait();
             _scriptController.Assembly = assemblyAwaiter.Result;
@@ -34,7 +37,7 @@ namespace Lunar
             _sceneController.LoadScene("start.ini");
 
             _scriptController.Init();
-            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _context.Scaling, "uProjection"));
+            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
 
             assemblyAwaiter.Dispose();
             GC.Collect();
@@ -75,9 +78,24 @@ namespace Lunar
                 _scriptController.PostRender();
 
                 //Present FrameBuffer
-                _context.SwapBuffer();
+                _windowController.SwapBuffer();
 
                 Time.StopFrameTimer();
+            }
+        }
+
+        static void OnKeyDown(object sender, KeyboardEventArgs eventArgs) 
+        {
+            if(eventArgs.EventTypes.Contains(KeyEvent.ESC))
+            {
+                _windowController.Dispose();
+                _graphicsController.Dispose();
+                Environment.Exit(0);
+            }
+            if (eventArgs.EventTypes.Contains(KeyEvent.ENTER) && eventArgs.EventTypes.Contains(KeyEvent.LCTRL))
+            {
+                _windowController.Fullscreen = !_windowController.Fullscreen;
+                _windowController.CreateWindowAndContext();
             }
         }
 
@@ -85,14 +103,14 @@ namespace Lunar
         {
             if(eventArgs.EventTypes.Contains(WindowEvent.EXIT))
             { 
-                _context.Dispose();
+                _windowController.Dispose();
                 _graphicsController.Dispose();
                 Environment.Exit(0); 
             }
             if(eventArgs.EventTypes.Contains(WindowEvent.RESIZE))
             {
-                _context.UpdateWindowSize();
-                _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _context.Scaling, "uProjection"));
+                _windowController.UpdateWindowSize();
+                _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
             }
         }
     }

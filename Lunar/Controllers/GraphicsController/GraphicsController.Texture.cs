@@ -12,7 +12,7 @@ namespace Lunar
 {
     partial class GraphicsController
     {
-        private Dictionary<uint, List<uint>> _texture;
+        private Dictionary<uint, List<uint>> _textures;
         private Dictionary<uint, int> _selectedTexture;
 
         internal uint CreateTexture(string file, out int w, out int h)
@@ -46,7 +46,7 @@ namespace Lunar
         {
             if(!_selectedTexture.ContainsKey(id)) { return; }
 
-            if (index < _texture.Count) _selectedTexture[id] = index;
+            if (index < _textures.Count) _selectedTexture[id] = index;
             else _selectedTexture[id] = 0;
         }
 
@@ -69,8 +69,8 @@ namespace Lunar
             return false;
         }
 
-        internal void BindTexture(uint id) { Gl.Enable(EnableCap.Texture2d); Gl.BindTexture(TextureTarget.Texture2d, _texture[id][_selectedTexture[id]]); }
+        internal void BindTexture(uint id) { Gl.Enable(EnableCap.Texture2d); Gl.BindTexture(TextureTarget.Texture2d, _textures[id][_selectedTexture[id]]); }
         internal void UnBindTexture() { Gl.BindTexture(TextureTarget.Texture2d, 0); Gl.Disable(EnableCap.Texture2d); }
-        internal void DeleteTexture(uint id) => Gl.DeleteTextures(_texture[id][_selectedTexture[id]]);
+        internal void DeleteTexture(uint id) => Gl.DeleteTextures(_textures[id][_selectedTexture[id]]);
     }
 }

@@ -3,17 +3,22 @@ using System.Collections.Generic;
 using OpenGL;
 using System.Text;
 using System.Linq;
+using System.Text.RegularExpressions;
 
 namespace Lunar
 {
     partial class GraphicsController
     {
         private Dictionary<uint, uint> _shaders;
-
         public uint CreateShader(string vertexShader, string fragmentShader)
         {
             string[] vertexSource = LoadShader(vertexShader, ShaderType.VertexShader);
             string[] fragmentSource = LoadShader(fragmentShader, ShaderType.FragmentShader);
+
+            for (int i = 0; i < vertexSource.Length; i++)
+                vertexSource[i] = Regex.Unescape(vertexSource[i]);
+            for (int i = 0; i < fragmentSource.Length; i++)
+                fragmentSource[i] = Regex.Unescape(fragmentSource[i]);
 
             uint vs = CompileShader(vertexSource, ShaderType.VertexShader);
             uint fs = CompileShader(fragmentSource, ShaderType.FragmentShader);
@@ -95,34 +100,14 @@ namespace Lunar
             "uniform mat4 uModelView;\n",
             "out vec2 TexCoord;\n",
             "\n",
-            "int roundUp(int numToRound, int multiple)\n",
-            "{\n",
-            "   if (multiple == 0) {\n",
-            "       return numToRound;\n",
-            "   }\n",
-            "\n",
-            "   int remainder = numToRound % multiple;\n",
-            "   if (remainder == 0) {\n",
-            "       return numToRound;\n",
-            "   }\n",
-            "\n",
-            "   if (numToRound < 0) {\n",
-            "       return -(abs(numToRound) - remainder);\n",
-            "   }\n",
-            "   else {\n",
-            "       return numToRound + multiple - remainder;\n",
-            "   }\n",
-            "}",
-            "\n",
             "void main()\n",
             "{\n",
-            "   vec3 newPos = vec3(roundUp(int(round(aPos.x)) * 4, 8), roundUp(int(round(aPos.y)) * 4, 8), aPos.z);\n",
-            "   gl_Position = uProjection * vec4(newPos, 1.0);\n",
+            "   gl_Position = uProjection * vec4(aPos, 1.0);\n",
             "   TexCoord = aTexCoord;\n",
             "}\n"
         };
         string[] _fsDefault =
-           {
+        {
             "#version 330 core\n",
             "out vec4 FragColor;\n",
             "in vec2 TexCoord;\n",

@@ -1,0 +1,102 @@
+﻿using System;
+using SDL2;
+using OpenGL;
+
+namespace Lunar
+{
+    class WindowController
+    {
+        private static WindowController instance = null;
+        public static WindowController Instance { get { instance = instance == null ? new WindowController() : instance; return instance; } }
+
+        private IntPtr _context;
+        private IntPtr _window;
+
+        public const float GameW = 1920;
+        public const float GameH = 1080;
+
+        public int Width { get => _width; set { _width = value > 0 ? value : _width; } }
+        private int _width;
+        public int Height { get => _height; set { _height = value > 0 ? value : _height; } }
+        private int _height;
+
+        public Matrix4x4f Scaling => _scaling;
+        private Matrix4x4f _scaling;
+
+        private bool _stretch;
+        public bool Fullscreen { get => _fullscreen; set => _fullscreen = value; }
+        private bool _fullscreen;
+        private const float ASPECT_RATIO = 16.0f / 9.0f;
+
+        /// <summary> Initializes SDL and creates window and renderer. </summary>
+        public WindowController()
+        {
+            _height = 0;
+            _width = 0;
+            _fullscreen = false;
+            _stretch = false;
+        }
+
+        internal void Init()
+        {
+            Gl.Initialize();
+
+            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0) //Init SDL
+            { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
+        }
+
+        internal void CreateWindowAndContext()
+        {
+            SDL.SDL_WindowFlags flags;
+            if (_fullscreen) flags = SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN;
+            else flags = SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
+
+            if (_window != IntPtr.Zero) { SDL.SDL_DestroyWindow(_window); _window = IntPtr.Zero; }
+            if (_context != IntPtr.Zero) { SDL.SDL_GL_DeleteContext(_context); _context = IntPtr.Zero; }
+
+            _window = SDL.SDL_CreateWindow("Game", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, _width, _height, flags);
+            _context = SDL.SDL_GL_CreateContext(_window);
+
+            SDL.SDL_GL_SetSwapInterval(1);
+            Gl.ClearColor(0.2f, 0.2f, 0.2f, 1f);
+            SetViewport();
+
+            Gl.CullFace(CullFaceMode.Front);
+            Gl.FrontFace(FrontFaceDirection.Cw);
+
+            Gl.BlendFunc(BlendingFactor.SrcAlpha, BlendingFactor.OneMinusSrcAlpha);
+            Gl.BlendEquation(BlendEquationMode.FuncAdd);
+            Gl.Enable(EnableCap.Blend);
+        }
+
+        private void SetViewport()
+        {
+            Gl.LoadIdentity();
+            Gl.Viewport(0, 0, _width, _height);
+
+            float w = _width;
+            float h = _height;
+
+            _scaling = Matrix4x4f.Identity;
+            if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
+            else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / (w / h))), 1f / GameH, 1); }
+        }
+
+        internal void UpdateWindowSize()
+        {
+            SDL.SDL_GetWindowSize(_window, out _width, out _height);
+            SetViewport();
+        }
+
+        internal void SwapBuffer()
+        {
+            SDL.SDL_GL_SwapWindow(_window);
+            Gl.Clear(ClearBufferMask.ColorBufferBit);
+        }
+
+        internal void Dispose()
+        {
+            SDL.SDL_GL_DeleteContext(_context);
+        }
+    }
+}

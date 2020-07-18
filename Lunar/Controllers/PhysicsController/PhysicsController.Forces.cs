@@ -57,13 +57,15 @@ namespace Lunar
             foreach (uint id in transforms.Keys)
             {
                 if (!_colliders.ContainsKey(id)) continue;
-
-                Gl.Begin(PrimitiveType.LineLoop);
-                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X - _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y - _colliders[id].scale.Y) / 270);
-                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X - _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y + _colliders[id].scale.Y) / 270);
-                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X + _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y + _colliders[id].scale.Y) / 270);
-                Gl.Vertex2((transforms[id].position.X + _colliders[id].position.X + _colliders[id].scale.X) / 480, (transforms[id].position.Y + _colliders[id].position.Y - _colliders[id].scale.Y) / 270);
-                Gl.End();
+                foreach (Transform collider in _colliders[id])
+                {
+                    Gl.Begin(PrimitiveType.LineLoop);
+                    Gl.Vertex2((transforms[id].position.X + collider.position.X - collider.scale.X) / 480f, (transforms[id].position.Y + collider.position.Y - collider.scale.Y) / 270f);
+                    Gl.Vertex2((transforms[id].position.X + collider.position.X - collider.scale.X) / 480f, (transforms[id].position.Y + collider.position.Y + collider.scale.Y) / 270f);
+                    Gl.Vertex2((transforms[id].position.X + collider.position.X + collider.scale.X) / 480f, (transforms[id].position.Y + collider.position.Y + collider.scale.Y) / 270f);
+                    Gl.Vertex2((transforms[id].position.X + collider.position.X + collider.scale.X) / 480f, (transforms[id].position.Y + collider.position.Y - collider.scale.Y) / 270f);
+                    Gl.End();
+                }
             }
         }
     }

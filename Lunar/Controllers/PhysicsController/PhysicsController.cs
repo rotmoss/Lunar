@@ -13,7 +13,7 @@ namespace Lunar
         {
             _activeForces = new Dictionary<uint, List<Vector2>>();
             _drag = new Dictionary<uint, float>();
-            _colliders = new Dictionary<uint, Transform>();
+            _colliders = new Dictionary<uint, List<Transform>>();
             _movable = new Dictionary<uint, bool>();
         }
     }

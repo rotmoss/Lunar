@@ -12,7 +12,7 @@ namespace Lunar
         private GraphicsController()
         {
             _shaders = new Dictionary<uint, uint>();
-            _texture = new Dictionary<uint, List<uint>>();
+            _textures = new Dictionary<uint, List<uint>>();
             _selectedTexture = new Dictionary<uint, int>();
             _vertexArray = new Dictionary<uint, uint>();
             _buffers = new Dictionary<uint, List<Buffer>>();
@@ -27,8 +27,8 @@ namespace Lunar
 
         public void AddTexture(uint id, string texture, out int w, out int h)
         {
-            if (!_texture.ContainsKey(id)) { _texture.Add(id, new List<uint>()); }
-            _texture[id].Add(CreateTexture(texture, out w, out h));
+            if (!_textures.ContainsKey(id)) { _textures.Add(id, new List<uint>()); }
+            _textures[id].Add(CreateTexture(texture, out w, out h));
             if (!_selectedTexture.ContainsKey(id)) { _selectedTexture.Add(id, 0); }
         }
 
@@ -46,7 +46,7 @@ namespace Lunar
 
         public void CreateSprite(uint id, string file, string vertexShader, string fragmentShader, out int w, out int h)
         {
-            AddShader(id, null, null);
+            AddShader(id, vertexShader, fragmentShader);
             AddTexture(id, file, out w, out h);
             AddBuffer(id, w, h);
             AddTransform(id);
@@ -86,10 +86,12 @@ namespace Lunar
 
         internal void RenderQuad(uint id)
         {
+            if (!_shaders.ContainsKey(id) || !_vertexArray.ContainsKey(id) || !_selectedTexture.ContainsKey(id) || !_textures.ContainsKey(id)) return;
+
             Gl.UseProgram(_shaders[id]);
             Gl.Enable(EnableCap.Texture2d);
             Gl.BindVertexArray(_vertexArray[id]);
-            Gl.BindTexture(TextureTarget.Texture2d, _texture[id][_selectedTexture[id]]);
+            Gl.BindTexture(TextureTarget.Texture2d, _textures[id][_selectedTexture[id]]);
 
             Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
 
@@ -105,11 +107,11 @@ namespace Lunar
         {
             _buffers.Values.ToList().ForEach(x => Gl.DeleteBuffers(x.Select(y => y.id).ToArray()));
             _vertexArray.Values.ToList().ForEach(x => Gl.DeleteVertexArrays(x));
-            _texture.Values.ToList().ForEach(x => x.ForEach(y => Gl.DeleteTextures(y)));
+            _textures.Values.ToList().ForEach(x => x.ForEach(y => Gl.DeleteTextures(y)));
             _shaders.Values.ToList().ForEach(x => Gl.DeleteProgram(x));
             _buffers.Clear();
             _vertexArray.Clear();
-            _texture.Clear();
+            _textures.Clear();
             _shaders.Clear();
             _graphicsTransform.Clear();
         }
@@ -118,7 +120,7 @@ namespace Lunar
         {
             if (_buffers.ContainsKey(id)) _buffers[id].Select(x => x.id).ToList().ForEach(y => Gl.DeleteBuffers(y)); _buffers.Remove(id);
             if (_vertexArray.ContainsKey(id)) Gl.DeleteBuffers(_vertexArray[id]); _vertexArray.Remove(id);
-            if (_texture.ContainsKey(id)) _texture[id].ForEach(y => Gl.DeleteBuffers(y)); _texture.Remove(id);
+            if (_textures.ContainsKey(id)) _textures[id].ForEach(y => Gl.DeleteBuffers(y)); _textures.Remove(id);
             if (_shaders.ContainsKey(id)) Gl.DeleteBuffers(_shaders[id]); _shaders.Remove(id);
             if (_graphicsTransform.ContainsKey(id)) _graphicsTransform.Remove(id);
         }

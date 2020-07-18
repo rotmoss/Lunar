@@ -10,7 +10,7 @@ namespace Lunar
         ZERO, ONE, TWO, THREE, FOUR, FIVE,
         W, A, S, D,
         UP, DOWN, LEFT, RIGHT,
-        SPACE, ENTER, SHIFT, R, ESC,
+        SPACE, ENTER, SHIFT, R, ESC, LCTRL
     }
 
     /// <summary> The type of windowevent </summary>
@@ -245,10 +245,12 @@ namespace Lunar
                                     SetEvent(keyboardEvents, KeyEvent.SHIFT);
                                     break;
 
+                                case SDL_Keycode.SDLK_LCTRL:
+                                    SetEvent(keyboardEvents, KeyEvent.LCTRL);
+                                    break;
                                 case SDL_Keycode.SDLK_r:
                                     SetEvent(keyboardEvents, KeyEvent.R);
                                     break;
-
                                 case SDL_Keycode.SDLK_ESCAPE:
                                     SetEvent(keyboardEvents, KeyEvent.ESC);
                                     break;
@@ -326,7 +328,9 @@ namespace Lunar
                                 case SDL_Keycode.SDLK_r:
                                     RemoveEvent(keyboardEvents, KeyEvent.R);
                                     break;
-
+                                case SDL_Keycode.SDLK_LCTRL:
+                                    RemoveEvent(keyboardEvents, KeyEvent.LCTRL);
+                                    break;
                                 case SDL_Keycode.SDLK_ESCAPE:
                                     RemoveEvent(keyboardEvents, KeyEvent.ESC);
                                     break;
