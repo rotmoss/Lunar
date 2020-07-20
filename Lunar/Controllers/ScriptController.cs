@@ -10,17 +10,17 @@ namespace Lunar
         private static ScriptController instance = null;
         public static ScriptController Instance { get { instance = instance == null ? new ScriptController() : instance; return instance; } }
 
-        private Dictionary<uint, Script[]> _scripts;
+        private Dictionary<uint, Script> _scripts;
 
         private Assembly _assembly;
         public Assembly Assembly { set { _assembly = value; } }
 
         private ScriptController()
         {
-            _scripts = new Dictionary<uint, Script[]>();
+            _scripts = new Dictionary<uint, Script>();
         }
 
-        internal void AddScript(uint id, string className)
+        internal void AddScript(uint id, string className, (string, string)[] properties = null)
         {
             object script;
 
@@ -33,42 +33,50 @@ namespace Lunar
             { Console.WriteLine("Script " + className + " does not inherit from script"); return; }
 
             ((Script)script)._id = id;
-   
-            if (!_scripts.ContainsKey(id)) _scripts.Add(id, new Script[0]);
-            _scripts[id] = _scripts[id].Add((Script)script);
-        }
 
-        internal Dictionary<uint, Transform> GetTransforms()
-        {
-            Dictionary<uint, Transform> temp = new Dictionary<uint, Transform>();
-
-            foreach (KeyValuePair<uint, Script[]> pair in _scripts) {
-                foreach (Script script in pair.Value)
-                    temp.Add(pair.Key, script._transform);
+            if (properties != null)
+            {
+                Type type = script.GetType();
+                foreach ((string, string) property in properties)
+                {
+                    if (type.GetMembers().Select(x => x.Name).Contains(property.Item1))
+                    {
+                        switch (type.GetMember(property.Item1)[0].GetUnderlyingType().ToString())
+                        {
+                            case "System.Bool":
+                                if (bool.TryParse(property.Item2, out bool boolResult)) {
+                                    type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { boolResult });
+                                }
+                                break;
+                            case "System.Int32":
+                                if (int.TryParse(property.Item2, out int intResult)) {
+                                    type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { intResult });
+                                }
+                                break;
+                            case "System.Float":
+                                if (float.TryParse(property.Item2, out float floatResult)) {
+                                    type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { floatResult });
+                                }
+                                break;
+                            case "System.String":
+                                type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { property.Item2 });
+                                break;
+                        }
+                    }
+                }
             }
 
-            return temp;
+            if (!_scripts.ContainsKey(id)) _scripts.Add(id, (Script)script);
+            else { _scripts[id] = (Script)script; }
         }
 
-        internal List<uint> GetRenderQueue()
-        {
-            List<uint> result = new List<uint>();
+        internal Dictionary<uint, Transform> GetTransforms() => _scripts.Keys.Zip(_scripts.Select(x => x.Value._transform), (id, transform) => new { id = id, transform = transform }).ToDictionary(ns => ns.id, ns => ns.transform);
+        internal List<uint> GetRenderQueue() => _scripts.Values.Where(x => x._visible).Select(x => x._id).ToList();
+        internal void UpdateDeltaTime(float deltaTime) => _scripts.Values.ToList().ForEach(x => x.DeltaTime = deltaTime);
 
-            foreach(Script[] scripts in _scripts.Values)
-                result.AddRange(scripts.Where(x => x._visible).Select(x => x._id));
-            
-            return result;
-        }
-
-        internal void UpdateDeltaTime(float deltaTime)
-        {
-            foreach (Script[] scripts in _scripts.Values)
-                scripts.ToList().ForEach(x => x.DeltaTime = deltaTime);
-        }
-
-        internal void Init() =>  _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Init()));
-        internal void Update() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.Update()));
-        internal void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.LateUpdate()));
-        internal void PostRender() => _scripts.Values.ToList().ForEach(x => x.ToList().ForEach(x => x.PostRender()));
+        internal void Init() =>  _scripts.Values.ToList().ForEach(x => x.Init());
+        internal void Update() => _scripts.Values.ToList().ForEach(x => x.Update());
+        internal void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.LateUpdate());
+        internal void PostRender() => _scripts.Values.ToList().ForEach(x => x.PostRender());
     }
 }

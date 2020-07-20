@@ -3,7 +3,7 @@ using System.IO;
 
 namespace Lunar
 {
-    class FileManager
+    internal partial class FileManager
     {
         public static readonly string Seperator = System.IO.Path.DirectorySeparatorChar.ToString();
         public static readonly string Path = AppDomain.CurrentDomain.BaseDirectory + Seperator + "GameData" + Seperator;
@@ -83,7 +83,6 @@ namespace Lunar
 
         private static void WriteLines(string file, string directory, string[] lines, out bool error)
         {
-
             try
             {
                 error = false;
@@ -96,6 +95,6 @@ namespace Lunar
                 error = true;
                 return;
             }
-        }
+        }    
     }
 }

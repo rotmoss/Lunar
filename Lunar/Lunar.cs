@@ -67,7 +67,7 @@ namespace Lunar
                 _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());
 
                 //Draw colliders as an outline on top of everything else
-                _physicsController.DrawColliders(transforms);
+                //_physicsController.DrawColliders(transforms);
 
                 //Update all scripts again
                 _scriptController.LateUpdate();

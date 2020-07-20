@@ -46,29 +46,29 @@ namespace Lunar
 
         internal void CheckColission(Dictionary<uint, Transform> transforms)
         {
-            foreach (uint id in transforms.Keys)
+            foreach (uint initialId in transforms.Keys)
             {
                 //We dont want to move stationary objects
-                if (!_movable.ContainsKey(id) || _movable[id] == false) continue;
+                if (!_movable.ContainsKey(initialId) || _movable[initialId] == false) continue;
 
                 //Check if the enitity has a collider
-                if (!_colliders.ContainsKey(id)) continue;
+                if (!_colliders.ContainsKey(initialId)) continue;
 
-                foreach (Transform initial in _colliders[id])
+                foreach (Transform initial in _colliders[initialId])
                 {
-                    foreach (uint collider in _colliders.Keys)
+                    foreach (uint correspondantId in _colliders.Keys)
                     {
                         //The collider shouldn't collide withn itself
-                        if (id == collider) continue;
+                        if (initialId == correspondantId) continue;
 
-                        foreach (Transform correspondant in _colliders[collider])
+                        foreach (Transform correspondant in _colliders[correspondantId])
                         {
-                            Transform a = initial + transforms[id];
-                            Transform b = correspondant + transforms[collider];
+                            Transform a = initial + transforms[initialId];
+                            Transform b = correspondant + transforms[correspondantId];
 
                             if (DoesOverlap(a, b))
                                 Move(
-                                    id, collider, transforms, 
+                                    initialId, correspondantId, transforms, 
                                     initial, correspondant, 
                                     CalculateSide(a.position, b.position, b.scale));
                             
@@ -118,32 +118,24 @@ namespace Lunar
             }
         }
 
-        private void isColliding(uint id, Dictionary<uint, Transform> transforms)
+        private Side CalculateSide(Vector2 aPos, Vector2 bPos, Vector2 bScale)
         {
-
-        }
-
-        private Side CalculateSide(Vector2 a, Vector2 b, Vector2 bScale)
-        {
+            //Calulate the angle from the center of b to each of its corners
             float angleTopRight =    new Vector2(bScale.X,  bScale.Y).Angle();
             float angleTopLeft =     new Vector2(-bScale.X, bScale.Y).Angle();
             float angleBottomRight = new Vector2(bScale.X,  -bScale.Y).Angle();
             float angleBottomLeft =  new Vector2(-bScale.X, -bScale.Y).Angle();
 
-            float angleBetween = (a - b).Angle();
+            float angleBetween = (aPos - bPos).Angle();
 
-            // the angle between the two vectors is between -45 and 45 degrees
+            //Check between which corners a is located
+
             if (angleBetween < angleBottomRight && angleBetween > angleTopRight)
                 return Side.RIGHT;
-
-            // the angle between the two vectors between 135 and 225 degrees
             if (angleBetween < angleTopLeft && angleBetween > angleBottomLeft)
                 return Side.LEFT;
-
-            // the angle between the two vectors is between 45 and 135 degrees
             if (angleBetween < angleTopRight && angleBetween > angleTopLeft)
                 return Side.TOP;
-
             if (angleBetween < angleBottomLeft || angleBetween > angleBottomRight)
                 return Side.BOTTOM;
 

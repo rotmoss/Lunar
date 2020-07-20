@@ -51,7 +51,15 @@ namespace Lunar
             AddBuffer(id, w, h);
             AddTransform(id);
         }
-
+    /*
+        public void CreateText(uint id, string font, string message, string vertexShader, string fragmentShader, out int w, out int h)
+        {
+            AddShader(id, vertexShader, fragmentShader);
+            //AddTexture(id, file, out w, out h);
+            AddBuffer(id, w, h);
+            AddTransform(id);
+        }
+    */
         /// <summary> Uses the graphics transform aswell as the entity transform to translate the vertexbuffer linked to the spcified id. </summary>
         /// <param name="transforms"> A dictionary containing all entity ids and their respective entity transform </param>
         internal void TranslateBuffers(Dictionary<uint, Transform> transforms)

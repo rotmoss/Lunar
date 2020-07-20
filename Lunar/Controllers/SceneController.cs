@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
+using System.IO;
+using System.Xml.Serialization;
 
 namespace Lunar
 {
@@ -9,7 +10,7 @@ namespace Lunar
         private static SceneController instance = null;
         public static SceneController Instance { get { instance = instance == null ? new SceneController() : instance; return instance; } }
 
-        private IdCollection _enteties;
+        private IdCollection _ids;
 
         private Dictionary<uint, string> _name;
         private Dictionary<uint, bool> _enabled;
@@ -24,7 +25,7 @@ namespace Lunar
 
         private SceneController()
         {
-            _enteties = new IdCollection();
+            _ids = new IdCollection();
 
             _name = new Dictionary<uint, string>();
             _enabled = new Dictionary<uint, bool>();
@@ -37,64 +38,61 @@ namespace Lunar
 
         internal void LoadScene(string file)
         {
-            if (!FileManager.ReadLines(file, "Scenes", out string[] result))
-            { Console.WriteLine("Could not find scene " + file); return; }
+            uint scene = _ids.GetId();
 
-            uint id = _enteties.GetId();
+            if (!_name.ContainsKey(scene)) _name.Add(scene, file);
+            else { _name[scene] = file; }
+            if (!_enabled.ContainsKey(scene)) _enabled.Add(scene, true);
+            else { _enabled[scene] = true; }
 
-            if (!_name.ContainsKey(id)) _name.Add(id, "");
-            _name[id] = file;
-
-            if (!_enabled.ContainsKey(id)) _enabled.Add(id, true);
-
-            LoadEntites(result, id);
+            LoadEntites(file, scene);
         }
 
-        internal void LoadEntites(string[] file, uint scene)
+        internal void LoadEntites(string file, uint scene)
         {
-            List<uint> ids = new List<uint>();
+            if (!File.Exists(FileManager.Path + "Scenes" + FileManager.Seperator + file))
+            { Console.WriteLine("Could not find scene " + file); return; }
 
-            foreach (string s in file)
+            XmlElementEntity[] array = FileManager.Dezerialize<XmlElementScene>(file, "Scenes", "scene").entities;
+
+            foreach (XmlElementEntity entity in array)
             {
-                string[] tokens = s.Split(' ');
-                if (tokens[0] != "entity") continue;
+                uint id = _ids.GetId();
 
-                uint id = _enteties.GetId();
+                if (!_name.ContainsKey(id)) _name.Add(id, entity.Name);
+                else { _name[id] = entity.Name; }
 
-                foreach (string token in tokens)
-                {
-                    string[] values = token.Split(new char[] { '=', '"' }).Where(x => !string.IsNullOrEmpty(x)).ToArray();
-                    if (values[0] == "name") {
-                        if (!_name.ContainsKey(id)) _name.Add(id, "");
-                        _name[id] = values[1];
-                    }
-                    if (values[0] == "enabled") {
-                        if (!_enabled.ContainsKey(id)) _enabled.Add(id, true);
-                        bool.TryParse(values[1], out bool enabled);
-                        _enabled[id] = enabled;
-                    }
-                    if (values[0] == "parent") {
-                        if (!_parent.ContainsKey(id)) _parent.Add(id, 0);
-                        _parent[id] = GetEntityID(values[1]);
-                    }
-                    if (values[0] == "script") {
-                        ScriptController.Instance.AddScript(id, values[1]);
-                    }
-                }
-                if (!_scene.ContainsKey(id)) _scene.Add(id, 0);
-                _scene[id] = scene;
+                if (!_enabled.ContainsKey(id)) _enabled.Add(id, entity.Enabled);
+                else { _enabled[id] = entity.Enabled; }
+
+                if (!_scene.ContainsKey(id)) _scene.Add(id, scene);
+                else { _scene[id] = scene; }
 
                 if (!_transforms.ContainsKey(id)) _transforms.Add(id, new Transform(0, 0, 1, 1));
                 else { _transforms[id] = new Transform(0, 0, 1, 1); }
 
                 if (!_visible.ContainsKey(id)) _visible.Add(id, true);
                 else { _visible[id] = true; }
+
+                List<(string, string)> variables = new List<(string, string)>();
+                if (entity.Script.Vars != null)
+                    foreach (XmlElementVar var in entity.Script.Vars) variables.Add((var.Name, var.Value));
+                ScriptController.Instance.AddScript(id, entity.Script.File, variables.ToArray());
+            }
+
+            foreach(XmlElementEntity entity in array)
+            {
+                uint id = GetEntityID(entity.Name);
+
+                if (!_parent.ContainsKey(id)) _parent.Add(id, GetEntityID(entity.Parent));
+                else { _parent[id] = GetEntityID(entity.Parent); }
             }
         }
+
         public Transform GetEntityTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : default;
         public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
         public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
         public void SetEntityVisibility(uint id, bool value) { if (_visible.ContainsKey(id)) _visible[id] = value; }
-        public void ForEach(Action<uint> action) => _enteties.Values.ForEach(action);
+        public void ForEach(Action<uint> action) => _ids.Values.ForEach(action);
     }
 }

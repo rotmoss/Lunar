@@ -23,20 +23,25 @@ namespace Lunar
             SDL_Surface temp = Marshal.PtrToStructure<SDL_Surface>(surface);
             w = temp.w; h = temp.h;
 
-            if(!GetGLPixelFormat(Marshal.PtrToStructure<uint>(temp.format), out PixelFormat format))
-            { w = 0; h = 0; return 0; }
+           uint texture = StoreTextureOnGpu(temp);
+            SDL_FreeSurface(surface);
 
+            return texture;
+        }
+
+        private uint StoreTextureOnGpu(SDL_Surface surface)
+        {
+            if (!GetGLPixelFormat(Marshal.PtrToStructure<uint>(surface.format), out PixelFormat format)) return 0;
+         
             uint texture = Gl.GenTexture();
 
             Gl.Enable(EnableCap.Texture2d);
             Gl.BindTexture(TextureTarget.Texture2d, texture);
 
-            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, temp.w, temp.h, 0, format, PixelType.UnsignedByte, temp.pixels);
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, surface.w, surface.h, 0, format, PixelType.UnsignedByte, surface.pixels);
 
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
-
-            SDL_FreeSurface(surface);
             Gl.Disable(EnableCap.Texture2d);
 
             return texture;
