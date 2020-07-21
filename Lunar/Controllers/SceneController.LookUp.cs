@@ -8,5 +8,6 @@
                 if (_name[id] == name) return id;
             return 0;
         }
+        public uint GetEntityParent(uint id) => _parent.ContainsKey(id) ? _parent[id] : 0;
     }
 }

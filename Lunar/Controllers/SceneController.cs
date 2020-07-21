@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Xml.Serialization;
 
 namespace Lunar
@@ -17,7 +18,18 @@ namespace Lunar
         private Dictionary<uint, uint> _parent;
         private Dictionary<uint, uint> _scene;
 
-        public Dictionary<uint, Transform> Transforms { get { return _transforms; } }
+        public Dictionary<uint, Transform> GlobalTransforms { 
+            get 
+            {
+                Dictionary<uint, Transform> dictionary = new Dictionary<uint, Transform>();
+
+                foreach (KeyValuePair<uint, Transform> pair in _transforms)
+                    dictionary.Add(pair.Key, GetEntityGlobalTransform(pair.Key));
+
+                return dictionary;
+             } 
+        }
+        public Dictionary<uint, Transform> LocalTransforms { get { return _transforms; } }
         private Dictionary<uint, Transform> _transforms;
 
         public Dictionary<uint, bool> Visible { get { return _visible; } }
@@ -82,14 +94,18 @@ namespace Lunar
 
             foreach(XmlElementEntity entity in array)
             {
-                uint id = GetEntityID(entity.Name);
+                if (entity.Parent == "" || entity.Parent == null) continue;
 
-                if (!_parent.ContainsKey(id)) _parent.Add(id, GetEntityID(entity.Parent));
-                else { _parent[id] = GetEntityID(entity.Parent); }
+                uint id = GetEntityID(entity.Name);
+                uint parentId = GetEntityID(entity.Parent);
+
+                if (!_parent.ContainsKey(id)) _parent.Add(id, parentId);
+                else { _parent[id] = parentId; }
             }
         }
 
-        public Transform GetEntityTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : default;
+        public Transform GetEntityLocalTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : default;
+        public Transform GetEntityGlobalTransform(uint id) => _transforms.ContainsKey(id) ? _parent.ContainsKey(id) ? _transforms[id] + GetEntityLocalTransform(_parent[id]) : _transforms[id] : default;
         public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
         public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
         public void SetEntityVisibility(uint id, bool value) { if (_visible.ContainsKey(id)) _visible[id] = value; }

@@ -7,10 +7,16 @@ namespace Lunar
         public uint _id;
         public string _name;
 
-        public Transform _transform 
+        public Transform _localTransform 
         { 
-            get { return SceneController.GetEntityTransform(_id); } 
+            get { return SceneController.GetEntityLocalTransform(_id); } 
             set { SceneController.SetEntityTransform(_id, value); } 
+        }
+
+        public Transform _globalTransform
+        {
+            get { return SceneController.GetEntityGlobalTransform(_id); }
+            set { SceneController.SetEntityTransform(_id, value); }
         }
         public bool _visible 
         { 

@@ -52,16 +52,14 @@ namespace Lunar
                 //Update all scripts
                 _scriptController.Update();
 
-                Dictionary<uint, Transform> transforms = _sceneController.Transforms;
-
                 //Update Transforms
-                _physicsController.ApplyForces(transforms);
+                _physicsController.ApplyForces(_sceneController.LocalTransforms);
 
                 //Check Colissions
-                _physicsController.CheckColission(transforms);
+                _physicsController.CheckColission(_sceneController.GlobalTransforms, _sceneController.LocalTransforms);
 
                 //Use Transfroms to Translate Graphics Data
-                _graphicsController.TranslateBuffers(transforms);
+                _graphicsController.TranslateBuffers(_sceneController.GlobalTransforms);
 
                 //Render Graphics
                 _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());

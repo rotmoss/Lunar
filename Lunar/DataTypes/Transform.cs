@@ -8,21 +8,25 @@ namespace Lunar
 {
     public struct Transform
     {
+        public uint parent;
         public Vector2 position;
         public Vector2 scale;
 
         public Transform(float x = 0, float y = 0, float w = 1, float h = 1)
         {
+            parent = 0;
             position = new Vector2(x, y);
             scale = new Vector2(w,h);
         }
         public Transform(Transform transform)
         {
+            parent = 0;
             position = transform.position;
             scale = transform.scale;
         }
         public Transform(Vector2 position, Vector2 scale)
         {
+            parent = 0;
             this.position = position;
             this.scale = scale;
         }

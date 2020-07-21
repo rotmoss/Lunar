@@ -44,9 +44,10 @@ namespace Lunar
             _movable[id] = isMovable;
         }
 
-        internal void CheckColission(Dictionary<uint, Transform> transforms)
+        //Doesnt work properly. It is supposed to check the global transforms and set the local ones.
+        internal void CheckColission(Dictionary<uint, Transform> LocalTransforms, Dictionary<uint, Transform> GlobalTransforms)
         {
-            foreach (uint initialId in transforms.Keys)
+            foreach (uint initialId in LocalTransforms.Keys)
             {
                 //We dont want to move stationary objects
                 if (!_movable.ContainsKey(initialId) || _movable[initialId] == false) continue;
@@ -63,12 +64,12 @@ namespace Lunar
 
                         foreach (Transform correspondant in _colliders[correspondantId])
                         {
-                            Transform a = initial + transforms[initialId];
-                            Transform b = correspondant + transforms[correspondantId];
+                            Transform a = initial + LocalTransforms[initialId];
+                            Transform b = correspondant + LocalTransforms[correspondantId];
 
                             if (DoesOverlap(a, b))
                                 Move(
-                                    initialId, correspondantId, transforms, 
+                                    initialId, correspondantId, LocalTransforms, 
                                     initial, correspondant, 
                                     CalculateSide(a.position, b.position, b.scale));
                             

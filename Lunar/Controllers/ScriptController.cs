@@ -69,8 +69,6 @@ namespace Lunar
             if (!_scripts.ContainsKey(id)) _scripts.Add(id, (Script)script);
             else { _scripts[id] = (Script)script; }
         }
-
-        internal Dictionary<uint, Transform> GetTransforms() => _scripts.Keys.Zip(_scripts.Select(x => x.Value._transform), (id, transform) => new { id = id, transform = transform }).ToDictionary(ns => ns.id, ns => ns.transform);
         internal List<uint> GetRenderQueue() => _scripts.Values.Where(x => x._visible).Select(x => x._id).ToList();
         internal void UpdateDeltaTime(float deltaTime) => _scripts.Values.ToList().ForEach(x => x.DeltaTime = deltaTime);
 
