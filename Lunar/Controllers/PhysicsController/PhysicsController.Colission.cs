@@ -69,7 +69,7 @@ namespace Lunar
 
                             if (DoesOverlap(a, b))
                                 Move(
-                                    initialId, correspondantId, LocalTransforms, 
+                                    LocalTransforms, GlobalTransforms, initialId, correspondantId, 
                                     initial, correspondant, 
                                     CalculateSide(a.position, b.position, b.scale));
                             
@@ -79,41 +79,41 @@ namespace Lunar
             }
         }
 
-        private void Move(uint id, uint colliderId, Dictionary<uint, Transform> transforms, Transform initial, Transform correspondant, Side side)
+        private void Move(Dictionary<uint, Transform> globalTransforms, Dictionary<uint, Transform> localTransforms, uint id, uint colliderId, Transform initial, Transform correspondant, Side side)
         {
             float topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
 
             switch (side)
             {
                 case Side.TOP:
-                    bottomA = transforms[id].position.Y + initial.position.Y - initial.scale.Y;
-                    topB = transforms[colliderId].position.Y + correspondant.position.Y + correspondant.scale.Y;
+                    bottomA = globalTransforms[id].position.Y + initial.position.Y - initial.scale.Y;
+                    topB = globalTransforms[colliderId].position.Y + correspondant.position.Y + correspondant.scale.Y;
 
-                    transforms[id] += new Vector2(0, topB - bottomA);
+                    localTransforms[id] += new Vector2(0, topB - bottomA);
                     OnCollision(new CollisionEventArgs { id = colliderId, side = Side.TOP }, id);
                     break;
 
                 case Side.BOTTOM:
-                    topA = transforms[id].position.Y + initial.position.Y + initial.scale.Y;
-                    bottomB = transforms[colliderId].position.Y + correspondant.position.Y - correspondant.scale.Y;
+                    topA = globalTransforms[id].position.Y + initial.position.Y + initial.scale.Y;
+                    bottomB = globalTransforms[colliderId].position.Y + correspondant.position.Y - correspondant.scale.Y;
 
-                    transforms[id] += new Vector2(0, bottomB - topA);
+                    localTransforms[id] += new Vector2(0, bottomB - topA);
                     OnCollision(new CollisionEventArgs { id = colliderId, side = Side.BOTTOM }, id);
                     break;
 
                 case Side.LEFT:
-                    rightA = transforms[id].position.X + initial.position.X + initial.scale.X;
-                    leftB = transforms[colliderId].position.X + correspondant.position.X - correspondant.scale.X;
+                    rightA = globalTransforms[id].position.X + initial.position.X + initial.scale.X;
+                    leftB = globalTransforms[colliderId].position.X + correspondant.position.X - correspondant.scale.X;
 
-                    transforms[id] += new Vector2(leftB - rightA, 0);
+                    localTransforms[id] += new Vector2(leftB - rightA, 0);
                     OnCollision(new CollisionEventArgs { id = colliderId, side = Side.LEFT }, id);
                     break;
 
                 case Side.RIGHT:
-                    leftA = transforms[id].position.X + initial.position.X - initial.scale.X;
-                    rightB = transforms[colliderId].position.X + correspondant.position.X + correspondant.scale.X;
+                    leftA = globalTransforms[id].position.X + initial.position.X - initial.scale.X;
+                    rightB = globalTransforms[colliderId].position.X + correspondant.position.X + correspondant.scale.X;
 
-                    transforms[id] += new Vector2(rightB - leftA, 0);
+                    localTransforms[id] += new Vector2(rightB - leftA, 0);
                     OnCollision(new CollisionEventArgs { id = colliderId, side = Side.RIGHT }, id);
                     break;
             }
