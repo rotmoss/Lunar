@@ -41,7 +41,7 @@ namespace Lunar
         {
             Gl.Initialize();
 
-            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0) //Init SDL
+            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
         }
 
@@ -96,6 +96,9 @@ namespace Lunar
 
         internal void Dispose()
         {
+            SDL.SDL_Quit();
+            SDL_image.IMG_Quit();
+            SDL_ttf.TTF_Quit();
             SDL.SDL_GL_DeleteContext(_context);
         }
     }

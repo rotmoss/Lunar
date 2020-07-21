@@ -34,7 +34,7 @@ namespace Lunar
             assemblyAwaiter.Wait();
             _scriptController.Assembly = assemblyAwaiter.Result;
 
-            _sceneController.LoadScene("start.ini");
+            _sceneController.LoadScene("start.xml");
 
             _scriptController.Init();
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));

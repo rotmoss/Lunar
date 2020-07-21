@@ -75,6 +75,14 @@
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>zlib1.dll</TargetPath>
     </ContentWithTargetPath>
+    <ContentWithTargetPath Include="SDL_x64\SDL2_ttf.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>SDL2_ttf.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="SDL_x64\libfreetype-6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>libfreetype-6.dll</TargetPath>
+    </ContentWithTargetPath>
   </ItemGroup>
 
   <ItemGroup Condition="'$(Platform)'=='x86'">
@@ -105,6 +113,14 @@
     <ContentWithTargetPath Include="SDL_x86\zlib1.dll">
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
       <TargetPath>zlib1.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="SDL_x86\SDL2_ttf.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>SDL2_ttf.dll</TargetPath>
+    </ContentWithTargetPath>
+    <ContentWithTargetPath Include="SDL_x86\libfreetype-6.dll">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+      <TargetPath>libfreetype-6.dll</TargetPath>
     </ContentWithTargetPath>
   </ItemGroup>
 

@@ -23,7 +23,21 @@ namespace Lunar
             SDL_Surface temp = Marshal.PtrToStructure<SDL_Surface>(surface);
             w = temp.w; h = temp.h;
 
-           uint texture = StoreTextureOnGpu(temp);
+            uint texture = StoreTextureOnGpu(temp);
+            SDL_FreeSurface(surface);
+
+            return texture;
+        }
+
+        internal uint CreateText(string file, string text, int size, Color color, uint wrapped, out int w, out int h)
+        {
+            if (!LoadText(file, text, size, color.ToSDL_Color(), wrapped, out IntPtr surface))
+            { w = 0; h = 0; return 0; }
+
+            SDL_Surface temp = Marshal.PtrToStructure<SDL_Surface>(surface);
+            w = temp.w; h = temp.h;
+
+            uint texture = StoreTextureOnGpu(temp);
             SDL_FreeSurface(surface);
 
             return texture;
@@ -57,9 +71,18 @@ namespace Lunar
 
         private bool LoadSurface(string file, out IntPtr value)
         {
-            if(file == null) { value = IntPtr.Zero; return false; }
             try { value = SDL_image.IMG_Load(FileManager.FindFile(file, "Textures")); }
             catch { Console.WriteLine("Couldn't load texture " + file); value = IntPtr.Zero; }
+            return value == IntPtr.Zero ? false : true;
+        }
+
+        private bool LoadText(string fontFile, string text, int size, SDL_Color color, uint wrapped, out IntPtr value)
+        {
+            IntPtr font;
+            try { font = SDL_ttf.TTF_OpenFont(FileManager.FindFile(fontFile, "Fonts"), size); }
+            catch { Console.WriteLine("Couldn't load font " + fontFile); value = IntPtr.Zero; return false; }
+
+            value = SDL_ttf.TTF_RenderUTF8_Blended_Wrapped(font, text, color, wrapped);            
             return value == IntPtr.Zero ? false : true;
         }
 

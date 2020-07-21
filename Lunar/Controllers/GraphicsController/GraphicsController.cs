@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
 using System.Linq;
 using OpenGL;
 
@@ -32,6 +33,13 @@ namespace Lunar
             if (!_selectedTexture.ContainsKey(id)) { _selectedTexture.Add(id, 0); }
         }
 
+        public void AddText(uint id, string font, string text, int size, Color color, uint wrapper, out int w, out int h)
+        {
+            if (!_textures.ContainsKey(id)) { _textures.Add(id, new List<uint>()); }
+            _textures[id].Add(CreateText(font, text, size, color, wrapper, out w, out h));
+            if (!_selectedTexture.ContainsKey(id)) { _selectedTexture.Add(id, 0); }
+        }
+
         public void AddBuffer(uint id, int w, int h, int textureX = 0, int textureY = 0, int textureW = 1, int textureH = 1)
         {
             if (_buffers.ContainsKey(id)) { _buffers[id].ForEach(x => Gl.DeleteProgram(x.id)); _buffers.Remove(id); }
@@ -51,15 +59,15 @@ namespace Lunar
             AddBuffer(id, w, h);
             AddTransform(id);
         }
-    /*
-        public void CreateText(uint id, string font, string message, string vertexShader, string fragmentShader, out int w, out int h)
+    
+        public void CreateText(uint id, string font, string text, int size, Color color, uint wrapper, string vertexShader, string fragmentShader, out int w, out int h)
         {
             AddShader(id, vertexShader, fragmentShader);
-            //AddTexture(id, file, out w, out h);
+            AddText(id, font, text, size, color, wrapper, out w, out h);
             AddBuffer(id, w, h);
             AddTransform(id);
         }
-    */
+    
         /// <summary> Uses the graphics transform aswell as the entity transform to translate the vertexbuffer linked to the spcified id. </summary>
         /// <param name="transforms"> A dictionary containing all entity ids and their respective entity transform </param>
         internal void TranslateBuffers(Dictionary<uint, Transform> transforms)
