@@ -104,8 +104,8 @@ namespace Lunar
             }
         }
 
-        public Transform GetEntityLocalTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : default;
-        public Transform GetEntityGlobalTransform(uint id) => _transforms.ContainsKey(id) ? _parent.ContainsKey(id) ? _transforms[id] + GetEntityLocalTransform(_parent[id]) : _transforms[id] : default;
+        public Transform GetEntityLocalTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : Transform.Zero;
+        public Transform GetEntityGlobalTransform(uint id) => _transforms.ContainsKey(id) ? _parent.ContainsKey(id) ? _transforms[id] + GetEntityLocalTransform(_parent[id]) : _transforms[id] : Transform.Zero;
         public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
         public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
         public void SetEntityVisibility(uint id, bool value) { if (_visible.ContainsKey(id)) _visible[id] = value; }

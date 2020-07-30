@@ -9,5 +9,10 @@
             return 0;
         }
         public uint GetEntityParent(uint id) => _parent.ContainsKey(id) ? _parent[id] : 0;
+        public void SetEntityParent(uint id, uint parent) 
+        {
+            if (!_parent.ContainsKey(id)) _parent.Add(id, parent);
+            else _parent[id] = parent; 
+        }
     }
 }
