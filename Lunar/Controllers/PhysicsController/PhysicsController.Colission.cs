@@ -27,7 +27,7 @@ namespace Lunar
         public EventHandler<CollisionEventArgs> CollisionEvent { get => _collisionEvent; set => _collisionEvent = value; }
         private EventHandler<CollisionEventArgs> _collisionEvent;
 
-        public void AddHitBox(uint id, bool isMovable, Vector2 size, Vector2 offset)
+        public void AddHitBox(uint id, bool isMovable, Vector2 offset, Vector2 size)
         {
             if (!_colliders.ContainsKey(id)) _colliders.Add(id, new List<Transform>());
             _colliders[id].Add(new Transform(offset, size));
@@ -67,12 +67,12 @@ namespace Lunar
                             Transform a = initial + LocalTransforms[initialId];
                             Transform b = correspondant + LocalTransforms[correspondantId];
 
-                            if (DoesOverlap(a, b))
+                            if (DoesOverlap(a, b)) {
                                 Move(
                                     LocalTransforms, GlobalTransforms, initialId, correspondantId, 
                                     initial, correspondant, 
                                     CalculateSide(a.position, b.position, b.scale));
-                            
+                            }
                         }
                     }
                 }

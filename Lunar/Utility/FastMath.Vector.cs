@@ -14,12 +14,21 @@ namespace Lunar
             return value;
         }
 
-        public static List<Vector2> MultiplyVectors(List<Vector2> a, float b)
+        public static List<Vector2> ScaleVectors(List<Vector2> a, float b)
         {
             a = new List<Vector2>(a);
 
             for (int i = 0; i < a.Count; i++)
                 a[i] *= b;
+            return a;
+        }
+
+        public static List<Vector2> AddVectors(List<Vector2> a, Vector2 b)
+        {
+            a = new List<Vector2>(a);
+
+            for (int i = 0; i < a.Count; i++)
+                a[i] = new Vector2(a[i].X + b.X, a[i].Y + b.Y);
             return a;
         }
 

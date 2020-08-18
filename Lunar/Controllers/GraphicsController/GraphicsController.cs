@@ -100,7 +100,7 @@ namespace Lunar
             UpdateBuffer(buffer, bufferData);
         }
 
-        internal void RenderQuad(uint id)
+        internal void RenderTexture(uint id)
         {
             if (!_shaders.ContainsKey(id) || !_vertexArray.ContainsKey(id) || !_selectedTexture.ContainsKey(id) || !_textures.ContainsKey(id)) return;
 
@@ -117,7 +117,35 @@ namespace Lunar
             Gl.Disable(EnableCap.Texture2d);
         }
 
-        internal void Render(List<uint> renderQueue) => renderQueue.ForEach(x => RenderQuad(x));
+        public void DrawQuad(bool fill, float x, float y, float w, float h, Color color = new Color())
+        {
+            PrimitiveType type = fill ? PrimitiveType.Quads : PrimitiveType.LineStrip;
+
+            Gl.Color3(color.r, color.g, color.b);
+
+            Gl.Begin(type);
+            Gl.Vertex2((x - w) / WindowController.Instance.Width, (y - h) / WindowController.Instance.Height);
+            Gl.Vertex2((x - w) / WindowController.Instance.Width, (y + h) / WindowController.Instance.Height);
+            Gl.Vertex2((x + w) / WindowController.Instance.Width, (y + h) / WindowController.Instance.Height);
+            Gl.Vertex2((x + w) / WindowController.Instance.Width, (y - h) / WindowController.Instance.Height);
+            Gl.End();
+        }
+
+        public void DrawQuad(bool fill, Transform t, Color color = new Color())
+        {
+            PrimitiveType type = fill ? PrimitiveType.Quads : PrimitiveType.LineStrip;
+
+            Gl.Color3(color.r, color.g, color.b);
+
+            Gl.Begin(type);
+            Gl.Vertex2(t.position.X - t.scale.X / WindowController.Instance.Width, t.position.Y - t.scale.Y / WindowController.Instance.Height);
+            Gl.Vertex2(t.position.X - t.scale.X / WindowController.Instance.Width, t.position.Y + t.scale.Y / WindowController.Instance.Height);
+            Gl.Vertex2(t.position.X + t.scale.X / WindowController.Instance.Width, t.position.Y + t.scale.Y / WindowController.Instance.Height);
+            Gl.Vertex2(t.position.X + t.scale.X / WindowController.Instance.Width, t.position.Y - t.scale.Y / WindowController.Instance.Height);
+            Gl.End();
+        }
+
+        internal void Render(List<uint> renderQueue) => renderQueue.ForEach(x => RenderTexture(x));
 
         internal void Dispose()
         {

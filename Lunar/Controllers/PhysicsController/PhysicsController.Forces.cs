@@ -10,43 +10,65 @@ namespace Lunar
     {
         const float DegreesToRadians = MathF.PI / 180f;
 
-        Dictionary<uint, List<Vector2>> _activeForces;
-        Dictionary<uint, float> _drag;
+        Dictionary<uint, Vector2> _speed;
+        Dictionary<uint, Vector2> _acceleration;
+        Dictionary<uint, Vector2> _jerk;
+        Dictionary<uint, float> _friction;
 
-        public void AddForce(uint id, Vector2 force)
+        public void SetSpeed(uint id, Vector2 v)
         {
-            if (!_activeForces.ContainsKey(id)) _activeForces.Add(id, new List<Vector2>());
-            _activeForces[id].Add(force);
+            if (!_speed.ContainsKey(id)) _speed.Add(id, Vector2.Zero);
+            _speed[id] = v;
         }
 
-        public void AddForce(uint id, float length, float angle)
+        public void SetSpeed(uint id, float length, float angle)
         {
-            if (!_activeForces.ContainsKey(id)) _activeForces.Add(id, new List<Vector2>());
-            _activeForces[id].Add(new Vector2(FastMath.Cos(angle * DegreesToRadians) * length, FastMath.Sin(angle * DegreesToRadians) * length));
+            if (!_speed.ContainsKey(id)) _speed.Add(id, Vector2.Zero);
+            _speed[id] = new Vector2(FastMath.Cos(angle * DegreesToRadians) * length, FastMath.Sin(angle * DegreesToRadians) * length);
         }
 
-        public void SetDrag(uint id, float drag = 0)
+        public void SetAcceleration(uint id, Vector2 v)
         {
-            if (!_drag.ContainsKey(id)) _drag.Add(id, drag);
-            else _drag[id] = drag;
+            if (!_acceleration.ContainsKey(id)) _acceleration.Add(id, Vector2.Zero);
+            _acceleration[id] = v;
+        }
+
+        public void SetAcceleration(uint id, float length, float angle)
+        {
+            if (!_acceleration.ContainsKey(id)) _acceleration.Add(id, Vector2.Zero);
+            _acceleration[id] = new Vector2(FastMath.Cos(angle * DegreesToRadians) * length, FastMath.Sin(angle * DegreesToRadians) * length);
+        }
+
+        public void Setjerk(uint id, Vector2 v)
+        {
+            if (!_jerk.ContainsKey(id)) _jerk.Add(id, Vector2.Zero);
+            _jerk[id] = v;
+        }
+
+        public void SetFriction(uint id, float drag = 0)
+        {
+            if (!_friction.ContainsKey(id)) _friction.Add(id, drag);
+            else _friction[id] = drag;
         }
 
         internal void ApplyForces(Dictionary<uint, Transform> transforms)
         {
             foreach (uint id in transforms.Keys)
             {
-                if (!_activeForces.ContainsKey(id)) continue;
+                if (!_speed.ContainsKey(id)) _speed.Add(id, Vector2.Zero);
+                if (!_acceleration.ContainsKey(id)) _acceleration.Add(id, Vector2.Zero);
+                if (!_jerk.ContainsKey(id)) _jerk.Add(id, Vector2.Zero);
+                if (!_friction.ContainsKey(id)) _friction.Add(id, 0);
 
-                //Apply drag to all active forces
-                if (_drag.ContainsKey(id) && _drag[id] != 0)
-                    _activeForces[id] = FastMath.MultiplyVectors(_activeForces[id], _drag[id]);
+                _acceleration[id] += _jerk[id] * Time.DeltaTime;
 
-                //Find vectors that have a length close to 0 and remove them
-                for (int i = 0; i < _activeForces[id].Count; i++)
-                    if (_activeForces[id][i].Length().AlmostEquals(0)) { _activeForces[id].RemoveAt(i); i--; }
+                //Calculate speed from acceleration
+                _speed[id] += _acceleration[id] * Time.DeltaTime;
 
-                //calculate new transform from forces and add it
-                transforms[id] += FastMath.SumVectors(_activeForces[id]) * Time.DeltaTime;  
+                _speed[id] *= _friction[id];
+
+                //Calculate position from speed
+                transforms[id] += _speed[id] * Time.DeltaTime;  
             }
         }
 

@@ -11,8 +11,10 @@ namespace Lunar
 
         private PhysicsController()
         {
-            _activeForces = new Dictionary<uint, List<Vector2>>();
-            _drag = new Dictionary<uint, float>();
+            _speed = new Dictionary<uint, Vector2>();
+            _acceleration = new Dictionary<uint, Vector2>();
+            _jerk = new Dictionary<uint, Vector2>();
+            _friction = new Dictionary<uint, float>();
             _colliders = new Dictionary<uint, List<Transform>>();
             _movable = new Dictionary<uint, bool>();
         }
