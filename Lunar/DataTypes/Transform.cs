@@ -32,6 +32,9 @@ namespace Lunar
         public static Transform operator +(Transform a, Transform b) => new Transform(a.position + b.position, a.scale * b.scale);
         public static Transform operator +(Transform a, Vector2 b) => new Transform(a.position + b, a.scale);
         public static Vector2 operator +(Vector2 a, Transform b) => new Vector2(b.position.X + a.X, b.position.Y + a.Y);
+        public static Transform operator *(Transform a, Vector2 b) => new Transform(a.position.X, a.position.Y, a.scale.X * b.X, a.scale.Y * b.Y);
+        public static Vector2 operator *(Vector2 a, Transform b) => new Vector2(b.scale.X * a.X, b.scale.Y * a.Y);
+        public static Transform operator *(Transform a, float b) => new Transform(a.position.X, a.position.Y, a.scale.X * b, a.scale.Y * b);
         public void Translate(Vector2 position) { this.position.X += position.X; this.position.Y += position.Y; }
         public void Scale(Vector2 scale) { this.scale.X += scale.X; this.scale.Y += scale.Y; }
         public void Translate(float x, float y) { position.X += x; position.Y += y; }

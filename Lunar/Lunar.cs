@@ -22,8 +22,9 @@ namespace Lunar
         static void Main(string[] args)
         {
             var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
-            _inputController.WindowChange += OnWindowChange;
-            _inputController.KeyDown += OnKeyDown;
+            _inputController.OnWindowClose += OnWindowClose;
+            _inputController.OnWindowResized += OnWindowResized;
+            _inputController.OnKeyDown += OnKeyDown;
 
             _windowController.Init();
             _windowController.Fullscreen = false;
@@ -47,7 +48,7 @@ namespace Lunar
                 Time.StartFrameTimer();
 
                 //Invoke Input-Events
-                _inputController.InvokeInputEvents(null);
+                _inputController.PollInputs();
 
                 //Update all scripts
                 _scriptController.Update();
@@ -82,34 +83,31 @@ namespace Lunar
             }
         }
 
-        static void OnKeyDown(object sender, KeyboardEventArgs eventArgs) 
+        static void OnKeyDown(object sender, KeyboardState eventArgs)
         {
-            if(eventArgs.EventTypes.Contains(KeyEvent.ESC))
-            {
+            if (eventArgs.RawStates[SDL.SDL_Keycode.SDLK_ESCAPE]) {
                 _windowController.Dispose();
                 _graphicsController.Dispose();
                 Environment.Exit(0);
             }
-            if (eventArgs.EventTypes.Contains(KeyEvent.ENTER) && eventArgs.EventTypes.Contains(KeyEvent.LCTRL))
+            if (eventArgs.RawStates[SDL.SDL_Keycode.SDLK_LALT] && eventArgs.RawStates[SDL.SDL_Keycode.SDLK_KP_ENTER])
             {
                 _windowController.Fullscreen = !_windowController.Fullscreen;
                 _windowController.CreateWindowAndContext();
             }
         }
 
-        static void OnWindowChange(object sender, WindowEventArgs eventArgs)
+        static void OnWindowClose(object sender, EventArgs eventArgs)
         {
-            if(eventArgs.EventTypes.Contains(WindowEvent.EXIT))
-            { 
-                _windowController.Dispose();
-                _graphicsController.Dispose();
-                Environment.Exit(0); 
-            }
-            if(eventArgs.EventTypes.Contains(WindowEvent.RESIZE))
-            {
-                _windowController.UpdateWindowSize();
-                _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
-            }
+            _windowController.Dispose();
+            _graphicsController.Dispose();
+            Environment.Exit(0);
+        }
+
+        static void OnWindowResized(object sender, EventArgs eventArgs)
+        {
+            _windowController.UpdateWindowSize();
+            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
         }
     }
 }
