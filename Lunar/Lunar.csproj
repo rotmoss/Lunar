@@ -20,8 +20,7 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Sable\Sable\Lunar\</OutputPath>
-    <GenerateSerializationAssemblies>Auto</GenerateSerializationAssemblies>
+    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -128,10 +127,6 @@
 
   <ItemGroup>
     <None Include="$(SolutionDir)\Lunar\GameData\**" CopyToOutputDirectory="PreserveNewest" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <None Remove="C:\Users\Jonatan\Documents\GitHub\Lunar\Lunar\GameData\Scripts\Movement.cs" />
   </ItemGroup>
 
 </Project>

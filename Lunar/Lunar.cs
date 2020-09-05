@@ -28,8 +28,8 @@ namespace Lunar
 
             _windowController.Init();
             _windowController.Fullscreen = false;
-            _windowController.Width = 960;
-            _windowController.Height = 540;
+            _windowController.Width = 1280;
+            _windowController.Height = 720;
             _windowController.CreateWindowAndContext();
 
             assemblyAwaiter.Wait();
@@ -85,12 +85,12 @@ namespace Lunar
 
         static void OnKeyDown(object sender, KeyboardState eventArgs)
         {
-            if (eventArgs.RawStates[SDL.SDL_Keycode.SDLK_ESCAPE]) {
+            if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_ESCAPE]) {
                 _windowController.Dispose();
                 _graphicsController.Dispose();
                 Environment.Exit(0);
             }
-            if (eventArgs.RawStates[SDL.SDL_Keycode.SDLK_LALT] && eventArgs.RawStates[SDL.SDL_Keycode.SDLK_KP_ENTER])
+            if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_LALT] && eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_KP_ENTER])
             {
                 _windowController.Fullscreen = !_windowController.Fullscreen;
                 _windowController.CreateWindowAndContext();

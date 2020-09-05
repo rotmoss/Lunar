@@ -2,7 +2,7 @@
 
 namespace Lunar
 {
-    public abstract class Script
+    public abstract partial class Script
     {
         public uint _id;
         public string _name;

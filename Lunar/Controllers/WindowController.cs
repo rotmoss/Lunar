@@ -12,20 +12,20 @@ namespace Lunar
         private IntPtr _context;
         private IntPtr _window;
 
-        public const float GameW = 1920;
-        public const float GameH = 1080;
+        public const float GameW = 1280;
+        public const float GameH = 720;
 
         public int Width { get => _width; set { _width = value > 0 ? value : _width; } }
         private int _width;
         public int Height { get => _height; set { _height = value > 0 ? value : _height; } }
         private int _height;
+        public bool Fullscreen { get => _fullscreen; set => _fullscreen = value; }
+        private bool _fullscreen;
 
         public Matrix4x4f Scaling => _scaling;
         private Matrix4x4f _scaling;
 
         private bool _stretch;
-        public bool Fullscreen { get => _fullscreen; set => _fullscreen = value; }
-        private bool _fullscreen;
         private const float ASPECT_RATIO = 16.0f / 9.0f;
 
         /// <summary> Initializes SDL and creates window and renderer. </summary>
@@ -74,12 +74,10 @@ namespace Lunar
             Gl.LoadIdentity();
             Gl.Viewport(0, 0, _width, _height);
 
-            float w = _width;
-            float h = _height;
-
             _scaling = Matrix4x4f.Identity;
+            float newRatio = (float)_width / (float)_height;
             if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
-            else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / (w / h))), 1f / GameH, 1); }
+            else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / newRatio)), 1f / GameH, 1); }
         }
 
         internal void UpdateWindowSize()

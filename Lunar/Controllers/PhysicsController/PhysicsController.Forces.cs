@@ -65,10 +65,12 @@ namespace Lunar
                 //Calculate speed from acceleration
                 _speed[id] += _acceleration[id] * Time.DeltaTime;
 
-                _speed[id] *= _friction[id];
-
                 //Calculate position from speed
-                transforms[id] += _speed[id] * Time.DeltaTime;  
+                transforms[id] += _speed[id] * Time.DeltaTime;
+
+                Vector2 friction = Vector2.Normalize(new Vector2(-_speed[id].X, -_speed[id].Y)) * Time.DeltaTime * _friction[id];
+                if (!float.IsNaN(friction.X) && !float.IsNaN(friction.Y) && friction.Length() < _speed[id].Length()) { _speed[id] += friction; }
+                else { _speed[id] = Vector2.Zero; }
             }
         }
 

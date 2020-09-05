@@ -13,13 +13,13 @@ namespace Lunar
         private SDL_Event _inputPolling;
 
         private Keyboard _keyboard;
-        public EventHandler<EventArgs> OnKeyDown;
-        public EventHandler<EventArgs> OnKeyUp;
+        public EventHandler<KeyboardState> OnKeyDown;
+        public EventHandler<KeyboardState> OnKeyUp;
 
         private List<GameController> _gameControllers;
-        public EventHandler<EventArgs> OnButtonDown;
-        public EventHandler<EventArgs> OnButtonUp;
-        public EventHandler<EventArgs> OnAxisChange;
+        public EventHandler<GameControllerState> OnButtonDown;
+        public EventHandler<GameControllerState> OnButtonUp;
+        public EventHandler<GameControllerState> OnAxisChange;
 
         public EventHandler<EventArgs> OnWindowClose;
         public EventHandler<EventArgs> OnWindowEnter;
@@ -37,7 +37,7 @@ namespace Lunar
         public EventHandler<EventArgs> OnWindowSizeChanged;
         public EventHandler<EventArgs> OnWindowTakeFocus;
 
-        public InputController()
+        private InputController()
         {
             _gameControllers = new List<GameController>();
 
@@ -57,7 +57,7 @@ namespace Lunar
         public bool KeyDown(Key key) => _keyboard.ReadKeyState(key);
         public bool KeyDown(SDL_Keycode key) => _keyboard.ReadRawKeyState(key);
 
-        public void PollInputs()
+        internal void PollInputs()
         {
             GameController controller;
 
@@ -67,33 +67,33 @@ namespace Lunar
                 {
                     controller = _gameControllers.Where(x => x.DeviceId == _inputPolling.jbutton.which).FirstOrDefault();
                     if (controller != null) {
-                        GameControllerState state = controller.OnButtonStateChange((SDL_GameControllerButton)_inputPolling.jbutton.button, _inputPolling.type);
-                        if (state != null)OnButtonDown?.Invoke(null, state);
+                        controller.ChangeButtonState((SDL_GameControllerButton)_inputPolling.jbutton.button, true);
+                        OnButtonDown?.Invoke(null, controller.GetState());
                     }
                 }
                 else if (_inputPolling.type == SDL_EventType.SDL_JOYBUTTONUP)
                 {
                     controller = _gameControllers.Where(x => x.DeviceId == _inputPolling.jbutton.which).FirstOrDefault();
                     if (controller != null)  {
-                        GameControllerState state = controller.OnButtonStateChange((SDL_GameControllerButton)_inputPolling.jbutton.button, _inputPolling.type);
-                        if (state != null) OnButtonDown?.Invoke(null, state);
+                        controller.ChangeButtonState((SDL_GameControllerButton)_inputPolling.jbutton.button, false);
+                        OnButtonDown?.Invoke(null, controller.GetState());
                     }
                 }
                 else if (_inputPolling.type == SDL_EventType.SDL_JOYAXISMOTION)
                 {
                     controller = _gameControllers.Where(x => x.DeviceId == _inputPolling.jbutton.which).FirstOrDefault();
                     if (controller != null) {
-                        GameControllerState state = controller.OnAxisStateChange((SDL_GameControllerAxis)_inputPolling.jaxis.axis, _inputPolling.jaxis.axisValue);
-                        if (state != null) OnAxisChange?.Invoke(null, state);
+                        controller.ChangeAxisState((SDL_GameControllerAxis)_inputPolling.jaxis.axis, _inputPolling.jaxis.axisValue);
+                        OnAxisChange?.Invoke(null, controller.GetState());
                     }
                 }
                 else if (_inputPolling.type == SDL_EventType.SDL_KEYDOWN) {
-                    KeyboardState state = _keyboard.ChangeKeyState(_inputPolling.key.keysym.sym, _inputPolling.type);
-                    if (state != null) { OnKeyDown?.Invoke(null, state);  }
+                    _keyboard.ChangeRawKeyState(_inputPolling.key.keysym.sym, true);
+                    OnKeyDown?.Invoke(null, _keyboard.GetState());
                 }
                 else if (_inputPolling.type == SDL_EventType.SDL_KEYUP) {
-                    KeyboardState state = _keyboard.ChangeKeyState(_inputPolling.key.keysym.sym, _inputPolling.type);
-                    if (state != null) { OnKeyUp?.Invoke(null, state); }
+                    _keyboard.ChangeRawKeyState(_inputPolling.key.keysym.sym, false);
+                    OnKeyUp?.Invoke(null, _keyboard.GetState());
                 }
                 else if (_inputPolling.type == SDL_EventType.SDL_WINDOWEVENT) {
                     switch(_inputPolling.window.windowEvent)

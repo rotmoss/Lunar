@@ -4,6 +4,18 @@ using static SDL2.SDL;
 
 namespace Lunar
 {
+    public class GameControllerState : EventArgs
+    {
+        public readonly Dictionary<Button, bool> ButtonStates;
+        public readonly Dictionary<Axis, float> AxisStates;
+
+        public GameControllerState(Dictionary<Axis, float> axisStates, Dictionary<Button, bool> buttonStates)
+        {
+            AxisStates = axisStates == null ? new Dictionary<Axis, float>() : axisStates;
+            ButtonStates = buttonStates == null ? new Dictionary<Button, bool>() : buttonStates;
+        }
+    }
+
     public class GameController
     {
         private IntPtr _controller;
@@ -34,38 +46,11 @@ namespace Lunar
             DeviceId = SDL_JoystickInstanceID(_controller);
         }
 
-        public GameControllerState OnButtonStateChange(SDL_GameControllerButton button, SDL_EventType type)
-        {
-            if (!_buttonMap.ContainsKey(button)) return null;
-
-            if (type == SDL_EventType.SDL_JOYBUTTONDOWN) {
-                _buttonStates[_buttonMap[button]] = true;
-                return ToGameControllerState();
-            }
-            else if (type == SDL_EventType.SDL_JOYBUTTONUP) {
-                _buttonStates[_buttonMap[button]] = false;
-                return ToGameControllerState();
-            }
-            return null;
-        }
-
-        public GameControllerState OnAxisStateChange(SDL_GameControllerAxis axis, float value)
-        {
-            if (!_axisMap.ContainsKey(axis)) return null;
-
-            _axisStates[_axisMap[axis]] = value;
-            return ToGameControllerState();
-        }
-
-        public GameControllerState ToGameControllerState()
-        {
-            GameControllerState e = new GameControllerState();
-            e.DeviceId = DeviceId;
-            e.ButtonStates = _buttonStates;
-            e.AxisStates = _axisStates;
-            return e;
-        }
-
+        public void ChangeButtonState(SDL_GameControllerButton button, bool state) => _buttonStates[_buttonMap[button]] = _buttonMap.ContainsKey(button) ? state : _buttonStates[_buttonMap[button]];
+        public void ChangeAxisState(SDL_GameControllerAxis axis, float value) => _axisStates[_axisMap[axis]] = _axisMap.ContainsKey(axis) ? value : _axisStates[_axisMap[axis]];
+        
+        public GameControllerState GetState() => new GameControllerState(_axisStates, _buttonStates);
+        
         public static readonly Dictionary<SDL_GameControllerButton, Button> DefaultButtonMap = new Dictionary<SDL_GameControllerButton, Button>
         {
             { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A, Button.BUTTON_0 },
