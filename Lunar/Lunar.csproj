@@ -36,7 +36,7 @@
   </PropertyGroup>
   
   <ItemGroup>
-    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.5.0" />
+    <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
     <PackageReference Include="OpenGL.Net" Version="0.8.4" />
     <PackageReference Include="OpenGL.Net.Math" Version="0.8.4" />
   </ItemGroup>

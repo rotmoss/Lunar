@@ -32,8 +32,8 @@ namespace Lunar
         {
             _controller = controller;
 
-            _buttonMap = buttonMap == null ? DefaultButtonMap : buttonMap;
-            _axisMap = axisMap == null ? DefaultAxisMap : axisMap;
+            _buttonMap = buttonMap ?? DefaultButtonMap;
+            _axisMap = axisMap ?? DefaultAxisMap;
 
             _buttonStates = new Dictionary<Button, bool>();
             _axisStates = new Dictionary<Axis, float>();
@@ -48,7 +48,7 @@ namespace Lunar
 
         public void ChangeButtonState(SDL_GameControllerButton button, bool state) { if (_buttonMap.ContainsKey(button)) { _buttonStates[_buttonMap[button]] = state; } }
         public void ChangeAxisState(SDL_GameControllerAxis axis, float value) { if (_axisMap.ContainsKey(axis)) { _axisStates[_axisMap[axis]] = value; } }
-        public bool ReadButtonState(Button button) => _buttonStates.ContainsKey(button) ? _buttonStates[button] : false;
+        public bool ReadButtonState(Button button) => _buttonStates.ContainsKey(button) && _buttonStates[button];
         public float ReadAxisState(Axis axis) => _axisStates.ContainsKey(axis) ? _axisStates[axis] : 0;
         public GameControllerState GetState() => new GameControllerState(_axisStates, _buttonStates);
         

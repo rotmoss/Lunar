@@ -1,8 +1,8 @@
-﻿using System;
+﻿using OpenGL;
+using System;
 using System.Collections.Generic;
-using OpenGL;
-using System.Text;
 using System.Linq;
+using System.Text;
 using System.Text.RegularExpressions;
 
 namespace Lunar
@@ -23,14 +23,14 @@ namespace Lunar
             uint vs = CompileShader(vertexSource, ShaderType.VertexShader);
             uint fs = CompileShader(fragmentSource, ShaderType.FragmentShader);
 
-            uint shaderprogram = Gl.CreateProgram();
+            uint shaderProgram = Gl.CreateProgram();
 
-            if(!AttachShader(vs, fs, shaderprogram)) Gl.DeleteProgram(shaderprogram);
+            if(!AttachShader(vs, fs, shaderProgram)) Gl.DeleteProgram(shaderProgram);
 
             Gl.DeleteShader(vs);
             Gl.DeleteShader(fs);
 
-            return shaderprogram;
+            return shaderProgram;
         }
 
         internal string[] LoadShader(string file, ShaderType type)
@@ -65,14 +65,14 @@ namespace Lunar
         internal string GetShaderInfo(uint id)
         {
             StringBuilder infolog = new StringBuilder(1024);
-            Gl.GetShaderInfoLog(id, 1024, out int infologLength, infolog);
+            Gl.GetShaderInfoLog(id, 1024, out _, infolog);
             return infolog.ToString();
         }
 
         internal string GetProgramInfo(uint id)
         {
             StringBuilder infolog = new StringBuilder(1024);
-            Gl.GetProgramInfoLog(id, 1024, out int infologLength, infolog);
+            Gl.GetProgramInfoLog(id, 1024, out _, infolog);
             return infolog.ToString();
         }
 
@@ -91,7 +91,7 @@ namespace Lunar
         internal void DeleteShader(uint id) => Gl.DeleteProgram(_shaders[id]);
         public void ForeachShader(Action<uint> actions) => _shaders.Keys.ToList().ForEach(actions);
 
-        string[] _vsDefault =
+        readonly string[] _vsDefault =
         {
             "#version 330 core\n",
             "layout(location = 0) in vec3 aPos;\n",
@@ -106,7 +106,8 @@ namespace Lunar
             "   TexCoord = aTexCoord;\n",
             "}\n"
         };
-        string[] _fsDefault =
+
+        readonly string[] _fsDefault =
         {
             "#version 330 core\n",
             "out vec4 FragColor;\n",

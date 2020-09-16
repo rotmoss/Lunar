@@ -1,6 +1,4 @@
-﻿using System;
-
-namespace Lunar
+﻿namespace Lunar
 {
     public partial class Script
     {

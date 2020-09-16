@@ -35,7 +35,7 @@ namespace Lunar
                 {
                     string[] tokens = temp.Split(Seperator);
 
-                    if (file.ToLower() == tokens[tokens.Length - 1].ToLower())
+                    if (file.ToLower() == tokens[^1].ToLower())
                     {
                         return temp;
                     }

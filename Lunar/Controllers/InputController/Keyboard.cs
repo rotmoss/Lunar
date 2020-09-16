@@ -1,6 +1,6 @@
 ﻿using System;
-using System.Linq;
 using System.Collections.Generic;
+using System.Linq;
 using static SDL2.SDL;
 
 namespace Lunar
@@ -11,7 +11,7 @@ namespace Lunar
 
         public KeyboardState(Dictionary<SDL_Keycode, bool> rawKeyStates)
         {
-            RawKeyStates = rawKeyStates == null ? new Dictionary<SDL_Keycode, bool>() : rawKeyStates;
+            RawKeyStates = rawKeyStates ?? new Dictionary<SDL_Keycode, bool>();
         }
     }
 
@@ -22,7 +22,7 @@ namespace Lunar
 
         public Keyboard(Dictionary<Key, SDL_Keycode> keyMap = null)
         {
-            _keyMap = keyMap == null ? DefaultKeyMap : keyMap;
+            _keyMap = keyMap ?? DefaultKeyMap;
             _rawKeyStates = Enum.GetValues(typeof(SDL_Keycode)).OfType<SDL_Keycode>().ToDictionary(x => x, x => false);
         }
 

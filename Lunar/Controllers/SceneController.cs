@@ -1,15 +1,13 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Linq;
-using System.Xml.Serialization;
 
 namespace Lunar
 {
     public partial class SceneController
     {
         private static SceneController instance = null;
-        public static SceneController Instance { get { instance = instance == null ? new SceneController() : instance; return instance; } }
+        public static SceneController Instance { get { instance ??= new SceneController(); return instance; } }
 
         private IdCollection _ids;
 
@@ -29,10 +27,10 @@ namespace Lunar
                 return dictionary;
              } 
         }
-        public Dictionary<uint, Transform> LocalTransforms { get { return _transforms; } }
+        public Dictionary<uint, Transform> LocalTransforms { get => _transforms; }
         private Dictionary<uint, Transform> _transforms;
 
-        public Dictionary<uint, bool> Visible { get { return _visible; } }
+        public Dictionary<uint, bool> Visible { get => _visible; }
         private Dictionary<uint, bool> _visible;
 
         private SceneController()
@@ -94,7 +92,7 @@ namespace Lunar
 
             foreach(XmlElementEntity entity in array)
             {
-                if (entity.Parent == "" || entity.Parent == null) continue;
+                if (string.IsNullOrEmpty(entity.Parent)) continue;
 
                 uint id = GetEntityID(entity.Name);
                 uint parentId = GetEntityID(entity.Parent);

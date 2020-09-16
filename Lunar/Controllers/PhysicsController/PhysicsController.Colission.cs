@@ -1,10 +1,6 @@
-﻿using OpenGL;
-using System;
+﻿using System;
 using System.Collections.Generic;
-using System.Diagnostics;
-using System.Windows;
 using System.Numerics;
-using System.Text;
 using System.Threading.Tasks;
 
 namespace Lunar
@@ -57,22 +53,22 @@ namespace Lunar
 
                 foreach (Transform initial in _colliders[initialId])
                 {
-                    foreach (uint correspondantId in _colliders.Keys)
+                    foreach (uint correspondentId in _colliders.Keys)
                     {
                         //The collider shouldn't collide withn itself
-                        if (initialId == correspondantId) continue;
+                        if (initialId == correspondentId) continue;
 
-                        foreach (Transform correspondant in _colliders[correspondantId])
+                        foreach (Transform correspondent in _colliders[correspondentId])
                         {
                             Transform a = initial + LocalTransforms[initialId];
-                            Transform b = correspondant + LocalTransforms[correspondantId];
+                            Transform b = correspondent + LocalTransforms[correspondentId];
 
                             if (DoesOverlap(a, b)) {
                                 Side side = CalculateSide(a.position, b.position, b.scale);
 
                                 Move(
-                                    LocalTransforms, GlobalTransforms, initialId, correspondantId, 
-                                    initial, correspondant, side);
+                                    LocalTransforms, GlobalTransforms, initialId, correspondentId, 
+                                    initial, correspondent, side);
 
                                 _acceleration[initialId] = side == Side.LEFT || side == Side.RIGHT ? new Vector2(0, _acceleration[initialId].Y) : new Vector2(_acceleration[initialId].X, 0);
                                 _speed[initialId] = side == Side.LEFT || side == Side.RIGHT ? new Vector2(0, _speed[initialId].Y) : new Vector2(_speed[initialId].X, 0);

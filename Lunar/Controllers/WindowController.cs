@@ -1,13 +1,13 @@
-﻿using System;
+﻿using OpenGL;
 using SDL2;
-using OpenGL;
+using System;
 
 namespace Lunar
 {
     class WindowController
     {
         private static WindowController instance = null;
-        public static WindowController Instance { get { instance = instance == null ? new WindowController() : instance; return instance; } }
+        public static WindowController Instance { get { instance ??= new WindowController(); return instance; } }
 
         private IntPtr _context;
         private IntPtr _window;

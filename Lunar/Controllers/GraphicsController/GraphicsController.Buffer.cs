@@ -1,6 +1,6 @@
-﻿using System.Collections.Generic;
-using OpenGL;
+﻿using OpenGL;
 using System;
+using System.Collections.Generic;
 
 namespace Lunar
 {

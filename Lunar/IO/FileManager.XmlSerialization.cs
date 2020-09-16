@@ -1,5 +1,5 @@
-﻿using System.Xml.Serialization;
-using System.IO;
+﻿using System.IO;
+using System.Xml.Serialization;
 
 namespace Lunar
 {
@@ -8,10 +8,8 @@ namespace Lunar
         public static T Dezerialize<T>(string file, string directory, string rootElement)
         {
             XmlSerializer serializer = new XmlSerializer(typeof(T), new XmlRootAttribute(rootElement));
-            using (StreamReader reader = new StreamReader(Path + directory + Seperator + file))
-            {
-                return (T)serializer.Deserialize(reader);
-            }
+            using StreamReader reader = new StreamReader(Path + directory + Seperator + file);
+            return (T)serializer.Deserialize(reader);
         }
     }
 

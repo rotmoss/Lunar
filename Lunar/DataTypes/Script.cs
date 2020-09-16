@@ -1,7 +1,4 @@
-﻿using System;
-using System.Numerics;
-
-namespace Lunar
+﻿namespace Lunar
 {
     public abstract partial class Script
     {

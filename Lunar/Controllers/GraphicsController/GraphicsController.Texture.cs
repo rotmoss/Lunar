@@ -1,12 +1,9 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+﻿using OpenGL;
 using SDL2;
-using static SDL2.SDL;
+using System;
+using System.Collections.Generic;
 using System.Runtime.InteropServices;
-using OpenGL;
+using static SDL2.SDL;
 
 namespace Lunar
 {
@@ -73,7 +70,7 @@ namespace Lunar
         {
             try { value = SDL_image.IMG_Load(FileManager.FindFile(file, "Textures")); }
             catch { Console.WriteLine("Couldn't load texture " + file); value = IntPtr.Zero; }
-            return value == IntPtr.Zero ? false : true;
+            return value != IntPtr.Zero;
         }
 
         private bool LoadText(string fontFile, string text, int size, SDL_Color color, uint wrapped, out IntPtr value)
@@ -83,14 +80,14 @@ namespace Lunar
             catch { Console.WriteLine("Couldn't load font " + fontFile); value = IntPtr.Zero; return false; }
 
             value = SDL_ttf.TTF_RenderUTF8_Blended_Wrapped(font, text, color, wrapped);            
-            return value == IntPtr.Zero ? false : true;
+            return value != IntPtr.Zero;
         }
 
         private bool GetGLPixelFormat(uint format, out PixelFormat result)
         {
             if (SDL_GetPixelFormatName(format) == "SDL_PIXELFORMAT_ABGR8888") { result = PixelFormat.Rgba; return true; }
-            else if (SDL_GetPixelFormatName(format) == "SDL_PIXELFORMAT_ARGB8888") { result = PixelFormat.Bgra; return true; }
-            else if (SDL_GetPixelFormatName(format) == "SDL_PIXELFORMAT_RGB24") { result = PixelFormat.Rgb; return true; }
+            if (SDL_GetPixelFormatName(format) == "SDL_PIXELFORMAT_ARGB8888") { result = PixelFormat.Bgra; return true; } 
+            if (SDL_GetPixelFormatName(format) == "SDL_PIXELFORMAT_RGB24") { result = PixelFormat.Rgb; return true; }
 
             Console.WriteLine("Pixelformat " + SDL_GetPixelFormatName(format) + " is not recognized: "); 
             result = PixelFormat.Rgb; 

@@ -8,7 +8,7 @@ namespace Lunar
     public partial class ScriptController
     {
         private static ScriptController instance = null;
-        public static ScriptController Instance { get { instance = instance == null ? new ScriptController() : instance; return instance; } }
+        public static ScriptController Instance { get { instance ??= new ScriptController(); return instance; } }
 
         private Dictionary<uint, Script> _scripts;
 

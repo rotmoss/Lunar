@@ -1,5 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using System.Numerics;
 
 namespace Lunar
@@ -7,7 +6,7 @@ namespace Lunar
     public partial class PhysicsController
     {
         private static PhysicsController instance = null;
-        public static PhysicsController Instance { get { instance = instance == null ? new PhysicsController() : instance; return instance; } }
+        public static PhysicsController Instance { get { instance ??= new PhysicsController(); return instance; } }
 
         private PhysicsController()
         {
