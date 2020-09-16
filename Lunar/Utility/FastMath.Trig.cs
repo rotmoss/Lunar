@@ -6,8 +6,10 @@ using System.Threading.Tasks;
 
 namespace Lunar
 {
-    static partial class FastMath
+    public static partial class FastMath
     {
+        const float DegreesToRadians = MathF.PI / 180f;
+
         private static readonly Dictionary<float, float> SineLookup = CreateSineLookup();
         private static readonly float[] SineLookupKeys = SineLookup.Keys.ToArray();
 

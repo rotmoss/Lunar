@@ -15,9 +15,9 @@ namespace Lunar
         public const float GameW = 1280;
         public const float GameH = 720;
 
-        public int Width { get => _width; set { _width = value > 0 ? value : _width; } }
+        public float Width { get => _width; set { _width = value > 0 ? (int)value : _width; } }
         private int _width;
-        public int Height { get => _height; set { _height = value > 0 ? value : _height; } }
+        public float Height { get => _height; set { _height = value > 0 ? (int)value : _height; } }
         private int _height;
         public bool Fullscreen { get => _fullscreen; set => _fullscreen = value; }
         private bool _fullscreen;
@@ -40,9 +40,6 @@ namespace Lunar
         internal void Init()
         {
             Gl.Initialize();
-
-            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
-            { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
         }
 
         internal void CreateWindowAndContext()
@@ -75,7 +72,7 @@ namespace Lunar
             Gl.Viewport(0, 0, _width, _height);
 
             _scaling = Matrix4x4f.Identity;
-            float newRatio = (float)_width / (float)_height;
+            float newRatio = Width / Height;
             if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
             else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / newRatio)), 1f / GameH, 1); }
         }

@@ -38,7 +38,7 @@ namespace Lunar
             { Key.BUTTON_1, SDL_Keycode.SDLK_UP },
             { Key.BUTTON_2, SDL_Keycode.SDLK_LEFT },
             { Key.BUTTON_3, SDL_Keycode.SDLK_RIGHT },
-            { Key.BUTTON_4, SDL_Keycode.SDLK_t },
+            { Key.BUTTON_4, SDL_Keycode.SDLK_LSHIFT },
             { Key.BUTTON_5, SDL_Keycode.SDLK_a },
             { Key.BUTTON_6, SDL_Keycode.SDLK_s },
             { Key.BUTTON_7, SDL_Keycode.SDLK_d },

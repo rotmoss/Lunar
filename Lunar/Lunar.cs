@@ -19,11 +19,19 @@ namespace Lunar
         private static PhysicsController _physicsController = PhysicsController.Instance;
         private static InputController _inputController = InputController.Instance;
 
+        public static bool DrawColliders { get => _drawColliders; set => _drawColliders = value; }
+        private static bool _drawColliders;
+
         static void Main(string[] args)
         {
+            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
+            { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
+
+            _drawColliders = false;
+
             var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
             _inputController.OnWindowClose += OnWindowClose;
-            _inputController.OnWindowResized += OnWindowResized;
+            _inputController.OnWindowSizeChanged += OnWindowSizeChanged;
             _inputController.OnKeyDown += OnKeyDown;
 
             _windowController.Init();
@@ -39,6 +47,7 @@ namespace Lunar
 
             _scriptController.Init();
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
+            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, Matrix4x4f.Identity, "uModelView"));
 
             assemblyAwaiter.Dispose();
             GC.Collect();
@@ -66,13 +75,10 @@ namespace Lunar
                 _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());
 
                 //Draw colliders as an outline on top of everything else
-                //_physicsController.DrawColliders(transforms);
+                if (_drawColliders) _physicsController.DrawColliders(_sceneController.GlobalTransforms);
 
                 //Update all scripts again
                 _scriptController.LateUpdate();
-
-                //Send DeltaTime to scripts
-                _scriptController.UpdateDeltaTime(Time.DeltaTime);
 
                 _scriptController.PostRender();
 
@@ -104,7 +110,7 @@ namespace Lunar
             Environment.Exit(0);
         }
 
-        static void OnWindowResized(object sender, EventArgs eventArgs)
+        static void OnWindowSizeChanged(object sender, EventArgs eventArgs)
         {
             _windowController.UpdateWindowSize();
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));

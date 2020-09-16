@@ -68,10 +68,14 @@ namespace Lunar
                             Transform b = correspondant + LocalTransforms[correspondantId];
 
                             if (DoesOverlap(a, b)) {
+                                Side side = CalculateSide(a.position, b.position, b.scale);
+
                                 Move(
                                     LocalTransforms, GlobalTransforms, initialId, correspondantId, 
-                                    initial, correspondant, 
-                                    CalculateSide(a.position, b.position, b.scale));
+                                    initial, correspondant, side);
+
+                                _acceleration[initialId] = side == Side.LEFT || side == Side.RIGHT ? new Vector2(0, _acceleration[initialId].Y) : new Vector2(_acceleration[initialId].X, 0);
+                                _speed[initialId] = side == Side.LEFT || side == Side.RIGHT ? new Vector2(0, _speed[initialId].Y) : new Vector2(_speed[initialId].X, 0);
                             }
                         }
                     }
@@ -150,7 +154,7 @@ namespace Lunar
 
             foreach (Delegate d in handler.GetInvocationList())
             {
-                if (((Script)d.Target)._id != id && instance != null)
+                if (((Script)d.Target).Id != id)
                 { handler -= (EventHandler<CollisionEventArgs>)d; }
             }
 

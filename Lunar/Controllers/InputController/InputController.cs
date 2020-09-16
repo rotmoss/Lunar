@@ -54,9 +54,10 @@ namespace Lunar
             }
         }
 
-        public bool KeyDown(Key key) => _keyboard.ReadKeyState(key);
-        public bool KeyDown(SDL_Keycode key) => _keyboard.ReadRawKeyState(key);
-
+        public bool GetKeyState(Key key) => _keyboard.ReadKeyState(key);
+        public bool GetKeyState(SDL_Keycode key) => _keyboard.ReadRawKeyState(key);
+        public bool GetButtonState(Button button, int id) => id < _gameControllers.Count ? _gameControllers[id].ReadButtonState(button) : false;
+        public float GetAxisState(Axis axis, int id) => id < _gameControllers.Count ? _gameControllers[id].ReadAxisState(axis) : 0;
         internal void PollInputs()
         {
             GameController controller;

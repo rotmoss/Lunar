@@ -13,7 +13,6 @@ namespace Lunar
         {
             _speed = new Dictionary<uint, Vector2>();
             _acceleration = new Dictionary<uint, Vector2>();
-            _jerk = new Dictionary<uint, Vector2>();
             _friction = new Dictionary<uint, float>();
             _colliders = new Dictionary<uint, List<Transform>>();
             _movable = new Dictionary<uint, bool>();

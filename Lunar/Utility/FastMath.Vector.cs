@@ -4,8 +4,10 @@ using System.Numerics;
 
 namespace Lunar
 {
-    static partial class FastMath
+    public static partial class FastMath
     {
+        public static Vector2 ToPolar(this Vector2 v) => new Vector2(Cos(v.Y * DegreesToRadians) * v.X, Sin(v.Y * DegreesToRadians) * v.X);
+
         public static Vector2 SumVectors(List<Vector2> vectors)
         {
             Vector2 value = new Vector2(0, 0);
@@ -35,6 +37,14 @@ namespace Lunar
         public static float Angle(this Vector2 value)
         {
             return DiamondAngleToRadians(DiamondAngle(value.X, value.Y));
+        }
+
+        public static Vector2 Deadzone(this Vector2 a, float max, float min, float percent)
+        {
+            percent /= 100f;
+            if (a.X < max * percent && a.X > min * percent) a.X = 0;
+            if (a.Y < max * percent && a.Y > min * percent) a.Y = 0;
+            return a;
         }
 
         private static float DiamondAngle(float y, float x)

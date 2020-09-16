@@ -32,7 +32,7 @@ namespace Lunar
             if (!script.GetType().IsSubclassOf(typeof(Script)))
             { Console.WriteLine("Script " + className + " does not inherit from script"); return; }
 
-            ((Script)script)._id = id;
+            ((Script)script).Id = id;
 
             if (properties != null)
             {
@@ -69,9 +69,7 @@ namespace Lunar
             if (!_scripts.ContainsKey(id)) _scripts.Add(id, (Script)script);
             else { _scripts[id] = (Script)script; }
         }
-        internal List<uint> GetRenderQueue() => _scripts.Values.Where(x => x._visible).Select(x => x._id).ToList();
-        internal void UpdateDeltaTime(float deltaTime) => _scripts.Values.ToList().ForEach(x => x.DeltaTime = deltaTime);
-
+        internal List<uint> GetRenderQueue() => _scripts.Values.Where(x => x.Visible).Select(x => x.Id).ToList();
         internal void Init() =>  _scripts.Values.ToList().ForEach(x => x.Init());
         internal void Update() => _scripts.Values.ToList().ForEach(x => x.Update());
         internal void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.LateUpdate());

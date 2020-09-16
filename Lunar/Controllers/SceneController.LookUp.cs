@@ -4,9 +4,14 @@
     {
         public uint GetEntityID(string name)
         {
-            foreach (uint id in _name.Keys)
-                if (_name[id] == name) return id;
+            foreach (uint id in _names.Keys)
+                if (_names[id] == name) return id;
             return 0;
+        }
+        public string GetEntityName(uint id)
+        {
+            if (_names.ContainsKey(id)) return _names[id];
+            return null;
         }
         public uint GetEntityParent(uint id) => _parent.ContainsKey(id) ? _parent[id] : 0;
         public void SetEntityParent(uint id, uint parent) 

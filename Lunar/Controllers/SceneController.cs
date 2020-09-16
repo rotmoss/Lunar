@@ -13,7 +13,7 @@ namespace Lunar
 
         private IdCollection _ids;
 
-        private Dictionary<uint, string> _name;
+        private Dictionary<uint, string> _names;
         private Dictionary<uint, bool> _enabled;
         private Dictionary<uint, uint> _parent;
         private Dictionary<uint, uint> _scene;
@@ -39,7 +39,7 @@ namespace Lunar
         {
             _ids = new IdCollection();
 
-            _name = new Dictionary<uint, string>();
+            _names = new Dictionary<uint, string>();
             _enabled = new Dictionary<uint, bool>();
             _parent = new Dictionary<uint, uint>();
             _scene = new Dictionary<uint, uint>();
@@ -52,8 +52,8 @@ namespace Lunar
         {
             uint scene = _ids.GetId();
 
-            if (!_name.ContainsKey(scene)) _name.Add(scene, file);
-            else { _name[scene] = file; }
+            if (!_names.ContainsKey(scene)) _names.Add(scene, file);
+            else { _names[scene] = file; }
             if (!_enabled.ContainsKey(scene)) _enabled.Add(scene, true);
             else { _enabled[scene] = true; }
 
@@ -71,8 +71,8 @@ namespace Lunar
             {
                 uint id = _ids.GetId();
 
-                if (!_name.ContainsKey(id)) _name.Add(id, entity.Name);
-                else { _name[id] = entity.Name; }
+                if (!_names.ContainsKey(id)) _names.Add(id, entity.Name);
+                else { _names[id] = entity.Name; }
 
                 if (!_enabled.ContainsKey(id)) _enabled.Add(id, entity.Enabled);
                 else { _enabled[id] = entity.Enabled; }

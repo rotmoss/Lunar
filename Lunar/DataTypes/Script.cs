@@ -1,46 +1,16 @@
 ﻿using System;
+using System.Numerics;
 
 namespace Lunar
 {
     public abstract partial class Script
     {
-        public uint _id;
-        public string _name;
+        public uint Id { get; internal set; }
+        public string Name { get; internal set; }
 
-        public Transform _localTransform 
-        { 
-            get { return SceneController.GetEntityLocalTransform(_id); } 
-            set { SceneController.SetEntityTransform(_id, value); } 
-        }
-
-        public Transform _globalTransform
-        {
-            get { return SceneController.GetEntityGlobalTransform(_id); }
-            set { SceneController.SetEntityTransform(_id, value); }
-        }
-        public bool _visible 
-        { 
-            get { return SceneController.GetEntityVisibility(_id); } 
-            set { SceneController.SetEntityVisibility(_id, value); } 
-        }
-
-        protected GraphicsController GraphicsController;
-        protected SceneController SceneController;
-        protected ScriptController ScriptController;
-        protected PhysicsController PhysicsController;
-        protected InputController InputController;
-
-        public float DeltaTime;
-
-        public Script()
-        {
-            GraphicsController = GraphicsController.Instance;
-            SceneController = SceneController.Instance;
-            ScriptController = ScriptController.Instance;
-            InputController = InputController.Instance;
-            PhysicsController = PhysicsController.Instance;
-        }
-
+        public float DeltaTime { get => Time.DeltaTime; }
+        public bool DrawColliders { get => Lunar.DrawColliders; set => Lunar.DrawColliders = value; }
+        public bool Visible { get => SceneController.Instance.GetEntityVisibility(Id); set => SceneController.Instance.SetEntityVisibility(Id, value); }
         virtual public void Init() { }
         virtual public void Update() { }
         virtual public void LateUpdate() { }

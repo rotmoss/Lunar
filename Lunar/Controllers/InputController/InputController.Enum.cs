@@ -8,9 +8,9 @@ namespace Lunar
 {
     public enum Button
     {
-        BUTTON_0,  BUTTON_1,  BUTTON_2,  BUTTON_3,
-        BUTTON_4,  BUTTON_5,  BUTTON_6,  BUTTON_7, 
-        BUTTON_8,  BUTTON_9,  BUTTON_10, BUTTON_11,
+        A,  B,  X,  Y,
+        START,  BACK,  LEFTSHOULDER,  RIGHTSHOULDER, 
+        LEFTSTICK,  RIGHTSTICK,  BUTTON_10, BUTTON_11,
         BUTTON_12, BUTTON_13, BUTTON_14, BUTTON_15,
 
         DPAD_LEFT, DPAD_RIGHT, DPAD_UP, DPAD_DOWN,
@@ -18,8 +18,8 @@ namespace Lunar
 
     public enum Axis
     {
-        AXIS_0, AXIS_1, AXIS_2, 
-        AXIS_3, AXIS_4, AXIS_5,
+        RIGHTX, RIGHTY, LEFTX, 
+        LEFTY, TRIGGERLEFT, TRIGGERRIGHT,
     }
 
     public enum Key

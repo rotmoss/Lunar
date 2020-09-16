@@ -29,6 +29,8 @@ namespace Lunar
                 Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location), "mscorlib.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SDL2-CS.dll"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenGL.Net.dll"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenGL.Net.Math.dll"),
             };
 
             MetadataReference[] references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).ToArray();

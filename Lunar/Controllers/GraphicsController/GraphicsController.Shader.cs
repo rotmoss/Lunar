@@ -102,7 +102,7 @@ namespace Lunar
             "\n",
             "void main()\n",
             "{\n",
-            "   gl_Position = uProjection * vec4(aPos, 1.0);\n",
+            "   gl_Position = uProjection * uModelView * vec4(aPos, 1.0);\n",
             "   TexCoord = aTexCoord;\n",
             "}\n"
         };

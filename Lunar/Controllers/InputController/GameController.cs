@@ -46,23 +46,24 @@ namespace Lunar
             DeviceId = SDL_JoystickInstanceID(_controller);
         }
 
-        public void ChangeButtonState(SDL_GameControllerButton button, bool state) => _buttonStates[_buttonMap[button]] = _buttonMap.ContainsKey(button) ? state : _buttonStates[_buttonMap[button]];
-        public void ChangeAxisState(SDL_GameControllerAxis axis, float value) => _axisStates[_axisMap[axis]] = _axisMap.ContainsKey(axis) ? value : _axisStates[_axisMap[axis]];
-        
+        public void ChangeButtonState(SDL_GameControllerButton button, bool state) { if (_buttonMap.ContainsKey(button)) { _buttonStates[_buttonMap[button]] = state; } }
+        public void ChangeAxisState(SDL_GameControllerAxis axis, float value) { if (_axisMap.ContainsKey(axis)) { _axisStates[_axisMap[axis]] = value; } }
+        public bool ReadButtonState(Button button) => _buttonStates.ContainsKey(button) ? _buttonStates[button] : false;
+        public float ReadAxisState(Axis axis) => _axisStates.ContainsKey(axis) ? _axisStates[axis] : 0;
         public GameControllerState GetState() => new GameControllerState(_axisStates, _buttonStates);
         
         public static readonly Dictionary<SDL_GameControllerButton, Button> DefaultButtonMap = new Dictionary<SDL_GameControllerButton, Button>
         {
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A, Button.BUTTON_0 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_B, Button.BUTTON_1 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_X, Button.BUTTON_2 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_Y, Button.BUTTON_3 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START, Button.BUTTON_4 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_BACK, Button.BUTTON_5 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSHOULDER, Button.BUTTON_6 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, Button.BUTTON_7 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSTICK, Button.BUTTON_8 },
-            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSTICK, Button.BUTTON_9 },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_A, Button.A },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_B, Button.B },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_X, Button.X },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_Y, Button.Y },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_START, Button.START },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_BACK, Button.BACK },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSHOULDER, Button.LEFTSHOULDER },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSHOULDER, Button.RIGHTSHOULDER },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_LEFTSTICK, Button.LEFTSTICK },
+            { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_RIGHTSTICK, Button.RIGHTSTICK },
             { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_DOWN, Button.DPAD_DOWN },
             { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_LEFT, Button.DPAD_LEFT },
             { SDL_GameControllerButton.SDL_CONTROLLER_BUTTON_DPAD_RIGHT, Button.DPAD_RIGHT },
@@ -71,12 +72,12 @@ namespace Lunar
 
         public static readonly Dictionary<SDL_GameControllerAxis, Axis> DefaultAxisMap = new Dictionary<SDL_GameControllerAxis, Axis>
         {
-            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX, Axis.AXIS_0 },
-            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY, Axis.AXIS_1 },
-            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX, Axis.AXIS_2  },
-            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY, Axis.AXIS_3 },
-            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT, Axis.AXIS_4  },
-            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT, Axis.AXIS_5  },
+            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTX, Axis.RIGHTX },
+            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_RIGHTY, Axis.RIGHTY },
+            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTX, Axis.LEFTX },
+            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_LEFTY, Axis.LEFTY },
+            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERLEFT, Axis.TRIGGERLEFT },
+            { SDL_GameControllerAxis.SDL_CONTROLLER_AXIS_TRIGGERRIGHT, Axis.TRIGGERRIGHT },
         };
     }
 }
