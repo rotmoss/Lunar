@@ -1,12 +1,7 @@
 ﻿using OpenGL;
 using SDL2;
 using System;
-using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
-using System.Reflection.Metadata;
-using System.Runtime.InteropServices;
-using System.Threading.Tasks;
 
 namespace Lunar
 {
@@ -48,6 +43,7 @@ namespace Lunar
             _scriptController.Init();
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
             _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, Matrix4x4f.Identity, "uModelView"));
+            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, Matrix4x4f.Identity, "uCameraView"));
 
             assemblyAwaiter.Dispose();
             GC.Collect();
@@ -69,7 +65,7 @@ namespace Lunar
                 _physicsController.CheckColission(_sceneController.GlobalTransforms, _sceneController.LocalTransforms);
 
                 //Use Transfroms to Translate Graphics Data
-                _graphicsController.TranslateBuffers(_sceneController.GlobalTransforms);
+                _graphicsController.UpdateModelView(_sceneController.GlobalTransforms);
 
                 //Render Graphics
                 _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());

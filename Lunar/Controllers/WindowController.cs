@@ -54,7 +54,7 @@ namespace Lunar
             _window = SDL.SDL_CreateWindow("Game", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, _width, _height, flags);
             _context = SDL.SDL_GL_CreateContext(_window);
 
-            SDL.SDL_GL_SetSwapInterval(1);
+            SDL.SDL_GL_SetSwapInterval(0);
             Gl.ClearColor(0.2f, 0.2f, 0.2f, 1f);
             SetViewport();
 

@@ -10,6 +10,7 @@ namespace Lunar
     partial class GraphicsController
     {
         private Dictionary<uint, uint> _shaders;
+        private Dictionary<uint, Dictionary<string, int>> _uniforms;
         public uint CreateShader(string vertexShader, string fragmentShader)
         {
             string[] vertexSource = LoadShader(vertexShader, ShaderType.VertexShader);
@@ -80,7 +81,10 @@ namespace Lunar
         {
             Gl.UseProgram(_shaders[id]);
 
-            if (data.GetType() == typeof(Matrix4x4f)) { Gl.UniformMatrix4f(Gl.GetUniformLocation(_shaders[id], uniformName), 1, false, data); }
+            if (!_uniforms.ContainsKey(id)) _uniforms.Add(id, new Dictionary<string, int>());
+            if (!_uniforms[id].ContainsKey(uniformName)) _uniforms[id].Add(uniformName, Gl.GetUniformLocation(_shaders[id], uniformName));
+
+            if (data.GetType() == typeof(Matrix4x4f)) { Gl.UniformMatrix4f(_uniforms[id][uniformName], 1, false, data); }
             else { throw new Exception(); }
 
             Gl.UseProgram(0);
@@ -98,11 +102,12 @@ namespace Lunar
             "layout(location = 1) in vec2 aTexCoord;\n",
             "uniform mat4 uProjection;\n",
             "uniform mat4 uModelView;\n",
+            "uniform mat4 uCameraView;\n",
             "out vec2 TexCoord;\n",
             "\n",
             "void main()\n",
             "{\n",
-            "   gl_Position = uProjection * uModelView * vec4(aPos, 1.0);\n",
+            "   gl_Position = uProjection * uCameraView * uModelView * vec4(aPos, 1.0);\n",
             "   TexCoord = aTexCoord;\n",
             "}\n"
         };

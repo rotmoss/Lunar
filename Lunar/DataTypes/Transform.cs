@@ -25,13 +25,12 @@ namespace Lunar
             this.scale = scale;
         }
 
-        public OpenGL.Matrix4x4f ToMatrix4x4f()
-        {
-            OpenGL.Matrix4x4f temp = OpenGL.Matrix4x4f.Identity;
-            temp.Translate(position.X, position.Y, 0);
-            temp.Scale(scale.X, scale.Y, 0);
-            return temp;
-        }
+        public OpenGL.Matrix4x4f ToMatrix4x4f() => new OpenGL.Matrix4x4f(
+            scale.X, 0, 0, 0, 
+            0, scale.Y, 0, 0, 
+            0, 0, 0, 0, 
+            position.X, position.Y, 0, 1
+        ); 
 
         public static Transform operator +(Transform a, Transform b) => new Transform(a.position + b.position, a.scale);
         public static Transform operator +(Transform a, Vector2 b) => new Transform(a.position + b, a.scale);

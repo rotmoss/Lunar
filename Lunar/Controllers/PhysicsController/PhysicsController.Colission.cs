@@ -43,13 +43,13 @@ namespace Lunar
         //Doesnt work properly. It is supposed to check the global transforms and set the local ones.
         internal void CheckColission(Dictionary<uint, Transform> LocalTransforms, Dictionary<uint, Transform> GlobalTransforms)
         {
-            Parallel.ForEach(LocalTransforms.Keys, initialId =>  
+            foreach (uint initialId in LocalTransforms.Keys)
             {
                 //We dont want to move stationary objects
-                if (!_movable.ContainsKey(initialId) || _movable[initialId] == false) return;
+                if (!_movable.ContainsKey(initialId) || _movable[initialId] == false) continue;
 
                 //Check if the enitity has a collider
-                if (!_colliders.ContainsKey(initialId)) return;
+                if (!_colliders.ContainsKey(initialId)) continue;
 
                 foreach (Transform initial in _colliders[initialId])
                 {
@@ -76,7 +76,7 @@ namespace Lunar
                         }
                     }
                 }
-            });
+            }
         }
 
         private void Move(Dictionary<uint, Transform> globalTransforms, Dictionary<uint, Transform> localTransforms, uint id, uint colliderId, Transform initial, Transform correspondant, Side side)

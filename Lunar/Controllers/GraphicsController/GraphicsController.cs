@@ -11,11 +11,11 @@ namespace Lunar
         private GraphicsController()
         {
             _shaders = new Dictionary<uint, uint>();
+            _uniforms = new Dictionary<uint, Dictionary<string, int>>();
             _textures = new Dictionary<uint, List<uint>>();
             _selectedTexture = new Dictionary<uint, int>();
             _vertexArray = new Dictionary<uint, uint>();
             _buffers = new Dictionary<uint, List<Buffer>>();
-            _graphicsTransform = new Dictionary<uint, Transform>();
         }
 
         public void AddShader(uint id, string vs, string fs)
@@ -55,7 +55,6 @@ namespace Lunar
             AddShader(id, vertexShader, fragmentShader);
             AddTexture(id, file, out w, out h);
             AddBuffer(id, w, h);
-            AddTransform(id);
         }
     
         public void CreateText(uint id, string font, string text, int size, Color color, uint wrapper, string vertexShader, string fragmentShader, out int w, out int h)
@@ -63,39 +62,19 @@ namespace Lunar
             AddShader(id, vertexShader, fragmentShader);
             AddText(id, font, text, size, color, wrapper, out w, out h);
             AddBuffer(id, w, h);
-            AddTransform(id);
         }
     
         /// <summary> Uses the graphics transform aswell as the entity transform to translate the vertexbuffer linked to the spcified id. </summary>
         /// <param name="transforms"> A dictionary containing all entity ids and their respective entity transform </param>
-        internal void TranslateBuffers(Dictionary<uint, Transform> transforms)
+        internal void UpdateModelView(Dictionary<uint, Transform> transforms)
         {
             foreach (KeyValuePair<uint, Transform> pair in transforms)
-            {
-                if (_graphicsTransform.ContainsKey(pair.Key) && _buffers.ContainsKey(pair.Key)) {
-                    TranslateBuffer(pair.Key, pair.Value + _graphicsTransform[pair.Key]);
-                }               
-            }
+                if (_buffers.ContainsKey(pair.Key)) TranslateBuffer(pair.Key, pair.Value);
         }
 
         internal void TranslateBuffer(uint id, Transform transform)
         {
-            Buffer buffer = _buffers[id].Where(x => x.name == "aPos").FirstOrDefault();
-
-            float[] bufferData = new float[buffer.data.Length];
-            for (int i = 0; i < bufferData.Length; i++) bufferData[i] = buffer.data[i];
-
-            bufferData[0] = (bufferData[0] + transform.position.X) * transform.scale.X;
-            bufferData[3] = (bufferData[3] + transform.position.X) * transform.scale.X;
-            bufferData[6] = (bufferData[6] + transform.position.X) * transform.scale.X;
-            bufferData[9] = (bufferData[9] + transform.position.X) * transform.scale.X;
-
-            bufferData[1] = (bufferData[1] + transform.position.Y) * transform.scale.Y;
-            bufferData[4] = (bufferData[4] + transform.position.Y) * transform.scale.Y;
-            bufferData[7] = (bufferData[7] + transform.position.Y) * transform.scale.Y;
-            bufferData[10] = (bufferData[10] + transform.position.Y) * transform.scale.Y;
-
-            UpdateBuffer(buffer, bufferData);
+            SetUniform(id, transform.ToMatrix4x4f(), "uModelView");
         }
 
         internal void RenderTexture(uint id)
@@ -157,7 +136,6 @@ namespace Lunar
             _vertexArray.Clear();
             _textures.Clear();
             _shaders.Clear();
-            _graphicsTransform.Clear();
         }
 
         internal void Dispose(uint id)
@@ -166,7 +144,6 @@ namespace Lunar
             if (_vertexArray.ContainsKey(id)) Gl.DeleteBuffers(_vertexArray[id]); _vertexArray.Remove(id);
             if (_textures.ContainsKey(id)) _textures[id].ForEach(y => Gl.DeleteBuffers(y)); _textures.Remove(id);
             if (_shaders.ContainsKey(id)) Gl.DeleteBuffers(_shaders[id]); _shaders.Remove(id);
-            if (_graphicsTransform.ContainsKey(id)) _graphicsTransform.Remove(id);
         }
     }
 }

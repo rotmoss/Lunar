@@ -1,6 +1,8 @@
-﻿using System;
+﻿using SDL2;
+using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading;
 using static SDL2.SDL;
 
 namespace Lunar
@@ -67,7 +69,8 @@ namespace Lunar
                 if (_inputPolling.type == SDL_EventType.SDL_JOYBUTTONDOWN)
                 {
                     controller = _gameControllers.Where(x => x.DeviceId == _inputPolling.jbutton.which).FirstOrDefault();
-                    if (controller != null) {
+                    if (controller != null)
+                    {
                         controller.ChangeButtonState((SDL_GameControllerButton)_inputPolling.jbutton.button, true);
                         OnButtonDown?.Invoke(null, controller.GetState());
                     }
@@ -75,7 +78,8 @@ namespace Lunar
                 else if (_inputPolling.type == SDL_EventType.SDL_JOYBUTTONUP)
                 {
                     controller = _gameControllers.Where(x => x.DeviceId == _inputPolling.jbutton.which).FirstOrDefault();
-                    if (controller != null)  {
+                    if (controller != null)
+                    {
                         controller.ChangeButtonState((SDL_GameControllerButton)_inputPolling.jbutton.button, false);
                         OnButtonDown?.Invoke(null, controller.GetState());
                     }
@@ -83,21 +87,25 @@ namespace Lunar
                 else if (_inputPolling.type == SDL_EventType.SDL_JOYAXISMOTION)
                 {
                     controller = _gameControllers.Where(x => x.DeviceId == _inputPolling.jbutton.which).FirstOrDefault();
-                    if (controller != null) {
+                    if (controller != null)
+                    {
                         controller.ChangeAxisState((SDL_GameControllerAxis)_inputPolling.jaxis.axis, _inputPolling.jaxis.axisValue);
                         OnAxisChange?.Invoke(null, controller.GetState());
                     }
                 }
-                else if (_inputPolling.type == SDL_EventType.SDL_KEYDOWN) {
+                else if (_inputPolling.type == SDL_EventType.SDL_KEYDOWN)
+                {
                     _keyboard.ChangeRawKeyState(_inputPolling.key.keysym.sym, true);
                     OnKeyDown?.Invoke(null, _keyboard.GetState());
                 }
-                else if (_inputPolling.type == SDL_EventType.SDL_KEYUP) {
+                else if (_inputPolling.type == SDL_EventType.SDL_KEYUP)
+                {
                     _keyboard.ChangeRawKeyState(_inputPolling.key.keysym.sym, false);
                     OnKeyUp?.Invoke(null, _keyboard.GetState());
                 }
-                else if (_inputPolling.type == SDL_EventType.SDL_WINDOWEVENT) {
-                    switch(_inputPolling.window.windowEvent)
+                else if (_inputPolling.type == SDL_EventType.SDL_WINDOWEVENT)
+                {
+                    switch (_inputPolling.window.windowEvent)
                     {
                         case SDL_WindowEventID.SDL_WINDOWEVENT_CLOSE: OnWindowClose?.Invoke(null, new EventArgs()); break;
                         case SDL_WindowEventID.SDL_WINDOWEVENT_ENTER: OnWindowEnter?.Invoke(null, new EventArgs()); break;

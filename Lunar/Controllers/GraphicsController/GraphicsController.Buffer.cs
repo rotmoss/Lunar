@@ -24,7 +24,7 @@ namespace Lunar
             uint buffer = Gl.GenBuffer();
 
             Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer);
-            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)(4 * bufferData.Length), bufferData, BufferUsage.StreamDraw);
+            Gl.BufferData(BufferTarget.ArrayBuffer, (uint)(4 * bufferData.Length), bufferData, BufferUsage.StaticCopy);
             Gl.BindBuffer(BufferTarget.ArrayBuffer, 0);
 
             return new Buffer { id = buffer, name = attributeName, size = size, data = bufferData };
