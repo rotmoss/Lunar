@@ -13,6 +13,7 @@ namespace Lunar
         }
 
         const int MAX_DELTA_BITS = 1 << 29;
+        private static unsafe int FloatToInt32Bits(float f)=> *(int*)&f;
         public static bool AlmostEquals(this float a, float b)
         {
             int aInt = FloatToInt32Bits(a);
@@ -25,9 +26,14 @@ namespace Lunar
             return intDiff <= (MAX_DELTA_BITS);
         }
 
-        private static unsafe int FloatToInt32Bits(float f)
+        public static float Normalize(float x, float min, float max)
         {
-            return *((int*)&f);
+            return (x - min) / (max - min);
+        }
+        public static float Sigmoid(float value, float xMultiple = 1, float yMultiple = 1, float xOffset = 0, float yOffset = 0)
+        {
+            float k = MathF.Exp(value * xMultiple) * yMultiple;
+            return (k / (1 + xOffset + k)) + yOffset;
         }
     }
 }
