@@ -9,6 +9,7 @@ namespace Lunar
         private static SceneController instance = null;
         public static SceneController Instance { get { instance ??= new SceneController(); return instance; } }
 
+        public IdCollection Ids { get => _ids; internal set => _ids = value; }
         private IdCollection _ids;
 
         private Dictionary<uint, string> _names;
@@ -25,7 +26,7 @@ namespace Lunar
                     dictionary.Add(pair.Key, GetEntityGlobalTransform(pair.Key));
 
                 return dictionary;
-             } 
+            } 
         }
         public Dictionary<uint, Transform> LocalTransforms { get => _transforms; }
         private Dictionary<uint, Transform> _transforms;
@@ -106,7 +107,7 @@ namespace Lunar
         public Transform GetEntityGlobalTransform(uint id) => _transforms.ContainsKey(id) ? _parent.ContainsKey(id) ? _transforms[id] + GetEntityLocalTransform(_parent[id]) : _transforms[id] : Transform.Zero;
         public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
         public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
-        public void SetEntityVisibility(uint id, bool value) { if (_visible.ContainsKey(id)) _visible[id] = value; }
+        public void SetEntityVisibility(uint id, bool value) { if (!_visible.ContainsKey(id)) _visible.Add(id, value); else { _visible[id] = value; } }
         public void ForEach(Action<uint> action) => _ids.Values.ForEach(action);
     }
 }

@@ -4,7 +4,7 @@ using System;
 
 namespace Lunar
 {
-    class WindowController
+    public class WindowController
     {
         private static WindowController instance = null;
         public static WindowController Instance { get { instance ??= new WindowController(); return instance; } }
@@ -83,7 +83,7 @@ namespace Lunar
             SetViewport();
         }
 
-        internal void SwapBuffer()
+        public void SwapBuffer()
         {
             SDL.SDL_GL_SwapWindow(_window);
             Gl.Clear(ClearBufferMask.ColorBufferBit);

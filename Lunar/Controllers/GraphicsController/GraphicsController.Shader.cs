@@ -93,7 +93,7 @@ namespace Lunar
         internal void UnBindShader() => Gl.UseProgram(0);
         internal void BindShader(uint id) => Gl.UseProgram(_shaders[id]);
         internal void DeleteShader(uint id) => Gl.DeleteProgram(_shaders[id]);
-        public void ForeachShader(Action<uint> actions) => _shaders.Keys.ToList().ForEach(actions);
+        public void ForeachShader(Action<uint> actions) { foreach(uint id in _shaders.Keys) actions.Invoke(id); }
 
         readonly string[] _vsDefault =
         {

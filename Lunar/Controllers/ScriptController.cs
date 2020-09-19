@@ -10,14 +10,14 @@ namespace Lunar
         private static ScriptController instance = null;
         public static ScriptController Instance { get { instance ??= new ScriptController(); return instance; } }
 
-        private Dictionary<uint, Script> _scripts;
+        private Dictionary<uint, KeyValuePair<Script, bool>> _scripts;
 
         private Assembly _assembly;
         public Assembly Assembly { set { _assembly = value; } }
 
         private ScriptController()
         {
-            _scripts = new Dictionary<uint, Script>();
+            _scripts = new Dictionary<uint, KeyValuePair<Script, bool>>();
         }
 
         internal void AddScript(uint id, string className, (string, string)[] properties = null)
@@ -53,26 +53,41 @@ namespace Lunar
                                     type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { intResult });
                                 }
                                 break;
+                            case "System.Byte":
+                                if (byte.TryParse(property.Item2, out byte byteResult)) {
+                                    type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { byteResult });
+                                }
+                                break;
                             case "System.Float":
                                 if (float.TryParse(property.Item2, out float floatResult)) {
                                     type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { floatResult });
                                 }
                                 break;
-                            case "System.String":
-                                type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { property.Item2 });
+                            default:
+                                try { type.InvokeMember(property.Item1, BindingFlags.SetField, null, script, new object[] { property.Item2 }); }
+                                catch { continue; }
                                 break;
                         }
                     }
                 }
             }
 
-            if (!_scripts.ContainsKey(id)) _scripts.Add(id, (Script)script);
-            else { _scripts[id] = (Script)script; }
+            if (!_scripts.ContainsKey(id)) _scripts.Add(id, new KeyValuePair<Script, bool>((Script)script, true));
+            else { _scripts[id] = new KeyValuePair<Script, bool>((Script)script, true); }
         }
-        internal List<uint> GetRenderQueue() => _scripts.Values.Where(x => x.Visible).Select(x => x.Id).ToList();
-        internal void Init() =>  _scripts.Values.ToList().ForEach(x => x.Init());
-        internal void Update() => _scripts.Values.ToList().ForEach(x => x.Update());
-        internal void LateUpdate() => _scripts.Values.ToList().ForEach(x => x.LateUpdate());
-        internal void PostRender() => _scripts.Values.ToList().ForEach(x => x.PostRender());
+        internal List<uint> GetRenderQueue() => _scripts.Values.Where(x => x.Key.Visible).Select(x => x.Key.Id).ToList();
+        internal void Init() =>  _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.Init());
+        internal void Update() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.Update());
+        internal void LateUpdate() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.LateUpdate());
+        internal void PostRender() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.PostRender());
+
+        public void DisableScripts(uint callerId)
+        {
+            foreach (uint id in _scripts.Keys) if(id != callerId) _scripts[id] = new KeyValuePair<Script, bool>(_scripts[id].Key, false);
+        }
+        public void EnableScripts()
+        {
+            foreach (uint id in _scripts.Keys) _scripts[id] = new KeyValuePair<Script, bool>(_scripts[id].Key, true);
+        }
     }
 }

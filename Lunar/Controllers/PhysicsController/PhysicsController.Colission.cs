@@ -45,9 +45,6 @@ namespace Lunar
         {
             foreach (uint initialId in LocalTransforms.Keys)
             {
-                //We dont want to move stationary objects
-                if (!_movable.ContainsKey(initialId) || _movable[initialId] == false) continue;
-
                 //Check if the enitity has a collider
                 if (!_colliders.ContainsKey(initialId)) continue;
 
@@ -57,6 +54,8 @@ namespace Lunar
                     {
                         //The collider shouldn't collide withn itself
                         if (initialId == correspondentId) continue;
+                        if (initialId == SceneController.Instance.GetEntityParent(correspondentId)) continue;
+                        if (SceneController.Instance.GetEntityParent(initialId) == correspondentId) continue;
 
                         foreach (Transform correspondent in _colliders[correspondentId])
                         {
@@ -64,6 +63,9 @@ namespace Lunar
                             Transform b = correspondent + LocalTransforms[correspondentId];
 
                             if (DoesOverlap(a, b)) {
+                                //We dont want to move stationary objects
+                                if (!_movable.ContainsKey(initialId) || _movable[initialId] == false) { OnCollision(new CollisionEventArgs { id = correspondentId, side = Side.NONE }, initialId); continue; }
+
                                 Side side = CalculateSide(a.position, b.position, b.scale);
 
                                 Move(

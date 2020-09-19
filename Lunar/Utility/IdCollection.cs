@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace Lunar
 {
-    class IdCollection : IEnumerable<uint>
+    public class IdCollection : IEnumerable<uint>
     {
         public List<uint> Values { get; set; }
 

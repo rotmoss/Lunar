@@ -65,7 +65,7 @@ namespace Lunar
                 _physicsController.CheckColission(_sceneController.GlobalTransforms, _sceneController.LocalTransforms);
 
                 //Use Transfroms to Translate Graphics Data
-                _graphicsController.UpdateModelView(_sceneController.GlobalTransforms);
+                _graphicsController.ForeachShader(id => _graphicsController.SetUniform(id, _sceneController.GlobalTransforms[id].ToMatrix4x4f(), "uModelView"));
 
                 //Render Graphics
                 _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());
