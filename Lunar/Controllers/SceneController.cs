@@ -31,9 +31,6 @@ namespace Lunar
         public Dictionary<uint, Transform> LocalTransforms { get => _transforms; }
         private Dictionary<uint, Transform> _transforms;
 
-        public Dictionary<uint, bool> Visible { get => _visible; }
-        private Dictionary<uint, bool> _visible;
-
         private SceneController()
         {
             _ids = new IdCollection();
@@ -44,7 +41,6 @@ namespace Lunar
             _scene = new Dictionary<uint, uint>();
 
             _transforms = new Dictionary<uint, Transform>();
-            _visible = new Dictionary<uint, bool>();
         }
 
         internal void LoadScene(string file)
@@ -82,9 +78,6 @@ namespace Lunar
                 if (!_transforms.ContainsKey(id)) _transforms.Add(id, new Transform(0, 0, 1, 1));
                 else { _transforms[id] = new Transform(0, 0, 1, 1); }
 
-                if (!_visible.ContainsKey(id)) _visible.Add(id, true);
-                else { _visible[id] = true; }
-
                 List<(string, string)> variables = new List<(string, string)>();
                 if (entity.Script.Vars != null)
                     foreach (XmlElementVar var in entity.Script.Vars) variables.Add((var.Name, var.Value));
@@ -106,8 +99,6 @@ namespace Lunar
         public Transform GetEntityLocalTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : Transform.Zero;
         public Transform GetEntityGlobalTransform(uint id) => _transforms.ContainsKey(id) ? _parent.ContainsKey(id) ? _transforms[id] + GetEntityLocalTransform(_parent[id]) : _transforms[id] : Transform.Zero;
         public void SetEntityTransform(uint id, Transform value) { if (_transforms.ContainsKey(id)) _transforms[id] = value; }
-        public bool GetEntityVisibility(uint id) => _visible.ContainsKey(id) ? _visible[id] : false;
-        public void SetEntityVisibility(uint id, bool value) { if (!_visible.ContainsKey(id)) _visible.Add(id, value); else { _visible[id] = value; } }
         public void ForEach(Action<uint> action) => _ids.Values.ForEach(action);
     }
 }

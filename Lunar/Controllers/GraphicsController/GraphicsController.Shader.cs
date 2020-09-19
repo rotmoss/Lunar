@@ -7,40 +7,50 @@ using System.Text.RegularExpressions;
 
 namespace Lunar
 {
+    public struct ShaderObject
+    {
+        public string VertexShader;
+        public string FragmentShader;
+        public uint ShaderProgram;
+        public Dictionary<string, int> Uniforms;
+    }
     partial class GraphicsController
     {
-        private Dictionary<uint, uint> _shaders;
-        private Dictionary<uint, Dictionary<string, int>> _uniforms;
+        public List<ShaderObject> _shaderPrograms;
+        public Dictionary<string, uint> _vertexShaders;
+        public Dictionary<string, uint> _fragmentShaders;
+
         public uint CreateShader(string vertexShader, string fragmentShader)
         {
-            string[] vertexSource = LoadShader(vertexShader, ShaderType.VertexShader);
-            string[] fragmentSource = LoadShader(fragmentShader, ShaderType.FragmentShader);
+            vertexShader = vertexShader == null ? "" : vertexShader;
+            fragmentShader = fragmentShader == null ? "" : fragmentShader;
 
-            for (int i = 0; i < vertexSource.Length; i++)
-                vertexSource[i] = Regex.Unescape(vertexSource[i]);
-            for (int i = 0; i < fragmentSource.Length; i++)
-                fragmentSource[i] = Regex.Unescape(fragmentSource[i]);
+            foreach (ShaderObject shader in _shaderPrograms) { if (shader.VertexShader == vertexShader && shader.FragmentShader == fragmentShader) { return shader.ShaderProgram; } }
 
-            uint vs = CompileShader(vertexSource, ShaderType.VertexShader);
-            uint fs = CompileShader(fragmentSource, ShaderType.FragmentShader);
+            uint vs, fs;
+
+            if (_vertexShaders.ContainsKey(vertexShader)) { vs = _vertexShaders[vertexShader]; }
+            else { vs = CompileShader(LoadShader(vertexShader, ShaderType.VertexShader), ShaderType.VertexShader); ; if (vs != 0) _vertexShaders.Add(vertexShader, vs); }
+            if (_fragmentShaders.ContainsKey(fragmentShader)) { fs = _fragmentShaders[fragmentShader]; }
+            else { fs = CompileShader(LoadShader(fragmentShader, ShaderType.FragmentShader), ShaderType.FragmentShader); if(fs != 0) _fragmentShaders.Add(fragmentShader, fs); }
 
             uint shaderProgram = Gl.CreateProgram();
-
             if(!AttachShader(vs, fs, shaderProgram)) Gl.DeleteProgram(shaderProgram);
 
-            Gl.DeleteShader(vs);
-            Gl.DeleteShader(fs);
-
+            _shaderPrograms.Add(new ShaderObject { VertexShader = vertexShader, FragmentShader = fragmentShader, ShaderProgram = shaderProgram, Uniforms = new Dictionary<string, int>() });
             return shaderProgram;
         }
 
         internal string[] LoadShader(string file, ShaderType type)
         {
-            if (!FileManager.ReadLines(file, "Shaders", out string[] shaderSource))
+            string[] shaderSource;
+            if (!FileManager.ReadLines(file, "Shaders", out shaderSource))
             {
                 Console.WriteLine("Could not find shader " + file);
-                return type == ShaderType.VertexShader ? _vsDefault : _fsDefault;
+                shaderSource = type == ShaderType.VertexShader ? _vsDefault : _fsDefault;
             }
+
+            Array.ForEach(shaderSource, x => x = Regex.Unescape(x));
             return shaderSource;
         }
 
@@ -59,7 +69,7 @@ namespace Lunar
             Gl.ShaderSource(id, source);
             Gl.CompileShader(id);
             Gl.GetShader(id, ShaderParameterName.CompileStatus, out int compiled);
-            if (compiled == 0) { Console.WriteLine(GetShaderInfo(id)); return 0; }
+            if (compiled == 0) { Console.WriteLine(GetShaderInfo(id)); Gl.DeleteShader(id); return 0; }
             return id;
         }
 
@@ -77,23 +87,27 @@ namespace Lunar
             return infolog.ToString();
         }
 
-        public void SetUniform<T>(uint id, T data, string uniformName) where T : struct
+        public void SetUniform<T>(ShaderObject shaderObject, T data, string uniformName) where T : struct
         {
-            Gl.UseProgram(_shaders[id]);
+            Gl.UseProgram(shaderObject.ShaderProgram);
+            if (!shaderObject.Uniforms.ContainsKey(uniformName)) {
+                shaderObject.Uniforms.Add(uniformName, Gl.GetUniformLocation(shaderObject.ShaderProgram, uniformName));
+            }
 
-            if (!_uniforms.ContainsKey(id)) _uniforms.Add(id, new Dictionary<string, int>());
-            if (!_uniforms[id].ContainsKey(uniformName)) _uniforms[id].Add(uniformName, Gl.GetUniformLocation(_shaders[id], uniformName));
-
-            if (data.GetType() == typeof(Matrix4x4f)) { Gl.UniformMatrix4f(_uniforms[id][uniformName], 1, false, data); }
+            if (data.GetType() == typeof(Matrix4x4f)) { Gl.UniformMatrix4f(shaderObject.Uniforms[uniformName], 1, false, data); }
             else { throw new Exception(); }
 
             Gl.UseProgram(0);
         }
 
-        internal void UnBindShader() => Gl.UseProgram(0);
-        internal void BindShader(uint id) => Gl.UseProgram(_shaders[id]);
-        internal void DeleteShader(uint id) => Gl.DeleteProgram(_shaders[id]);
-        public void ForeachShader(Action<uint> actions) { foreach(uint id in _shaders.Keys) actions.Invoke(id); }
+        public void DisposeShaders()
+        {
+            _shaderPrograms.ForEach(x => Gl.DeleteProgram(x.ShaderProgram));
+            _vertexShaders.Values.ToList().ForEach(x => Gl.DeleteShader(x));
+            _fragmentShaders.Values.ToList().ForEach(x => Gl.DeleteShader(x));
+        }
+
+        public void ForEachShader(Action<ShaderObject> actions) { foreach(ShaderObject shaderObject in _shaderPrograms) actions(shaderObject); }
 
         readonly string[] _vsDefault =
         {
@@ -101,13 +115,12 @@ namespace Lunar
             "layout(location = 0) in vec3 aPos;\n",
             "layout(location = 1) in vec2 aTexCoord;\n",
             "uniform mat4 uProjection;\n",
-            "uniform mat4 uModelView;\n",
             "uniform mat4 uCameraView;\n",
             "out vec2 TexCoord;\n",
             "\n",
             "void main()\n",
             "{\n",
-            "   gl_Position = uProjection * uCameraView * uModelView * vec4(aPos, 1.0);\n",
+            "   gl_Position = uProjection * uCameraView * vec4(aPos, 1.0);\n",
             "   TexCoord = aTexCoord;\n",
             "}\n"
         };

@@ -8,6 +8,8 @@ namespace Lunar
     {
         public static T[] Add<T>(this T[] a, T b)
         {
+            if (a == null) return new T[] { b };
+
             T[] result = new T[a.Length + 1];
 
             Array.Copy(a, result, a.Length);

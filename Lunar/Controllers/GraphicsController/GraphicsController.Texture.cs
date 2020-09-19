@@ -9,9 +9,6 @@ namespace Lunar
 {
     partial class GraphicsController
     {
-        private Dictionary<uint, List<uint>> _textures;
-        private Dictionary<uint, int> _selectedTexture;
-
         internal uint CreateTexture(string file, out int w, out int h)
         {
             if(!LoadSurface(file, out IntPtr surface))
@@ -54,16 +51,15 @@ namespace Lunar
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
             Gl.Disable(EnableCap.Texture2d);
+            Gl.BindTexture(TextureTarget.Texture2d, 0);
 
             return texture;
         }
 
         public void SetCurrentTexture(uint id, int index)
         {
-            if(!_selectedTexture.ContainsKey(id)) { return; }
-
-            if (index < _textures.Count) _selectedTexture[id] = index;
-            else _selectedTexture[id] = 0;
+            GraphicsObject graphicsObject = _graphicsObjects[id];
+            if (graphicsObject.Textures.Length > index) graphicsObject.SelectedTexture = graphicsObject.Textures[index];
         }
 
         private bool LoadSurface(string file, out IntPtr value)
@@ -93,9 +89,5 @@ namespace Lunar
             result = PixelFormat.Rgb; 
             return false;
         }
-
-        internal void BindTexture(uint id) { Gl.Enable(EnableCap.Texture2d); Gl.BindTexture(TextureTarget.Texture2d, _textures[id][_selectedTexture[id]]); }
-        internal void UnBindTexture() { Gl.BindTexture(TextureTarget.Texture2d, 0); Gl.Disable(EnableCap.Texture2d); }
-        internal void DeleteTexture(uint id) => Gl.DeleteTextures(_textures[id][_selectedTexture[id]]);
     }
 }

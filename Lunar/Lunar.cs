@@ -41,9 +41,8 @@ namespace Lunar
             _sceneController.LoadScene("start.xml");
 
             _scriptController.Init();
-            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
-            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, Matrix4x4f.Identity, "uModelView"));
-            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, Matrix4x4f.Identity, "uCameraView"));
+            _graphicsController.ForEachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
+            _graphicsController.ForEachShader(x => _graphicsController.SetUniform(x, Matrix4x4f.Identity, "uCameraView"));
 
             assemblyAwaiter.Dispose();
             GC.Collect();
@@ -65,10 +64,10 @@ namespace Lunar
                 _physicsController.CheckColission(_sceneController.GlobalTransforms, _sceneController.LocalTransforms);
 
                 //Use Transfroms to Translate Graphics Data
-                _graphicsController.ForeachShader(id => _graphicsController.SetUniform(id, _sceneController.GlobalTransforms[id].ToMatrix4x4f(), "uModelView"));
+                _graphicsController.UpdateBuffer(_sceneController.GlobalTransforms);
 
                 //Render Graphics
-                _graphicsController.Render(_sceneController.Visible.Where(x => x.Value).Select(x => x.Key).ToList());
+                _graphicsController.Render();
 
                 //Draw colliders as an outline on top of everything else
                 if (_drawColliders) _physicsController.DrawColliders(_sceneController.GlobalTransforms);
@@ -109,7 +108,7 @@ namespace Lunar
         static void OnWindowSizeChanged(object sender, EventArgs eventArgs)
         {
             _windowController.UpdateWindowSize();
-            _graphicsController.ForeachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
+            _graphicsController.ForEachShader(x => _graphicsController.SetUniform(x, _windowController.Scaling, "uProjection"));
         }
     }
 }

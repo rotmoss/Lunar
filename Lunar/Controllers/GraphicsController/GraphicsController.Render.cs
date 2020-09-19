@@ -1,19 +1,19 @@
 ﻿using System;
-using System.Collections.Generic;
+using System.Linq;
 using OpenGL;
 
 namespace Lunar
 {
     public partial class GraphicsController
     {
-        internal void RenderTexture(uint id)
+        internal void RenderTexture(GraphicsObject graphicsObject)
         {
-            if (!_shaders.ContainsKey(id) || !_vertexArray.ContainsKey(id) || !_selectedTexture.ContainsKey(id) || !_textures.ContainsKey(id)) return;
+            if (!graphicsObject.Visible || graphicsObject.ShaderProgram == 0 || graphicsObject.VertexArrayObject == 0 || graphicsObject.SelectedTexture == 0) return;
 
-            Gl.UseProgram(_shaders[id]);
+            Gl.UseProgram(graphicsObject.ShaderProgram);
             Gl.Enable(EnableCap.Texture2d);
-            Gl.BindVertexArray(_vertexArray[id]);
-            Gl.BindTexture(TextureTarget.Texture2d, _textures[id][_selectedTexture[id]]);
+            Gl.BindVertexArray(graphicsObject.VertexArrayObject);
+            Gl.BindTexture(TextureTarget.Texture2d, graphicsObject.SelectedTexture);
 
             Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
 
@@ -53,6 +53,6 @@ namespace Lunar
             Gl.End();
         }
 
-        public void Render(List<uint> renderQueue) => renderQueue.ForEach(x => RenderTexture(x));
+        public void Render() { foreach (GraphicsObject x in _graphicsObjects.Values) { RenderTexture(x); } }
     }
 }

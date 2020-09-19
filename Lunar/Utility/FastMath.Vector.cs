@@ -62,5 +62,31 @@ namespace Lunar
 
             return MathF.Atan2(y, x);
         }
+
+        public static float[] ToFloatArray(this Vector2[] array)
+        {
+            float[] temp = new float[array.Length * 2];
+
+            for (int i = 0, j = 0; i < array.Length; i++, j += 2)
+            {
+                temp[j] = array[i].X;
+                temp[j + 1] = array[i].Y;
+            }
+
+            return temp;
+        }
+        public static float[] ToFloatArray(this Vector3[] array)
+        {
+            float[] temp = new float[array.Length * 3];
+
+            for (int i = 0, j = 0; i < array.Length; i++, j += 3)
+            {
+                temp[j] = array[i].X;
+                temp[j + 1] = array[i].Y;
+                temp[j + 2] = array[i].Z;
+            }
+
+            return temp;
+        }
     }
 }
