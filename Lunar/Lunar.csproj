@@ -4,18 +4,14 @@
     <OutputType>Exe</OutputType>
     <TargetFramework>net5.0</TargetFramework>
     <LangVersion>preview</LangVersion>
-    <Platforms>AnyCPU;x64;x86</Platforms>
+    <Platforms>x64;x86</Platforms>
     <StartupObject>Lunar.Lunar</StartupObject>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|AnyCPU'">
-    <Identity>C:\Users\Jonatan\Documents\GitHub\Lunar\Lunar\Lunar\SDL2-CS.dll</Identity>
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -25,14 +21,12 @@
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-  </PropertyGroup>
-
-  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|AnyCPU'">
-    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
   </PropertyGroup>
   
   <ItemGroup>
@@ -127,6 +121,17 @@
 
   <ItemGroup>
     <None Include="$(SolutionDir)\Lunar\GameData\**" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lunar.Graphics\Lunar.Graphics.csproj" />
+    <ProjectReference Include="..\Lunar.Input\Lunar.Input.csproj" />
+    <ProjectReference Include="..\Lunar.IO\Lunar.IO.csproj" />
+    <ProjectReference Include="..\Lunar.Physics\Lunar.Physics.csproj" />
+    <ProjectReference Include="..\Lunar.Scene\Lunar.Scene.csproj" />
+    <ProjectReference Include="..\Script\Lunar.Scripts.csproj" />
+    <ProjectReference Include="..\Time\Lunar.Stopwatch.csproj" />
+    <ProjectReference Include="..\Transform\Lunar.Math.csproj" />
   </ItemGroup>
 
 </Project>
