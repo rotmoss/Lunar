@@ -1,6 +1,7 @@
 ﻿using System;
 using SDL2;
 using OpenGL;
+using System.Threading.Tasks;
 
 namespace Lunar.Graphics
 {
@@ -34,18 +35,16 @@ namespace Lunar.Graphics
             _stretch = false;
             _scaling = Matrix4x4f.Identity;
 
-            Gl.Initialize();
             CreateWindowAndContext();
         }
 
         public static void CreateWindowAndContext()
         {
+            Gl.Initialize();
+
             SDL.SDL_WindowFlags flags;
             if (_fullscreen) flags = SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN;
             else flags = SDL.SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE;
-
-            if (_window != IntPtr.Zero) { SDL.SDL_DestroyWindow(_window); _window = IntPtr.Zero; }
-            if (_context != IntPtr.Zero) { SDL.SDL_GL_DeleteContext(_context); _context = IntPtr.Zero; }
 
             _window = SDL.SDL_CreateWindow("Game", SDL.SDL_WINDOWPOS_UNDEFINED, SDL.SDL_WINDOWPOS_UNDEFINED, _width, _height, flags);
             _context = SDL.SDL_GL_CreateContext(_window);

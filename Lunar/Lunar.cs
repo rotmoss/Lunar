@@ -7,43 +7,53 @@ using Lunar.Graphics;
 using Lunar.Input;
 using Lunar.Scripts;
 using Lunar.Stopwatch;
+using System.Threading.Tasks;
+using System.Threading;
 
 namespace Lunar
 { 
     public class Lunar
     {
+        static System.Threading.Thread glThread;
         public static bool DrawColliders { get => _drawColliders; set => _drawColliders = value; }
         private static bool _drawColliders;
 
-        static void Main(string[] args)
+        static void LoadScene()
         {
-            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
-            { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
-
-            _drawColliders = false;
-
             var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
+
             InputController.Init();
 
             InputController.OnWindowClose += OnWindowClose;
             InputController.OnWindowSizeChanged += OnWindowSizeChanged;
             InputController.OnKeyDown += OnKeyDown;
 
-            Window.Init(1280, 720, false);
+            SceneController.Instance.LoadScene("start.xml", out ScriptInfo[] scripts);
 
             assemblyAwaiter.Wait();
             Script.Assembly = assemblyAwaiter.Result;
-
-            SceneController.Instance.LoadScene("start.xml", out ScriptInfo[] scripts);
             Script.AddScripts(scripts);
+
+            assemblyAwaiter.Dispose();
+        }
+
+        static void Main(string[] args)
+        {
+            _drawColliders = false;
+
+            Task task = Task.Run(() => LoadScene());
+
+            if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
+            { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
+            Window.Init(1280, 720, false);
+
+            task.Wait();
+            GC.Collect();
 
             Script.InitScripts();
 
             ShaderProgram.ForEachShader(x => x.SetUniform(Window.Scaling, "uProjection"));
             ShaderProgram.ForEachShader(x => x.SetUniform(Matrix4x4f.Identity, "uCameraView"));
-
-            assemblyAwaiter.Dispose();
-            GC.Collect();
 
             while (true)
             {
