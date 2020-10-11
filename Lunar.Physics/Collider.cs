@@ -34,6 +34,7 @@ namespace Lunar.Physics
 
         public Collider(uint Id, Vector2 size, Vector2 offset, bool movable = false)
         {
+            id = Id;
             this.movable = movable;
             this.offset = offset;
             this.size = size;
@@ -45,11 +46,11 @@ namespace Lunar.Physics
         {
             foreach (Collider collider in _colliders)
             {
-                collider.CheckColission(Transform.GetGlobalTransform(collider.id));
+                if(collider.movable) collider.CheckColission();
             }
         }
 
-        public void CheckColission(Transform transform)
+        public void CheckColission()
         {
             foreach (Collider collider in _colliders)
             {
@@ -61,12 +62,14 @@ namespace Lunar.Physics
                 } while (id != 0);
                 if (id == collider.id) continue;
 
-                Transform a = new Transform(offset, size) + Transform.GetGlobalTransform(id);
+                Transform a = new Transform(offset, size) + Transform.GetGlobalTransform(this.id);
                 Transform b = new Transform(collider.offset, collider.size) + Transform.GetGlobalTransform(collider.id);
 
                 if (DoesOverlap(a, b))
                 {
-                    OnCollision(new ColissionEventArgs { movable = movable, collider = collider, reciever = this, side = CalculateSide(b.position, b.scale) });
+                    Side side = CalculateSide(b.position, b.scale);
+                    MoveTransform(side, Transform.GetLocalTransform(this.id), a, b);
+                    OnCollision(new ColissionEventArgs { movable = movable, collider = collider, reciever = this, side = side });
                 }
             }
         }
@@ -121,7 +124,7 @@ namespace Lunar.Physics
             return true;
         }
 
-        public static void MoveTransform(Side side, ref Transform local, Transform global, Transform collider)
+        public void MoveTransform(Side side, Transform local, Transform global, Transform collider)
         {
             float topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
 
@@ -131,28 +134,28 @@ namespace Lunar.Physics
                     bottomA = global.position.Y + local.position.Y - local.scale.Y;
                     topB = global.position.Y + collider.position.Y + collider.scale.Y;
 
-                    local += new Vector2(0, topB - bottomA);
+                    Transform.Translate(id, new Vector2(0, topB - bottomA));
                     break;
 
                 case Side.BOTTOM:
                     topA = global.position.Y + local.position.Y + local.scale.Y;
                     bottomB = global.position.Y + collider.position.Y - collider.scale.Y;
 
-                    local += new Vector2(0, bottomB - topA);
+                    Transform.Translate(id, new Vector2(0, bottomB - topA));
                     break;
 
                 case Side.LEFT:
                     rightA = global.position.X + local.position.X + local.scale.X;
                     leftB = global.position.X + collider.position.X - collider.scale.X;
 
-                    local += new Vector2(leftB - rightA, 0);
+                    Transform.Translate(id, new Vector2(leftB - rightA, 0));
                     break;
 
                 case Side.RIGHT:
                     leftA = global.position.X + local.position.X - local.scale.X;
                     rightB = global.position.X + collider.position.X + collider.scale.X;
 
-                    local += new Vector2(rightB - leftA, 0);
+                    Transform.Translate(id, new Vector2(rightB - leftA, 0));
                     break;
             }
         }

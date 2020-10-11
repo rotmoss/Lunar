@@ -68,19 +68,19 @@ namespace Lunar.Graphics
 
             if (vs.id == 0) {
                 if (!vs.CompileShader(LoadShaderSource(vertexShader, ShaderType.VertexShader), ShaderType.VertexShader)) {
-                    vs.Dispose(); fs.Dispose(); shaderProgram = null; return false;
+                    Gl.DeleteShader(vs.id); Gl.DeleteShader(fs.id); shaderProgram = null; return false;
                 }
             }
 
             if (fs.id == 0) {
                 if (!fs.CompileShader(LoadShaderSource(fragmentShader, ShaderType.FragmentShader), ShaderType.FragmentShader)) {
-                    vs.Dispose(); fs.Dispose(); shaderProgram = null; return false;
+                    Gl.DeleteShader(vs.id); Gl.DeleteShader(fs.id); shaderProgram = null; return false;
                 }
             }
 
             shaderProgram = new ShaderProgram(vs, fs);
 
-            if (!shaderProgram.CompileProgram()) { shaderProgram.Dispose(); return false; }
+            if (!shaderProgram.CompileProgram()) { Gl.DeleteShader(vs.id); Gl.DeleteShader(fs.id); Gl.DeleteProgram(shaderProgram.id); return false; }
 
             _shaderPrograms.Add(shaderProgram);
             return true;
@@ -101,7 +101,6 @@ namespace Lunar.Graphics
             return shaderSource;
         }
 
-        public static void DisposeAll() { foreach (ShaderProgram x in _shaderPrograms) { x.Dispose(); } }
         public static void ForEachShader(Action<ShaderProgram> actions) { foreach (ShaderProgram shaderObject in _shaderPrograms) actions(shaderObject); }
 
         internal bool CompileProgram()
@@ -138,13 +137,15 @@ namespace Lunar.Graphics
 
             Gl.UseProgram(0);
         }
-
-
-        public void Dispose()
+        public static void DisposeShaders()
         {
-            vs.Dispose();
-            fs.Dispose();
-            Gl.DeleteProgram(id);
+            foreach (Shader shader in _shaders) {
+                Gl.DeleteShader(shader.id);
+            }
+
+            foreach (ShaderProgram shader in _shaderPrograms) {
+                Gl.DeleteProgram(shader.id);
+            }
         }
     }
 }

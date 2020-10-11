@@ -38,13 +38,13 @@ namespace Lunar.Physics
             foreach (Force force in _forces)
             {
                 //Calculate speed from acceleration
-                force._speed += force._acceleration * Time.DeltaTime;
+                force._speed += force._acceleration * (float)Time.DeltaTime;
 
                 //Calculate position from speed
-                Transform.Translate(force._id, force._speed * Time.DeltaTime);
+                Transform.Translate(force._id, force._speed * (float)Time.DeltaTime);
 
                 //Apply friction force
-                Vector2 friction = Vector2.Normalize(-new Vector2(force._speed.X, force._speed.Y)) * Time.DeltaTime * force._frictionConstant;
+                Vector2 friction = Vector2.Normalize(-new Vector2(force._speed.X, force._speed.Y)) * (float)Time.DeltaTime * force._frictionConstant;
                 if (!float.IsNaN(friction.X) && !float.IsNaN(friction.Y) && friction.Length() < force._speed.Length()) { force._speed += friction; }
                 else { force._speed = Vector2.Zero; }
             }

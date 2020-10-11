@@ -7,7 +7,7 @@ using static SDL2.SDL;
 
 namespace Lunar.Graphics
 {
-    class Texture
+    public class Texture
     {
         public uint id;
         public string name;

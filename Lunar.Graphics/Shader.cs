@@ -25,10 +25,5 @@ namespace Lunar.Graphics
             Gl.GetShaderInfoLog(id, 1024, out _, infolog);
             Console.WriteLine(infolog.ToString());
         }
-
-        public void Dispose()
-        {
-            Gl.DeleteShader(id);
-        }
     }
 }

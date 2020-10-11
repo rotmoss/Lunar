@@ -86,10 +86,11 @@ namespace Lunar.Graphics
 
         public static void Close()
         {
+            SDL.SDL_DestroyWindow(_window);
+            SDL.SDL_GL_DeleteContext(_context);
             SDL.SDL_Quit();
             SDL_image.IMG_Quit();
             SDL_ttf.TTF_Quit();
-            SDL.SDL_GL_DeleteContext(_context);
         }
     }
 }

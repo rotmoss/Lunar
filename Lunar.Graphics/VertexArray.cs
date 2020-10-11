@@ -7,12 +7,10 @@ namespace Lunar.Graphics
     public class VertexArray
     {
         internal uint id;
-        internal List<BufferObject> buffers;
 
         public VertexArray()
         {
             id = 0;
-            buffers = new List<BufferObject>();
         }
 
         internal static bool CreateVertexArray(ShaderProgram shaderProgram, out VertexArray vertexArray, params BufferObject[] buffers)
@@ -20,7 +18,6 @@ namespace Lunar.Graphics
             if (shaderProgram == null) { vertexArray = null; return false; }
 
             vertexArray = new VertexArray();
-            vertexArray.buffers.AddRange(buffers);
 
             vertexArray.id = Gl.GenVertexArray();
 

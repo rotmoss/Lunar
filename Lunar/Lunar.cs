@@ -8,13 +8,11 @@ using Lunar.Input;
 using Lunar.Scripts;
 using Lunar.Stopwatch;
 using System.Threading.Tasks;
-using System.Threading;
 
 namespace Lunar
 { 
     public class Lunar
     {
-        static System.Threading.Thread glThread;
         public static bool DrawColliders { get => _drawColliders; set => _drawColliders = value; }
         private static bool _drawColliders;
 
@@ -75,10 +73,12 @@ namespace Lunar
                 Script.LateUpdateScripts();
 
                 //Use Transfroms to Translate Graphics Data
-                GraphicsObject.TranslateBuffers("aPos");
+                RenderData.TranslateBuffers("aPos");
+
+                AnimatedSprite.Animate();
 
                 //Render Graphics
-                GraphicsObject.Render();
+                RenderData.Render();
 
                 //Draw colliders as an outline on top of everything else
                 //if (_drawColliders) _physicsController.DrawColliders(_sceneController.GlobalTransforms);
@@ -96,8 +96,8 @@ namespace Lunar
         static void OnKeyDown(object sender, KeyboardState eventArgs)
         {
             if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_ESCAPE]) {
+                RenderData.DisposeAll();
                 Window.Close();
-                GraphicsObject.DisposeAll();
                 Environment.Exit(0);
             }
             if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_LALT] && eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_KP_ENTER])
@@ -107,10 +107,11 @@ namespace Lunar
             }
         }
 
+
         static void OnWindowClose(object sender, EventArgs eventArgs)
         {
+            RenderData.DisposeAll();
             Window.Close();
-            GraphicsObject.DisposeAll();
             Environment.Exit(0);
         }
 
