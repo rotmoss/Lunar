@@ -9,6 +9,7 @@ using Lunar.Scripts;
 using Lunar.Stopwatch;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
+using Lunar.Audio;
 
 namespace Lunar
 { 
@@ -56,7 +57,10 @@ namespace Lunar
 
             if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
+            if (SDL_mixer.Mix_Init(SDL_mixer.MIX_InitFlags.MIX_INIT_MP3) < 0)
+            { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
             Window.Init(1280, 720, false);
+            Sample.Init();
 
             task.Wait();
             GC.Collect();
@@ -80,7 +84,7 @@ namespace Lunar
                 Force.ApplyForces();
 
                 //Check Colissions
-                Collider.CheckColissions();
+                //Collider.CheckColissions();
 
                 //Update all scripts again
                 Script.LateUpdateScripts();

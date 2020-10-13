@@ -198,6 +198,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\Lunar.Audio\Lunar.Audio.csproj" />
     <ProjectReference Include="..\Lunar.Graphics\Lunar.Graphics.csproj" />
     <ProjectReference Include="..\Lunar.Input\Lunar.Input.csproj" />
     <ProjectReference Include="..\Lunar.IO\Lunar.IO.csproj" />

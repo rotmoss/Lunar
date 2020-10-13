@@ -5,7 +5,7 @@
         public uint GetEntityID(string name)
         {
             foreach (uint id in _names.Keys)
-                if (_names[id] == name) return id;
+                if (_names[id].ToLower() == name.ToLower()) return id;
             return 0;
         }
         public string GetEntityName(uint id)

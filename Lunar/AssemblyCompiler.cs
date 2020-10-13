@@ -46,6 +46,7 @@ namespace Lunar
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Physics.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.StopWatch.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Math.dll"),
+                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Audio.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SDL2-CS.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenGL.Net.dll"),
                 Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenGL.Net.Math.dll"),

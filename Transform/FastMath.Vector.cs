@@ -39,6 +39,12 @@ namespace Lunar.Math
             return DiamondAngleToRadians(DiamondAngle(value.X, value.Y));
         }
 
+        public static float AngleDegrees(this Vector2 value)
+        {
+            return DiamondAngleToRadians(DiamondAngle(value.X, value.Y)) / DegreesToRadians;
+        }
+
+
         public static Vector2 Deadzone(this Vector2 a, float max, float min, float percent)
         {
             percent /= 100f;
