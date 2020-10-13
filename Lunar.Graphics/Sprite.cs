@@ -28,7 +28,6 @@ namespace Lunar.Graphics
             _renderData.Add(this);
         }
 
-
         public void SetSelectedTexture(uint index)
         {
             if (index < textures.Length) { texture = textures[index]; }

@@ -8,13 +8,26 @@ using Lunar.Input;
 using Lunar.Scripts;
 using Lunar.Stopwatch;
 using System.Threading.Tasks;
+using System.Runtime.InteropServices;
 
 namespace Lunar
 { 
     public class Lunar
     {
         public static bool DrawColliders { get => _drawColliders; set => _drawColliders = value; }
-        private static bool _drawColliders;
+        private static bool _drawColliders = true;
+
+        private const int MF_BYCOMMAND = 0x00000000;
+        public const int SC_CLOSE = 0xF060;
+
+        [DllImport("user32.dll")]
+        public static extern int DeleteMenu(IntPtr hMenu, int nPosition, int wFlags);
+
+        [DllImport("user32.dll")]
+        private static extern IntPtr GetSystemMenu(IntPtr hWnd, bool bRevert);
+
+        [DllImport("kernel32.dll", ExactSpelling = true)]
+        private static extern IntPtr GetConsoleWindow();
 
         static void LoadScene()
         {
@@ -37,7 +50,7 @@ namespace Lunar
 
         static void Main(string[] args)
         {
-            _drawColliders = false;
+            DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
 
             Task task = Task.Run(() => LoadScene());
 
@@ -81,7 +94,7 @@ namespace Lunar
                 RenderData.Render();
 
                 //Draw colliders as an outline on top of everything else
-                //if (_drawColliders) _physicsController.DrawColliders(_sceneController.GlobalTransforms);
+                if (_drawColliders) { Collider.DrawColliders(); }
 
                 //Update all scripts again
                 Script.PostRenderUpdateScripts();

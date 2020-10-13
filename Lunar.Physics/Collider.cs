@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Numerics;
 using Lunar.Math;
 using Lunar.Scene;
+using Lunar.Graphics;
 
 namespace Lunar.Physics
 {
@@ -32,7 +33,7 @@ namespace Lunar.Physics
 
         private static List<Collider> _colliders = new List<Collider>();
 
-        public Collider(uint Id, Vector2 size, Vector2 offset, bool movable = false)
+        public Collider(uint Id, Vector2 offset, Vector2 size, bool movable = false)
         {
             id = Id;
             this.movable = movable;
@@ -68,7 +69,7 @@ namespace Lunar.Physics
                 if (DoesOverlap(a, b))
                 {
                     Side side = CalculateSide(b.position, b.scale);
-                    MoveTransform(side, Transform.GetLocalTransform(this.id), a, b);
+                    MoveTransform(side, a, b);
                     OnCollision(new ColissionEventArgs { movable = movable, collider = collider, reciever = this, side = side });
                 }
             }
@@ -124,39 +125,48 @@ namespace Lunar.Physics
             return true;
         }
 
-        public void MoveTransform(Side side, Transform local, Transform global, Transform collider)
+        public void MoveTransform(Side side, Transform global, Transform collider)
         {
             float topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
 
             switch (side)
             {
                 case Side.TOP:
-                    bottomA = global.position.Y + local.position.Y - local.scale.Y;
-                    topB = global.position.Y + collider.position.Y + collider.scale.Y;
+                    bottomA = global.position.Y - global.scale.Y;
+                    topB = collider.position.Y + collider.scale.Y;
 
                     Transform.Translate(id, new Vector2(0, topB - bottomA));
                     break;
 
                 case Side.BOTTOM:
-                    topA = global.position.Y + local.position.Y + local.scale.Y;
-                    bottomB = global.position.Y + collider.position.Y - collider.scale.Y;
+                    topA = global.position.Y + global.scale.Y;
+                    bottomB = collider.position.Y - collider.scale.Y;
 
                     Transform.Translate(id, new Vector2(0, bottomB - topA));
                     break;
 
                 case Side.LEFT:
-                    rightA = global.position.X + local.position.X + local.scale.X;
-                    leftB = global.position.X + collider.position.X - collider.scale.X;
+                    rightA = global.position.X + global.scale.X;
+                    leftB = collider.position.X - collider.scale.X;
 
                     Transform.Translate(id, new Vector2(leftB - rightA, 0));
                     break;
 
                 case Side.RIGHT:
-                    leftA = global.position.X + local.position.X - local.scale.X;
-                    rightB = global.position.X + collider.position.X + collider.scale.X;
+                    leftA = global.position.X - global.scale.X;
+                    rightB = collider.position.X + collider.scale.X;
 
                     Transform.Translate(id, new Vector2(rightB - leftA, 0));
-                    break;
+                    break; 
+            }
+        }
+
+        public static void DrawColliders()
+        {
+            foreach (Collider collider in _colliders)
+            {
+                Transform transform = new Transform(collider.offset, collider.size) + Transform.GetGlobalTransform(collider.id);
+                Window.DrawQuad(false, transform.position.X - transform.scale.X, transform.position.Y - transform.scale.Y, transform.position.X + transform.scale.X, transform.position.Y + transform.scale.Y, 0, 0, 0);
             }
         }
     }

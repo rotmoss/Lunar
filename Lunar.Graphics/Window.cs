@@ -61,6 +61,18 @@ namespace Lunar.Graphics
             Gl.Enable(EnableCap.Blend);
         }
 
+        public static void DrawQuad(bool fill, float x1, float y1, float x2, float y2, byte r, byte b, byte g)
+        {
+            PrimitiveType type = fill ? PrimitiveType.Quads : PrimitiveType.LineStrip;
+            Gl.Color3(r, g,b);
+            Gl.Begin(type);
+            Gl.Vertex2((x1 * Scaling.Row0.x) + (y1 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y1 * Scaling.Row1.y));
+            Gl.Vertex2((x1 * Scaling.Row0.x) + (y2 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y2 * Scaling.Row1.y));
+            Gl.Vertex2((x2 * Scaling.Row0.x) + (y2 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y2 * Scaling.Row1.y));
+            Gl.Vertex2((x2 * Scaling.Row0.x) + (y1 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y1 * Scaling.Row1.y));
+            Gl.Vertex2((x1 * Scaling.Row0.x) + (y1 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y1 * Scaling.Row1.y));
+            Gl.End();
+        }
         private static void SetViewport()
         {
             Gl.LoadIdentity();
