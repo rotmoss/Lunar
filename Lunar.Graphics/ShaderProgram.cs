@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using OpenGL;
 using System.Text;
 using System.Text.RegularExpressions;
+using System.Numerics;
 
 namespace Lunar.Graphics
 {
@@ -137,6 +138,14 @@ namespace Lunar.Graphics
 
             Gl.UseProgram(0);
         }
+
+        public static Matrix4x4f ToMatrix4x4f(Vector2 pos, Vector2 scale) => new Matrix4x4f(
+            scale.X, 0, 0, 0,
+            0, scale.Y, 0, 0,
+            0, 0, 0, 0,
+            pos.X, pos.Y, 0, 1
+        );
+
         public static void DisposeShaders()
         {
             foreach (Shader shader in _shaders) {

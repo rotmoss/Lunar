@@ -67,12 +67,16 @@ namespace Lunar.Graphics
             texture?.Dispose();
             positionBuffer.Dispose();
             texCoordsBuffer.Dispose();
+            _renderData.Remove(this);
         }
 
         public static void DisposeAll() 
         {
             foreach (RenderData graphicsObject in _renderData) {
-                graphicsObject.Dispose();
+                graphicsObject.vertexArray?.Dispose();
+                graphicsObject.texture?.Dispose();
+                graphicsObject.positionBuffer.Dispose();
+                graphicsObject.texCoordsBuffer.Dispose();
             }
             ShaderProgram.DisposeShaders();
         }

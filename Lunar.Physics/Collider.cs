@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.Numerics;
 using Lunar.Math;
 using Lunar.Scene;
-using Lunar.Graphics;
 
 namespace Lunar.Physics
 {
@@ -27,6 +26,14 @@ namespace Lunar.Physics
         private bool movable;
         private Vector2 offset;
         private Vector2 size;
+
+        public Transform Quad
+        { 
+            get
+            {
+                return new Transform(offset, size) + Transform.GetGlobalTransform(id);
+            } 
+        }
 
         public EventHandler<ColissionEventArgs> CollisionEvent { get => _collisionEvent; set => _collisionEvent = value; }
         private EventHandler<ColissionEventArgs> _collisionEvent;
@@ -161,12 +168,11 @@ namespace Lunar.Physics
             }
         }
 
-        public static void DrawColliders()
+        public static void Foreach(Action<Collider> action)
         {
             foreach (Collider collider in _colliders)
             {
-                Transform transform = new Transform(collider.offset, collider.size) + Transform.GetGlobalTransform(collider.id);
-                Window.DrawQuad(false, transform.position.X - transform.scale.X, transform.position.Y - transform.scale.Y, transform.position.X + transform.scale.X, transform.position.Y + transform.scale.Y, 0, 0, 0);
+                action.Invoke(collider);
             }
         }
     }

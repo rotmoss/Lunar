@@ -17,41 +17,34 @@ namespace Lunar
         private static AssemblyCompiler instance;
         public static AssemblyCompiler Instance { get { instance ??= new AssemblyCompiler(); return instance; } }
 
-        public async Task<Assembly> CompileScripts()
-        {
-            var refPaths = new[]
+        public static readonly string[] refPaths =
             {
                 typeof(object).GetTypeInfo().Assembly.Location,
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "System.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "System.Console.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "System.Runtime.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "System.Collections.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "System.Linq.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "System.Numerics.Vectors.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "netstandard.dll"),
-                Path.Combine(Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location),
-                    "mscorlib.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Scripts.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Input.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Graphics.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Scene.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Physics.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.StopWatch.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Math.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "Lunar.Audio.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "SDL2-CS.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenGL.Net.dll"),
-                Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "OpenGL.Net.Math.dll"),
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.dll",
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Console.dll",
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Runtime.dll",
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Collections.dll",
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Linq.dll",
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Numerics.Vectors.dll",
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\netstandard.dll", 
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\mscorlib.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Scripts.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Input.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Graphics.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Scene.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Physics.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.StopWatch.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Math.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Audio.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\SDL2-CS.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\OpenGL.Net.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\OpenGL.Net.Math.dll"
             };
 
+    public async Task<Assembly> CompileScripts()
+        {
+           
             MetadataReference[] references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).ToArray();
 
             SyntaxTree[] syntaxTrees = await Task.Run(LoadScripts);

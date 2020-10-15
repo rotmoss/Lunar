@@ -84,7 +84,7 @@ namespace Lunar
                 Force.ApplyForces();
 
                 //Check Colissions
-                //Collider.CheckColissions();
+               // Collider.CheckColissions();
 
                 //Update all scripts again
                 Script.LateUpdateScripts();
@@ -98,7 +98,16 @@ namespace Lunar
                 RenderData.Render();
 
                 //Draw colliders as an outline on top of everything else
-                if (_drawColliders) { Collider.DrawColliders(); }
+                if (_drawColliders) {
+                    Collider.Foreach(x => { 
+                        Window.DrawQuad(false, 
+                            x.Quad.position.X - x.Quad.scale.X, 
+                            x.Quad.position.Y - x.Quad.scale.Y, 
+                            x.Quad.position.X + x.Quad.scale.X, 
+                            x.Quad.position.Y + x.Quad.scale.Y, 
+                            0, 0, 0); 
+                    });
+                }
 
                 //Update all scripts again
                 Script.PostRenderUpdateScripts();
@@ -127,6 +136,7 @@ namespace Lunar
 
         static void OnWindowClose(object sender, EventArgs eventArgs)
         {
+            Sample.DisposeAll();
             RenderData.DisposeAll();
             Window.Close();
             Environment.Exit(0);
