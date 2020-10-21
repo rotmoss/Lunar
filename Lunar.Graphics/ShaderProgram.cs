@@ -4,6 +4,7 @@ using OpenGL;
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Numerics;
+using System.Runtime.CompilerServices;
 
 namespace Lunar.Graphics
 {
@@ -18,17 +19,17 @@ namespace Lunar.Graphics
         private static List<Shader> _shaders = new List<Shader>();
 
         readonly static string[] _vsDefault =
-{
+        {
             "#version 330 core",
             "layout(location = 0) in vec3 aPos;",
             "layout(location = 1) in vec2 aTexCoord;",
-            "uniform mat4 uProjection;",
-            "uniform mat4 uCameraView;",
+            "uniform dmat4 uProjection;",
+            "uniform dmat4 uCameraView;",
             "out vec2 TexCoord;",
             "",
             "void main()",
             "{",
-            "   gl_Position = uProjection * uCameraView * vec4(aPos, 1.0);",
+            "   gl_Position = uProjection * uCameraView * dvec4(aPos, 1.0);",
             "   TexCoord = aTexCoord;",
             "}"
         };
@@ -87,6 +88,43 @@ namespace Lunar.Graphics
             return true;
         }
 
+        public static bool CreateShader(string vsName, string[] vertexShader, string fsName, string[] fragmentShader, out ShaderProgram shaderProgram)
+        {
+            Shader vs = new Shader { name = vsName == null ? "" : vsName, id = 0 };
+            Shader fs = new Shader { name = fsName == null ? "" : fsName, id = 0 };
+
+            foreach (Shader shader in _shaders)
+            {
+                if (shader.name == vsName)
+                    vs.id = shader.id;
+                if (shader.name == fsName)
+                    fs.id = shader.id;
+            }
+
+            if (vs.id == 0)
+            {
+                if (!vs.CompileShader(AddLineBreaks(vertexShader), ShaderType.VertexShader))
+                {
+                    Gl.DeleteShader(vs.id); Gl.DeleteShader(fs.id); shaderProgram = null; return false;
+                }
+            }
+
+            if (fs.id == 0)
+            {
+                if (!fs.CompileShader(AddLineBreaks(fragmentShader), ShaderType.FragmentShader))
+                {
+                    Gl.DeleteShader(vs.id); Gl.DeleteShader(fs.id); shaderProgram = null; return false;
+                }
+            }
+
+            shaderProgram = new ShaderProgram(vs, fs);
+
+            if (!shaderProgram.CompileProgram()) { Gl.DeleteShader(vs.id); Gl.DeleteShader(fs.id); Gl.DeleteProgram(shaderProgram.id); return false; }
+
+            _shaderPrograms.Add(shaderProgram);
+            return true;
+        }
+
         private static string[] LoadShaderSource(string file, ShaderType type)
         {
             if (!IO.FileManager.ReadLines(file, "shaders", out string[] shaderSource))
@@ -95,11 +133,15 @@ namespace Lunar.Graphics
                 shaderSource = type == ShaderType.VertexShader ? _vsDefault : _fsDefault;
             }
 
-            for(int i = 0; i < shaderSource.Length; i++)
-            {
-                shaderSource[i] += "\n";
-            }
-            return shaderSource;
+            return AddLineBreaks(shaderSource);
+        }
+
+        private static string[] AddLineBreaks(string[] source)
+        {
+            for (int i = 0; i < source.Length; i++)
+                source[i] += "\n";
+            return source;
+            
         }
 
         public static void ForEachShader(Action<ShaderProgram> actions) { foreach (ShaderProgram shaderObject in _shaderPrograms) actions(shaderObject); }
@@ -126,17 +168,21 @@ namespace Lunar.Graphics
             Gl.UseProgram(id);
 
             if (!uniforms.ContainsKey(uniformName))
-            {
                 uniforms.Add(uniformName, Gl.GetUniformLocation(id, uniformName));
-            }
+
 
             if (data.GetType() == typeof(Matrix4x4f))
-            {
                 Gl.UniformMatrix4f(uniforms[uniformName], 1, false, data);
-            }
+            else if (data.GetType() == typeof(Vertex4f))
+                Gl.Uniform4f(uniforms[uniformName], 1, data);
             else { throw new Exception(); }
 
             Gl.UseProgram(0);
+        }
+
+        public static Vertex4f ToVertex4f(Vector4 vec)
+        {
+            return new Vertex4f(vec.X, vec.Y, vec.Z, vec.W);
         }
 
         public static Matrix4x4f ToMatrix4x4f(Vector2 pos, Vector2 scale) => new Matrix4x4f(

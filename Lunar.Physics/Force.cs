@@ -1,7 +1,8 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Lunar.Scene;
+using System.Threading.Tasks;
+using Lunar.Scenes;
 using Lunar.Stopwatch;
 
 namespace Lunar.Physics
@@ -28,27 +29,22 @@ namespace Lunar.Physics
             _forces.Add(this);
         }
 
-        public void SetColissionEvent(EventHandler<ColissionEventArgs> eventHandler)
+        public void ApplyForce()
         {
-            eventHandler += OnColission;
+            //Calculate speed from acceleration
+            _speed += _acceleration * (float)Time.DeltaTime;
+
+            //Calculate position from speed
+            Transform.Translate(_id, _speed * (float)Time.DeltaTime);
+
+            //Apply friction force
+            Vector2 friction = Vector2.Normalize(-new Vector2(_speed.X, _speed.Y)) * (float)Time.DeltaTime * _frictionConstant;
+            if (!float.IsNaN(friction.X) && !float.IsNaN(friction.Y) && friction.Length() < _speed.Length()) { _speed += friction; }
+            else { _speed = Vector2.Zero; }
         }
 
-        public static void ApplyForces()
-        {
-            foreach (Force force in _forces)
-            {
-                //Calculate speed from acceleration
-                force._speed += force._acceleration * (float)Time.DeltaTime;
-
-                //Calculate position from speed
-                Transform.Translate(force._id, force._speed * (float)Time.DeltaTime);
-
-                //Apply friction force
-                Vector2 friction = Vector2.Normalize(-new Vector2(force._speed.X, force._speed.Y)) * (float)Time.DeltaTime * force._frictionConstant;
-                if (!float.IsNaN(friction.X) && !float.IsNaN(friction.Y) && friction.Length() < force._speed.Length()) { force._speed += friction; }
-                else { force._speed = Vector2.Zero; }
-            }
-        }
+        public static void ApplyForces() => Parallel.ForEach(_forces, x => x.ApplyForce());
+        
 
         public void OnColission(object sender, ColissionEventArgs e)
         {

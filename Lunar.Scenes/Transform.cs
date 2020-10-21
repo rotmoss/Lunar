@@ -1,7 +1,7 @@
 ﻿using System.Numerics;
 using System.Collections.Generic;
 
-namespace Lunar.Scene
+namespace Lunar.Scenes
 {
     public class Transform
     {
@@ -52,11 +52,15 @@ namespace Lunar.Scene
         public static Transform GetLocalTransform(uint id) => _transforms.ContainsKey(id) ? _transforms[id] : Zero;
         public static Transform GetGlobalTransform(uint id)
         {
+            Scene scene = Scene.GetScene(id);
+            if (scene == null) 
+                return Zero;
+
             Transform t = Zero;
             do
             {
                 t += _transforms.ContainsKey(id) ? _transforms[id] : Zero;
-                id = SceneController.Instance.GetEntityParent(id);
+                id = scene.GetParent(id);
             } while (id != 0);
             return t;
         }

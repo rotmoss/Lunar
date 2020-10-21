@@ -1,22 +1,25 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
-using Lunar.Scene;
+using Lunar.Scenes;
 using OpenGL;
 
 namespace Lunar.Graphics
 {
-    public abstract class RenderData
+    public abstract class RenderData : IDisposable
     {
         public uint id;
         internal protected ShaderProgram shaderProgram;
-        internal protected Texture texture;
         internal protected VertexArray vertexArray;
         internal protected BufferObject positionBuffer;
-        internal protected BufferObject texCoordsBuffer;
+        public string Layer { get => _layer; set => _layer = _layers.Contains(value) ? value : "default"; }
+        private string _layer = "default";
 
-        public bool Visible;
+        public bool Visible { get => _visible; set => _visible = value; }
+        private bool _visible;
 
+        public static List<string> _layers = new List<string>(new string[] { "default" });
         public static List<RenderData> _renderData = new List<RenderData>();
 
         public static void TranslateBuffers(string attributeName)
@@ -42,42 +45,34 @@ namespace Lunar.Graphics
             }
         }
 
-        public static void Render()
+        public void SetUniform<T>(T data, string uniformName) where T : struct => shaderProgram?.SetUniform(data, uniformName);
+
+        public static void SetLineWidth(int value) => Gl.LineWidth(value);
+        public static void AddLayer(string value, int index) => _layers.Insert(index, value);
+        public static void AddLayers(params string[] value) => _layers.AddRange(value);
+
+        public abstract void Render();
+        public static void RenderAll()
         {
-            Gl.Enable(EnableCap.Texture2d);
-            for (int i = 0; i < _renderData.Count; i++)
-            {
-                if (!_renderData[i].Visible || _renderData[i].shaderProgram == null || _renderData[i].vertexArray == null || _renderData[i].texture == null) return;
+            foreach (string layer in _layers)
+                foreach (RenderData renderData in _renderData.Where(x => x._layer == layer))
+                    renderData.Render();
 
-                Gl.UseProgram(_renderData[i].shaderProgram.id);
-                Gl.BindVertexArray(_renderData[i].vertexArray.id);
-                Gl.BindTexture(TextureTarget.Texture2d, _renderData[i].texture.id);
 
-                Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
-            }
             Gl.UseProgram(0);
             Gl.BindVertexArray(0);
             Gl.BindTexture(TextureTarget.Texture2d, 0);
-            Gl.Disable(EnableCap.Texture2d);
         }
 
-        public void Dispose()
-        {
-            vertexArray?.Dispose();
-            texture?.Dispose();
-            positionBuffer.Dispose();
-            texCoordsBuffer.Dispose();
-            _renderData.Remove(this);
-        }
+        public abstract void Dispose();
 
         public static void DisposeAll() 
         {
-            foreach (RenderData graphicsObject in _renderData) {
-                graphicsObject.vertexArray?.Dispose();
-                graphicsObject.texture?.Dispose();
-                graphicsObject.positionBuffer.Dispose();
-                graphicsObject.texCoordsBuffer.Dispose();
+            while(_renderData.Count > 0)
+            {
+                _renderData[0].Dispose();
             }
+
             ShaderProgram.DisposeShaders();
         }
     }

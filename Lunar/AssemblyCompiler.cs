@@ -12,11 +12,8 @@ using Lunar.IO;
 
 namespace Lunar
 {
-    public class AssemblyCompiler
+    public static class AssemblyCompiler
     {
-        private static AssemblyCompiler instance;
-        public static AssemblyCompiler Instance { get { instance ??= new AssemblyCompiler(); return instance; } }
-
         public static readonly string[] refPaths =
             {
                 typeof(object).GetTypeInfo().Assembly.Location,
@@ -26,13 +23,13 @@ namespace Lunar
                 Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Collections.dll",
                 Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Linq.dll",
                 Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\System.Numerics.Vectors.dll",
-                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\netstandard.dll", 
+                Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\netstandard.dll",
                 Path.GetDirectoryName(typeof(System.Runtime.GCSettings).GetTypeInfo().Assembly.Location) + "\\mscorlib.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Scripts.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Input.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Graphics.dll",
-                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Scene.dll",
+                AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Scenes.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Physics.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.StopWatch.dll",
                 AppDomain.CurrentDomain.BaseDirectory + "\\Lunar.Math.dll",
@@ -42,18 +39,25 @@ namespace Lunar
                 AppDomain.CurrentDomain.BaseDirectory + "\\OpenGL.Net.Math.dll"
             };
 
-    public async Task<Assembly> CompileScripts()
+        public static async Task<Assembly> CompileScripts()
         {
-           
-            MetadataReference[] references = refPaths.Select(r => MetadataReference.CreateFromFile(r)).ToArray();
+            Task<SyntaxTree[]> syntaxTrees = Task.Run(LoadScripts);
 
-            SyntaxTree[] syntaxTrees = await Task.Run(LoadScripts);
+            List<MetadataReference> references = new List<MetadataReference>();
+            foreach (string refPath in refPaths)
+            {
+                try { references.Add(MetadataReference.CreateFromFile(refPath)); }
+                catch { Console.WriteLine("Could not load dll: " + refPath); }
+            }
+
+            syntaxTrees.Wait();
+
             CSharpCompilation compilation = await Task.Run(() => CSharpCompilation.Create(Path.GetRandomFileName(),
-                syntaxTrees, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)));
+                syntaxTrees.Result, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)));
             return await Task.Run(() => CompileAssembly(compilation));
         }
 
-        public SyntaxTree[] LoadScripts()
+        public static SyntaxTree[] LoadScripts()
         {
             string path = FileManager.Path + "Scripts" + FileManager.Seperator;
             if (!Directory.Exists(path)) return null;
@@ -77,7 +81,7 @@ namespace Lunar
             return syntaxTrees.ToArray();
         }
 
-        public Assembly CompileAssembly(CSharpCompilation compilation)
+        public static Assembly CompileAssembly(CSharpCompilation compilation)
         {
             using MemoryStream ms = new MemoryStream();
             EmitResult result = compilation.Emit(ms);
@@ -89,7 +93,7 @@ namespace Lunar
                 IEnumerable<Diagnostic> failures = result.Diagnostics.Where(diagnostic =>
                     diagnostic.IsWarningAsError || diagnostic.Severity == DiagnosticSeverity.Error);
 
-                foreach (Diagnostic diagnostic in failures) 
+                foreach (Diagnostic diagnostic in failures)
                     Console.Error.WriteLine("\t{0}: {1}", diagnostic.Id, diagnostic.GetMessage());
 
                 return null;

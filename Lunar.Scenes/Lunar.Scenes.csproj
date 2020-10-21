@@ -20,8 +20,8 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\Lunar.Scene\Lunar.Scene.csproj" />
-    <ProjectReference Include="..\Time\Lunar.Stopwatch.csproj" />
+    <ProjectReference Include="..\Lunar.Input\Lunar.Input.csproj" />
+    <ProjectReference Include="..\Lunar.IO\Lunar.IO.csproj" />
   </ItemGroup>
 
 </Project>

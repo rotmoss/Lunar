@@ -3,12 +3,16 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using OpenGL;
 
 namespace Lunar.Graphics
 {
     public class Sprite : RenderData
     {
+        internal Texture texture;
         internal Texture[] textures;
+        internal protected BufferObject texCoordsBuffer;
+
         public Sprite(uint Id, string textureFile, string vertexShader, string fragmentShader, out int w, out int h)
         {
             id = Id;
@@ -28,9 +32,30 @@ namespace Lunar.Graphics
             _renderData.Add(this);
         }
 
-        public void SetSelectedTexture(uint index)
+        public override void Render()
         {
-            if (index < textures.Length) { texture = textures[index]; }
+            Gl.Enable(EnableCap.Texture2d);
+
+            if (!Visible || shaderProgram == null || vertexArray == null || texture == null) return;
+
+            Gl.UseProgram(shaderProgram.id);
+            Gl.BindVertexArray(vertexArray.id);
+            Gl.BindTexture(TextureTarget.Texture2d, texture.id);
+
+            Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
+
+            Gl.Disable(EnableCap.Texture2d);
+        }
+
+        public void SetSelectedTexture(uint index) => texture = index < textures.Length ? textures[index] : texture;
+
+        public override void Dispose()
+        {
+            vertexArray?.Dispose();
+            texture?.Dispose();
+            positionBuffer.Dispose();
+            texCoordsBuffer.Dispose();
+            _renderData.Remove(this);
         }
     }
 }

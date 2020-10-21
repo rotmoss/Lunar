@@ -1,7 +1,7 @@
 ﻿using OpenGL;
 using SDL2;
 using System;
-using Lunar.Scene;
+using Lunar.Scenes;
 using Lunar.Physics;
 using Lunar.Graphics;
 using Lunar.Input;
@@ -10,6 +10,7 @@ using Lunar.Stopwatch;
 using System.Threading.Tasks;
 using System.Runtime.InteropServices;
 using Lunar.Audio;
+using System.Collections.Generic;
 
 namespace Lunar
 { 
@@ -32,7 +33,7 @@ namespace Lunar
 
         static void LoadScene()
         {
-            var assemblyAwaiter = AssemblyCompiler.Instance.CompileScripts();
+            var assemblyAwaiter = AssemblyCompiler.CompileScripts();
 
             InputController.Init();
 
@@ -40,7 +41,7 @@ namespace Lunar
             InputController.OnWindowSizeChanged += OnWindowSizeChanged;
             InputController.OnKeyDown += OnKeyDown;
 
-            SceneController.Instance.LoadScene("start.xml", out ScriptInfo[] scripts);
+            Scene.LoadScene("start.xml", out ScriptInfo[] scripts);
 
             assemblyAwaiter.Wait();
             Script.Assembly = assemblyAwaiter.Result;
@@ -59,16 +60,19 @@ namespace Lunar
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
             if (SDL_mixer.Mix_Init(SDL_mixer.MIX_InitFlags.MIX_INIT_MP3) < 0)
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
+
             Window.Init(1280, 720, false);
-            Sample.Init();
+            Mixer.Init();
 
             task.Wait();
             GC.Collect();
 
+            RenderData.AddLayers("Background", "Sprite", "Foreground", "Collider");
+            RenderData.SetLineWidth(2);
+
             Script.InitScripts();
 
             ShaderProgram.ForEachShader(x => x.SetUniform(Window.Scaling, "uProjection"));
-            ShaderProgram.ForEachShader(x => x.SetUniform(Matrix4x4f.Identity, "uCameraView"));
 
             while (true)
             {
@@ -84,7 +88,7 @@ namespace Lunar
                 Force.ApplyForces();
 
                 //Check Colissions
-               // Collider.CheckColissions();
+                Collider.CheckColissions();
 
                 //Update all scripts again
                 Script.LateUpdateScripts();
@@ -92,22 +96,10 @@ namespace Lunar
                 //Use Transfroms to Translate Graphics Data
                 RenderData.TranslateBuffers("aPos");
 
-                AnimatedSprite.Animate();
+                AnimatedSprite.Animate(Time.FrameTime);
 
                 //Render Graphics
-                RenderData.Render();
-
-                //Draw colliders as an outline on top of everything else
-                if (_drawColliders) {
-                    Collider.Foreach(x => { 
-                        Window.DrawQuad(false, 
-                            x.Quad.position.X - x.Quad.scale.X, 
-                            x.Quad.position.Y - x.Quad.scale.Y, 
-                            x.Quad.position.X + x.Quad.scale.X, 
-                            x.Quad.position.Y + x.Quad.scale.Y, 
-                            0, 0, 0); 
-                    });
-                }
+                RenderData.RenderAll();
 
                 //Update all scripts again
                 Script.PostRenderUpdateScripts();
@@ -136,7 +128,7 @@ namespace Lunar
 
         static void OnWindowClose(object sender, EventArgs eventArgs)
         {
-            Sample.DisposeAll();
+            Mixer.Dispose();
             RenderData.DisposeAll();
             Window.Close();
             Environment.Exit(0);

@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Lunar
+namespace Lunar.Scenes
 {
     public class IdCollection : IEnumerable<uint>
     {

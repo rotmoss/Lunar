@@ -1,22 +1,18 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Drawing;
+using System.Linq;
 using System.Numerics;
+using System.Threading.Tasks;
 using Lunar.Math;
-using Lunar.Scene;
+using Lunar.Scenes;
+using Lunar.Graphics;
 
 namespace Lunar.Physics
 {
     public enum Side
     {
         NONE, TOP, BOTTOM, LEFT, RIGHT
-    }
-
-    public class ColissionEventArgs : EventArgs
-    {
-        public bool movable;
-        public Collider collider;
-        public Collider reciever;
-        public Side side;
     }
 
     public class Collider
@@ -27,18 +23,13 @@ namespace Lunar.Physics
         private Vector2 offset;
         private Vector2 size;
 
-        public Transform Quad
-        { 
-            get
-            {
-                return new Transform(offset, size) + Transform.GetGlobalTransform(id);
-            } 
-        }
+        private Shape shape;
 
         public EventHandler<ColissionEventArgs> CollisionEvent { get => _collisionEvent; set => _collisionEvent = value; }
         private EventHandler<ColissionEventArgs> _collisionEvent;
 
         private static List<Collider> _colliders = new List<Collider>();
+        private static Random random = new Random();
 
         public Collider(uint Id, Vector2 offset, Vector2 size, bool movable = false)
         {
@@ -47,30 +38,32 @@ namespace Lunar.Physics
             this.offset = offset;
             this.size = size;
 
+            Transform t = new Transform(offset, size);
+
+            shape = new Shape(Id, "vsCollider", _vs, "fsCollider", _fs, 2, true, new float[] { 
+                t.position.X - t.scale.X, t.position.Y - t.scale.Y, 
+                t.position.X + t.scale.X, t.position.Y - t.scale.Y, 
+                t.position.X + t.scale.X, t.position.Y + t.scale.Y, 
+                t.position.X - t.scale.X, t.position.Y + t.scale.Y 
+            });
+
+            shape.SetUniform(ShaderProgram.ToVertex4f(new Vector4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1)), "aColor");
+            shape.Layer = "Collider";
+
             _colliders.Add(this);
         }
 
-        public static void CheckColissions()
-        {
-            foreach (Collider collider in _colliders)
-            {
-                if(collider.movable) collider.CheckColission();
-            }
-        }
-
+        public static void CheckColissions() => Parallel.ForEach(_colliders, x => x.CheckColission());
+        
         public void CheckColission()
         {
+            if (!movable) return;
+
             foreach (Collider collider in _colliders)
             {
-                uint id = this.id;
-                do
-                {
-                    if (id == collider.id) break;
-                    id = SceneController.Instance.GetEntityParent(id);
-                } while (id != 0);
-                if (id == collider.id) continue;
+                if (IsParent(collider)) continue;
 
-                Transform a = new Transform(offset, size) + Transform.GetGlobalTransform(this.id);
+                Transform a = new Transform(offset, size) + Transform.GetGlobalTransform(id);
                 Transform b = new Transform(collider.offset, collider.size) + Transform.GetGlobalTransform(collider.id);
 
                 if (DoesOverlap(a, b))
@@ -80,6 +73,20 @@ namespace Lunar.Physics
                     OnCollision(new ColissionEventArgs { movable = movable, collider = collider, reciever = this, side = side });
                 }
             }
+        }
+
+        private bool IsParent(Collider collider)
+        {
+            if (id == collider.id)
+                return true;
+
+            Scene scene = Scene.GetScene(id);
+            uint currentId = scene.GetParent(id);
+
+            while (currentId != 0)
+                id = scene.GetParent(id);
+
+            return false;
         }
 
         private Side CalculateSide(Vector2 pos, Vector2 scale)
@@ -131,7 +138,6 @@ namespace Lunar.Physics
             //If none of the sides from A are outside B
             return true;
         }
-
         public void MoveTransform(Side side, Transform global, Transform collider)
         {
             float topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
@@ -171,9 +177,31 @@ namespace Lunar.Physics
         public static void Foreach(Action<Collider> action)
         {
             foreach (Collider collider in _colliders)
-            {
                 action.Invoke(collider);
-            }
         }
+
+        readonly static string[] _vs =
+        {
+            "#version 330 core",
+            "layout(location = 0) in vec2 aPos;",
+            "uniform mat4 uProjection;",
+            "uniform mat4 uCameraView;",
+            "",
+            "void main()",
+            "{",
+            "   gl_Position = uProjection * uCameraView * vec4(aPos, 0.0, 1.0);",
+            "}"
+        };
+
+        readonly static string[] _fs =
+        {
+            "#version 330 core",
+            "uniform vec4 aColor;",
+            "out vec4 FragColor;",
+            "void main()",
+            "{",
+            "   FragColor = aColor;",
+            "}",
+        };
     }
 }

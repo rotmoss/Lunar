@@ -1,13 +1,12 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
+using OpenGL;
 
 namespace Lunar.Graphics
 {
     public class Text : RenderData
     {
+        internal Texture texture;
+        internal protected BufferObject texCoordsBuffer;
         public Text(string fontFile, string message, int size, uint wrapped, byte r, byte g, byte b, byte a, string vertexShader, string fragmentShader, out int w, out int h)
         {
             Visible = true;
@@ -27,6 +26,30 @@ namespace Lunar.Graphics
         {
             texture.Dispose();
             Texture.CreateText(fontFile, message, size, wrapped, r, g, b, a, out w, out h, out texture);
+        }
+
+        public override void Render()
+        {
+            Gl.Enable(EnableCap.Texture2d);
+
+            if (!Visible || shaderProgram == null || vertexArray == null || texture == null) return;
+
+            Gl.UseProgram(shaderProgram.id);
+            Gl.BindVertexArray(vertexArray.id);
+            Gl.BindTexture(TextureTarget.Texture2d, texture.id);
+
+            Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
+
+            Gl.Disable(EnableCap.Texture2d);
+        }
+
+        public override void Dispose()
+        {
+            vertexArray?.Dispose();
+            texture?.Dispose();
+            positionBuffer.Dispose();
+            texCoordsBuffer.Dispose();
+            _renderData.Remove(this);
         }
     }
 }
