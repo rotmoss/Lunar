@@ -31,7 +31,7 @@ namespace Lunar.Graphics
             _frameWidth = frameWidth / (float)w;
             _frameHeight = frameHeight / (float)h;
 
-            positionBuffer = new BufferObject(new float[] { -frameWidth, -frameHeight, 0, frameWidth, -frameHeight, 0, frameWidth, frameHeight, 0, -frameWidth, frameHeight, 0 }, 3, "aPos");
+            positionBuffer = new BufferObject(new float[] { -frameWidth, -frameHeight, frameWidth, -frameHeight, frameWidth, frameHeight, -frameWidth, frameHeight }, 2, "aPos");
             texCoordsBuffer = new BufferObject(new float[] { 0, _frameHeight, _frameWidth, _frameHeight, _frameWidth, 0, 0, 0 }, 2, "aTexCoord");
 
             if (!VertexArray.CreateVertexArray(shaderProgram, out vertexArray, positionBuffer, texCoordsBuffer)) { Dispose(); return; }

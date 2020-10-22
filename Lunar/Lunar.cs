@@ -50,6 +50,31 @@ namespace Lunar
             assemblyAwaiter.Dispose();
         }
 
+
+        static void OnKeyDown(object sender, KeyboardState eventArgs)
+        {
+            if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_LALT] && eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_RETURN])
+            {
+                Window.ToggleFullscreen();
+                Window.UpdateWindowSize();
+            }
+        }
+
+
+        static void OnWindowClose(object sender, EventArgs eventArgs)
+        {
+            Mixer.Dispose();
+            RenderData.DisposeAll();
+            Window.Close();
+            Environment.Exit(0);
+        }
+
+        static void OnWindowSizeChanged(object sender, EventArgs eventArgs)
+        {
+            Window.UpdateWindowSize();
+            ShaderProgram.ForEachShader(x => x.SetUniformMatrix(Window.Scaling, "uProjection"));
+        }
+
         static void Main(string[] args)
         {
             DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
@@ -72,7 +97,9 @@ namespace Lunar
 
             Script.InitScripts();
 
-            ShaderProgram.ForEachShader(x => x.SetUniform(Window.Scaling, "uProjection"));
+            ShaderProgram.ForEachShader(x => x.SetUniformMatrix(Window.Scaling, "uProjection"));
+
+            Script.LateInitScripts();
 
             while (true)
             {
@@ -109,35 +136,6 @@ namespace Lunar
 
                 Time.StopFrameTimer();
             }
-        }
-
-        static void OnKeyDown(object sender, KeyboardState eventArgs)
-        {
-            if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_ESCAPE]) {
-                RenderData.DisposeAll();
-                Window.Close();
-                Environment.Exit(0);
-            }
-            if (eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_LALT] && eventArgs.RawKeyStates[SDL.SDL_Keycode.SDLK_KP_ENTER])
-            {
-                Window.Fullscreen = !Window.Fullscreen;
-                Window.CreateWindowAndContext();
-            }
-        }
-
-
-        static void OnWindowClose(object sender, EventArgs eventArgs)
-        {
-            Mixer.Dispose();
-            RenderData.DisposeAll();
-            Window.Close();
-            Environment.Exit(0);
-        }
-
-        static void OnWindowSizeChanged(object sender, EventArgs eventArgs)
-        {
-            Window.UpdateWindowSize();
-            ShaderProgram.ForEachShader(x => x.SetUniform(Window.Scaling, "uProjection"));
         }
     }
 }

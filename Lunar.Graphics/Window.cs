@@ -2,6 +2,8 @@
 using SDL2;
 using OpenGL;
 using System.Threading.Tasks;
+using System.Numerics;
+using Lunar.Scenes;
 
 namespace Lunar.Graphics
 {
@@ -61,6 +63,12 @@ namespace Lunar.Graphics
             Gl.Enable(EnableCap.Blend);
         }
 
+        public static void ToggleFullscreen()
+        {
+            _fullscreen = !_fullscreen;
+            SDL.SDL_SetWindowFullscreen(_window, _fullscreen ? (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : (uint)SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
+        }
+
         public static void DrawQuad(bool fill, float x1, float y1, float x2, float y2, byte r, byte b, byte g)
         {
             PrimitiveType type = fill ? PrimitiveType.Quads : PrimitiveType.LineStrip;
@@ -82,6 +90,25 @@ namespace Lunar.Graphics
             float newRatio = Width / Height;
             if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
             else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / newRatio)), 1f / GameH, 1); }
+        }
+
+        public static Vector2 Scale(Vector2 v, Transform cam)
+        {
+            v *= cam.scale;
+            v -= cam.position;
+
+            Vertex4f temp = new Vertex4f(v.X, v.Y, 0, 1);
+            temp = _scaling * temp;
+
+            return new Vector2(temp.x, temp.y);
+        }
+
+        public static Vector2[] Scale(Vector2[] v, Transform cam)
+        {
+            for (int i = 0; i < v.Length; i++)
+                v[i] = Scale(v[i], cam);
+
+            return v;
         }
 
         public static void UpdateWindowSize()

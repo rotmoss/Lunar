@@ -47,10 +47,26 @@ namespace Lunar.Physics
                 t.position.X - t.scale.X, t.position.Y + t.scale.Y 
             });
 
-            shape.SetUniform(ShaderProgram.ToVertex4f(new Vector4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1)), "aColor");
+            shape.ShaderProgram.SetUniform(new Vector4((float)random.NextDouble(), (float)random.NextDouble(), (float)random.NextDouble(), 1).ToVertex4f(), "aColor");
             shape.Layer = "Collider";
 
             _colliders.Add(this);
+        }
+
+        public static Vector2[] GetTransforms()
+        {
+            Vector2[] v = new Vector2[_colliders.Count * 4];
+
+            for (int i = 0, j = 0; i < v.Length; i += 4, j++) {
+                Transform t = new Transform(_colliders[j].offset, _colliders[j].size) + Transform.GetGlobalTransform(_colliders[j].id);
+
+                v[i + 0] = new Vector2(t.position.X - t.scale.X, t.position.Y - t.scale.Y);
+                v[i + 1] = new Vector2(t.position.X + t.scale.X, t.position.Y - t.scale.Y);
+                v[i + 2] = new Vector2(t.position.X + t.scale.X, t.position.Y + t.scale.Y);
+                v[i + 3] = new Vector2(t.position.X - t.scale.X, t.position.Y + t.scale.Y);
+            }
+
+            return v;
         }
 
         public static void CheckColissions() => Parallel.ForEach(_colliders, x => x.CheckColission());

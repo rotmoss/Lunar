@@ -8,7 +8,7 @@ using System.Runtime.CompilerServices;
 
 namespace Lunar.Graphics
 {
-    public class ShaderProgram
+    public partial class ShaderProgram
     {
         public uint id;
         public Shader vs;
@@ -21,15 +21,15 @@ namespace Lunar.Graphics
         readonly static string[] _vsDefault =
         {
             "#version 330 core",
-            "layout(location = 0) in vec3 aPos;",
+            "layout(location = 0) in vec2 aPos;",
             "layout(location = 1) in vec2 aTexCoord;",
-            "uniform dmat4 uProjection;",
-            "uniform dmat4 uCameraView;",
+            "uniform mat4 uProjection;",
+            "uniform mat4 uCameraView;",
             "out vec2 TexCoord;",
             "",
             "void main()",
             "{",
-            "   gl_Position = uProjection * uCameraView * dvec4(aPos, 1.0);",
+            "   gl_Position = uProjection * uCameraView * vec4(aPos, 0.0, 1.0);",
             "   TexCoord = aTexCoord;",
             "}"
         };
@@ -150,9 +150,10 @@ namespace Lunar.Graphics
         {
             id = Gl.CreateProgram();
             Gl.AttachShader(id, vs.id); Gl.AttachShader(id, fs.id);
-            Gl.LinkProgram(id); Gl.ValidateProgram(id);
+            Gl.LinkProgram(id);
             Gl.GetProgram(id, ProgramProperty.LinkStatus, out int linked);
             if (linked == 0) { PrintProgramInfo(); return false; }
+             Gl.ValidateProgram(id);
             return true;
         }
 
@@ -162,35 +163,6 @@ namespace Lunar.Graphics
             Gl.GetProgramInfoLog(id, 1024, out _, infolog);
             Console.WriteLine(infolog.ToString());
         }
-
-        public void SetUniform<T>(T data, string uniformName) where T : struct
-        {
-            Gl.UseProgram(id);
-
-            if (!uniforms.ContainsKey(uniformName))
-                uniforms.Add(uniformName, Gl.GetUniformLocation(id, uniformName));
-
-
-            if (data.GetType() == typeof(Matrix4x4f))
-                Gl.UniformMatrix4f(uniforms[uniformName], 1, false, data);
-            else if (data.GetType() == typeof(Vertex4f))
-                Gl.Uniform4f(uniforms[uniformName], 1, data);
-            else { throw new Exception(); }
-
-            Gl.UseProgram(0);
-        }
-
-        public static Vertex4f ToVertex4f(Vector4 vec)
-        {
-            return new Vertex4f(vec.X, vec.Y, vec.Z, vec.W);
-        }
-
-        public static Matrix4x4f ToMatrix4x4f(Vector2 pos, Vector2 scale) => new Matrix4x4f(
-            scale.X, 0, 0, 0,
-            0, scale.Y, 0, 0,
-            0, 0, 0, 0,
-            pos.X, pos.Y, 0, 1
-        );
 
         public static void DisposeShaders()
         {

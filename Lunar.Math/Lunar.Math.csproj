@@ -19,4 +19,12 @@
     <DebugSymbols>false</DebugSymbols>
   </PropertyGroup>
 
+  <ItemGroup>
+    <PackageReference Include="OpenGL.Net.Math" Version="0.8.4" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lunar.Scenes\Lunar.Scenes.csproj" />
+  </ItemGroup>
+
 </Project>

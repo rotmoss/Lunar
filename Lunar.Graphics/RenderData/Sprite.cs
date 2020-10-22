@@ -22,7 +22,7 @@ namespace Lunar.Graphics
             if (!ShaderProgram.CreateShader(vertexShader, fragmentShader, out shaderProgram)) { Dispose(); w = h = 0; return; }
             if (!Texture.CreateTexture(textureFile, out w, out h, out textures[0])) { Dispose(); return; }
 
-            positionBuffer = new BufferObject(new float[] { -w, -h, 0, w, -h, 0, w, h, 0, -w, h, 0 }, 3, "aPos");
+            positionBuffer = new BufferObject(new float[] { -w, -h, w, -h, w, h, -w, h }, 2, "aPos");
             texCoordsBuffer = new BufferObject(new float[] { 0, 1, 1, 1, 1, 0, 0, 0 }, 2, "aTexCoord");
 
             if (!VertexArray.CreateVertexArray(shaderProgram, out vertexArray, positionBuffer, texCoordsBuffer)) { Dispose(); return; }

@@ -19,11 +19,13 @@ namespace Lunar.Scripts
         private static Dictionary<uint, KeyValuePair<Script, bool>> _scripts = new Dictionary<uint, KeyValuePair<Script, bool>>();
 
         virtual public void Init() { }
+        virtual public void LateInit() { }
         virtual public void Update() { }
         virtual public void LateUpdate() { }
         virtual public void PostRender() { }
 
         public static void InitScripts() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.Init());
+        public static void LateInitScripts() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.LateInit());
         public static void UpdateScripts() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.Update());
         public static void LateUpdateScripts() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.LateUpdate());
         public static void PostRenderUpdateScripts() => _scripts.Values.Where(x => x.Value).ToList().ForEach(x => x.Key.PostRender());

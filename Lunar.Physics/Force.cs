@@ -45,7 +45,6 @@ namespace Lunar.Physics
 
         public static void ApplyForces() => Parallel.ForEach(_forces, x => x.ApplyForce());
         
-
         public void OnColission(object sender, ColissionEventArgs e)
         {
             Reset(e.side);
