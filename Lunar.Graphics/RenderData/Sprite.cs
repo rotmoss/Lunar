@@ -9,53 +9,58 @@ namespace Lunar.Graphics
 {
     public class Sprite : RenderData
     {
-        internal Texture texture;
-        internal Texture[] textures;
-        internal protected BufferObject texCoordsBuffer;
+        public Texture[] Textures { get => _textures; }
+        private Texture[] _textures;
 
-        public Sprite(uint Id, string textureFile, string vertexShader, string fragmentShader, out int w, out int h)
+        public Buffer TexCoordsBuffer { get => _texCoordsBuffer; }
+        private Buffer _texCoordsBuffer;
+
+        public Sprite(uint Id, string[] textureFiles, string vertexShader, string fragmentShader, out int w, out int h)
         {
             id = Id;
-            textures = new Texture[1];
             Visible = true;
+            w = h = 0;
 
-            if (!ShaderProgram.CreateShader(vertexShader, fragmentShader, out shaderProgram)) { Dispose(); w = h = 0; return; }
-            if (!Texture.CreateTexture(textureFile, out w, out h, out textures[0])) { Dispose(); return; }
+            _textures = new Texture[textureFiles.Length];
 
-            positionBuffer = new BufferObject(new float[] { -w, -h, w, -h, w, h, -w, h }, 2, "aPos");
-            texCoordsBuffer = new BufferObject(new float[] { 0, 1, 1, 1, 1, 0, 0, 0 }, 2, "aTexCoord");
+            if (!ShaderProgram.CreateShader(vertexShader, fragmentShader, out _shaderProgram)) { Dispose(); w = h = 0; return; }
+            for (int i = 0; i < textureFiles.Length; i++)
+                if (!Texture.CreateTextureFromFile(textureFiles[i], out w, out h, out _textures[i])) { Dispose(); return; }
 
-            if (!VertexArray.CreateVertexArray(shaderProgram, out vertexArray, positionBuffer, texCoordsBuffer)) { Dispose(); return; }
+            _positionBuffer = new Buffer(new double[] { -w, -h, w, -h, w, h, -w, h }, 2, "aPos");
+            _texCoordsBuffer = new Buffer(new double[] { 0, 1, 1, 1, 1, 0, 0, 0 }, 2, "aTexCoord");
 
-            SetSelectedTexture(0);
+            if (!VertexArray.CreateVertexArray(_shaderProgram, out _vertexArray, _positionBuffer, _texCoordsBuffer)) { Dispose(); return; }
 
-            _renderData.Add(this);
+            Window.AddRenderData(this);
         }
 
         public override void Render()
         {
             Gl.Enable(EnableCap.Texture2d);
 
-            if (!Visible || shaderProgram == null || vertexArray == null || texture == null) return;
+            if (!Visible || _shaderProgram == null || _vertexArray == null || _textures == null) return;
 
-            Gl.UseProgram(shaderProgram.id);
-            Gl.BindVertexArray(vertexArray.id);
-            Gl.BindTexture(TextureTarget.Texture2d, texture.id);
+            Gl.UseProgram(_shaderProgram.id);
+            Gl.BindVertexArray(_vertexArray.id);
+
+            for (int i = 0; i < _textures.Length; i++) {
+                Gl.ActiveTexture(TextureUnit.Texture0 + i);
+                Gl.BindTexture(TextureTarget.Texture2d, _textures[i].id);
+            }
 
             Gl.DrawArrays(PrimitiveType.Quads, 0, 4);
 
             Gl.Disable(EnableCap.Texture2d);
         }
 
-        public void SetSelectedTexture(uint index) => texture = index < textures.Length ? textures[index] : texture;
-
         public override void Dispose()
         {
-            vertexArray?.Dispose();
-            texture?.Dispose();
-            positionBuffer.Dispose();
-            texCoordsBuffer.Dispose();
-            _renderData.Remove(this);
+            _vertexArray?.Dispose();
+            for(int i = 0; i < _textures.Length; i++) _textures[i]?.Dispose();
+            _positionBuffer.Dispose();
+            _texCoordsBuffer.Dispose();
+            Window.RemoveRenderData(this);
         }
     }
 }

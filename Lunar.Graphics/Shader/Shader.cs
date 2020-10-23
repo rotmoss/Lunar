@@ -23,6 +23,7 @@ namespace Lunar.Graphics
         {
             StringBuilder infolog = new StringBuilder(1024);
             Gl.GetShaderInfoLog(id, 1024, out _, infolog);
+            Console.WriteLine("name: " + name);
             Console.WriteLine(infolog.ToString());
         }
     }

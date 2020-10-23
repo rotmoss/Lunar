@@ -84,7 +84,7 @@ namespace Lunar.Scripts
         public bool GetKeyState(Key key) => InputController.GetKeyState(key);
         public bool GetKeyState(SDL2.SDL.SDL_Keycode key) => InputController.GetKeyState(key);
         public bool GetButtonState(Button button, int id) => InputController.GetButtonState(button, id);
-        public float GetAxisState(Axis axsis, int id) => InputController.GetAxisState(axsis, id);
+        public double GetAxisState(Axis axsis, int id) => InputController.GetAxisState(axsis, id);
 
         public Transform Transform { get => Transform.GetGlobalTransform(Id); set => Transform.SetTransform(Id, value); }
         public Transform LocalTransform { get => Transform.GetLocalTransform(Id); set => Transform.SetTransform(Id, value); }

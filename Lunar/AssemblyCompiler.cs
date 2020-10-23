@@ -53,7 +53,7 @@ namespace Lunar
             syntaxTrees.Wait();
 
             CSharpCompilation compilation = await Task.Run(() => CSharpCompilation.Create(Path.GetRandomFileName(),
-                syntaxTrees.Result, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary)));
+                syntaxTrees.Result, references, new CSharpCompilationOptions(OutputKind.DynamicallyLinkedLibrary, allowUnsafe: true)));
             return await Task.Run(() => CompileAssembly(compilation));
         }
 

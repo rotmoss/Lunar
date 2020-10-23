@@ -8,6 +8,17 @@ namespace Lunar.Graphics
 {
     partial class ShaderProgram
     {
+        public void SetUniform(float data, string uniformName)
+        {
+            Gl.UseProgram(id);
+
+            if (!uniforms.ContainsKey(uniformName))
+                uniforms.Add(uniformName, Gl.GetUniformLocation(id, uniformName));
+
+            Gl.Uniform1f(uniforms[uniformName], 1, data);
+
+            Gl.UseProgram(0);
+        }
         public void SetUniform(Vertex2f data, string uniformName)
         {
             Gl.UseProgram(id);

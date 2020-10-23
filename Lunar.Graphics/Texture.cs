@@ -16,7 +16,16 @@ namespace Lunar.Graphics
 
         private static List<Texture> _textures = new List<Texture>();
 
-        public static bool CreateTexture(string file, out int w, out int h, out Texture texture)
+        public static bool CreateTexture(int w, int h, out Texture texture)
+        {
+            texture = new Texture();
+            texture.w = w; texture.h = h;
+            texture.StoreTextureOnGpu();
+            _textures.Add(texture);
+            return true;
+        }
+
+        public static bool CreateTextureFromFile(string file, out int w, out int h, out Texture texture)
         {
             foreach (Texture t in _textures) { if (t.name == file) 
             { texture = t; w = t.w; h = t.w; return true; } }
@@ -29,14 +38,14 @@ namespace Lunar.Graphics
             SDL_Surface temp = Marshal.PtrToStructure<SDL_Surface>(surface);
             texture.w = w = temp.w; texture.h = h = temp.h;
 
-            texture.id = StoreTextureOnGpu(temp);
+            texture.StoreTextureOnGpu(temp);
             SDL_FreeSurface(surface);
 
             _textures.Add(texture);
             return true;
         }
 
-        public static bool CreateText(string file, string message, int size, uint wrapped, byte r, byte g, byte b, byte a, out int w, out int h, out Texture texture)
+        public static bool CreateTextureFromText(string file, string message, int size, uint wrapped, byte r, byte g, byte b, byte a, out int w, out int h, out Texture texture)
         {
             foreach (Texture t in _textures)
             {
@@ -52,30 +61,45 @@ namespace Lunar.Graphics
             SDL_Surface temp = Marshal.PtrToStructure<SDL_Surface>(surface);
             texture.w = w = temp.w; texture.h = h = temp.h;
 
-            texture.id = StoreTextureOnGpu(temp);
+            texture.StoreTextureOnGpu(temp);
             SDL_FreeSurface(surface);
 
             _textures.Add(texture);
             return true;
         }
 
-        private static uint StoreTextureOnGpu(SDL_Surface surface)
+        private void StoreTextureOnGpu(SDL_Surface surface)
         {
-            if (!GetGLPixelFormat(Marshal.PtrToStructure<uint>(surface.format), out PixelFormat format)) return 0;
+            if (!GetGLPixelFormat(Marshal.PtrToStructure<uint>(surface.format), out PixelFormat format)) return;
 
-            uint texture = Gl.GenTexture();
+            id = Gl.GenTexture();
 
             Gl.Enable(EnableCap.Texture2d);
-            Gl.BindTexture(TextureTarget.Texture2d, texture);
+            Gl.BindTexture(TextureTarget.Texture2d, id);
 
-            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, surface.w, surface.h, 0, format, PixelType.UnsignedByte, surface.pixels);
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, w, h, 0, format, PixelType.UnsignedByte, surface.pixels);
 
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
             Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+
             Gl.Disable(EnableCap.Texture2d);
             Gl.BindTexture(TextureTarget.Texture2d, 0);
+        }
 
-            return texture;
+        private void StoreTextureOnGpu()
+        {
+            id = Gl.GenTexture();
+
+            Gl.Enable(EnableCap.Texture2d);
+            Gl.BindTexture(TextureTarget.Texture2d, id);
+
+            Gl.TexImage2D(TextureTarget.Texture2d, 0, InternalFormat.Rgba, w, h, 0, PixelFormat.Rgba, PixelType.UnsignedByte, Marshal.PtrToStructure<SDL_Surface>(SDL_CreateRGBSurface(0, w, h, 32, 0xff000000, 0x00ff0000, 0x0000ff00, 0x000000ff)).pixels);
+
+            Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMagFilter, Gl.NEAREST);
+            Gl.TexParameter(TextureTarget.Texture2d, TextureParameterName.TextureMinFilter, Gl.NEAREST);
+
+            Gl.Disable(EnableCap.Texture2d);
+            Gl.BindTexture(TextureTarget.Texture2d, 0);
         }
 
         private static bool LoadSurface(string file, out IntPtr value)
@@ -106,12 +130,12 @@ namespace Lunar.Graphics
             return false;
         }
 
-        public void Dispose()
+        public void Dispose() => Gl.DeleteTextures(id);
+
+        public static void DisposeAll()
         {
             foreach (Texture texture in _textures)
-            {
-                Gl.DeleteTextures(texture.id);
-            }
+                texture.Dispose();
         }
     }
 }

@@ -1,7 +1,8 @@
 ﻿using System;
 using SDL2;
 using OpenGL;
-using System.Threading.Tasks;
+using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Lunar.Scenes;
 
@@ -9,12 +10,11 @@ namespace Lunar.Graphics
 {
     public static class Window
     {
-
         private static IntPtr _context;
         private static IntPtr _window;
 
-        public const float GameW = 1280;
-        public const float GameH = 720;
+        public const double GameW = 1280;
+        public const double GameH = 720;
 
         public static float Width { get => _width; set { _width = value > 0 ? (int)value : _width; } }
         private static int _width;
@@ -23,8 +23,26 @@ namespace Lunar.Graphics
         public static bool Fullscreen { get => _fullscreen; set => _fullscreen = value; }
         private static bool _fullscreen;
 
-        public static Matrix4x4f Scaling => _scaling;
-        private static Matrix4x4f _scaling;
+        public static FramebufferTexture Framebuffer { get => _framebuffer; }
+        private static FramebufferTexture _framebuffer;
+
+        public static List<RenderData> _renderData = new List<RenderData>();
+        public static List<string> RenderLayers { get => _renderLayers; }
+        public static List<string> _renderLayers = new List<string>(new string[] { "default" });
+
+        public static ShaderStorageBuffer<Matrix4x4f> Projection { get => _projection; }
+        private static ShaderStorageBuffer<Matrix4x4f> _projection;
+
+        public static ShaderStorageBuffer<Matrix4x4f> View { get => _view; }
+        private static ShaderStorageBuffer<Matrix4x4f> _view;
+
+        public static ShaderStorageBuffer<float> AspectRatio { get => _aspectRatio; }
+        private static ShaderStorageBuffer<float> _aspectRatio;
+
+        public static ShaderStorageBuffer<float> W { get => _w; }
+        private static ShaderStorageBuffer<float> _w;
+        public static ShaderStorageBuffer<float> H { get => _h; }
+        private static ShaderStorageBuffer<float> _h;
 
         private static bool _stretch;
         private const float ASPECT_RATIO = 16.0f / 9.0f;
@@ -35,9 +53,16 @@ namespace Lunar.Graphics
             _height = h;
             _fullscreen = fullScreen;
             _stretch = false;
-            _scaling = Matrix4x4f.Identity;
 
             CreateWindowAndContext();
+
+            _projection = new ShaderStorageBuffer<Matrix4x4f>(0, Matrix4x4f.Identity);
+            _view = new ShaderStorageBuffer<Matrix4x4f>(1, Matrix4x4f.Identity);
+            _aspectRatio = new ShaderStorageBuffer<float>(2, ASPECT_RATIO);
+            _w = new ShaderStorageBuffer<float>(3, (float)GameW);
+            _h = new ShaderStorageBuffer<float>(4, (float)GameH);
+
+            SetViewport();
         }
 
         public static void CreateWindowAndContext()
@@ -52,8 +77,7 @@ namespace Lunar.Graphics
             _context = SDL.SDL_GL_CreateContext(_window);
 
             SDL.SDL_GL_SetSwapInterval(1);
-            Gl.ClearColor(0.2f, 0.2f, 0.2f, 1f);
-            SetViewport();
+            Gl.ClearColor(0.2f, 0.2f, 0.2f, 1f);       
 
             Gl.CullFace(CullFaceMode.Front);
             Gl.FrontFace(FrontFaceDirection.Cw);
@@ -66,49 +90,12 @@ namespace Lunar.Graphics
         public static void ToggleFullscreen()
         {
             _fullscreen = !_fullscreen;
+            SDL.SDL_GetDesktopDisplayMode(0, out SDL.SDL_DisplayMode mode);
+            _width = mode.w;
+            _height = mode.h;
+            SDL.SDL_SetWindowSize(_window, _width, _height);
+            SetViewport();
             SDL.SDL_SetWindowFullscreen(_window, _fullscreen ? (uint)SDL.SDL_WindowFlags.SDL_WINDOW_FULLSCREEN : (uint)SDL.SDL_WindowFlags.SDL_WINDOW_RESIZABLE);
-        }
-
-        public static void DrawQuad(bool fill, float x1, float y1, float x2, float y2, byte r, byte b, byte g)
-        {
-            PrimitiveType type = fill ? PrimitiveType.Quads : PrimitiveType.LineStrip;
-            Gl.Color3(r, g,b);
-            Gl.Begin(type);
-            Gl.Vertex2((x1 * Scaling.Row0.x) + (y1 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y1 * Scaling.Row1.y));
-            Gl.Vertex2((x1 * Scaling.Row0.x) + (y2 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y2 * Scaling.Row1.y));
-            Gl.Vertex2((x2 * Scaling.Row0.x) + (y2 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y2 * Scaling.Row1.y));
-            Gl.Vertex2((x2 * Scaling.Row0.x) + (y1 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y1 * Scaling.Row1.y));
-            Gl.Vertex2((x1 * Scaling.Row0.x) + (y1 * Scaling.Row0.y), (x1 * Scaling.Row1.x) + (y1 * Scaling.Row1.y));
-            Gl.End();
-        }
-        private static void SetViewport()
-        {
-            Gl.LoadIdentity();
-            Gl.Viewport(0, 0, _width, _height);
-
-            _scaling = Matrix4x4f.Identity;
-            float newRatio = Width / Height;
-            if (_stretch) { _scaling.Scale(1f / GameW, 1f / GameH, 1); }
-            else { _scaling.Scale(1f / (GameW / (ASPECT_RATIO / newRatio)), 1f / GameH, 1); }
-        }
-
-        public static Vector2 Scale(Vector2 v, Transform cam)
-        {
-            v *= cam.scale;
-            v -= cam.position;
-
-            Vertex4f temp = new Vertex4f(v.X, v.Y, 0, 1);
-            temp = _scaling * temp;
-
-            return new Vector2(temp.x, temp.y);
-        }
-
-        public static Vector2[] Scale(Vector2[] v, Transform cam)
-        {
-            for (int i = 0; i < v.Length; i++)
-                v[i] = Scale(v[i], cam);
-
-            return v;
         }
 
         public static void UpdateWindowSize()
@@ -117,19 +104,107 @@ namespace Lunar.Graphics
             SetViewport();
         }
 
+        private static void SetViewport()
+        {
+            Gl.LoadIdentity();
+            Gl.Viewport(0, 0, _width, _height);
+
+            Matrix4x4d temp = Matrix4x4d.Identity;
+            double newRatio = Width / Height;
+            if (_stretch) { temp.Scale(1 / GameW, (1 / GameH), 1); }
+            else { temp.Scale(1 / (GameW / (ASPECT_RATIO / newRatio)), 1 / GameH, 1); }
+
+            _projection.Data = (Matrix4x4f)temp;
+            _aspectRatio.Data = (float)newRatio;
+            _w.Data = (float)GameW;
+            _h.Data = (float)GameH;
+
+
+            Framebuffer?.UpdateFrameSize(_width, _height);
+        }
+
         public static void SwapBuffer()
         {
             SDL.SDL_GL_SwapWindow(_window);
             Gl.Clear(ClearBufferMask.ColorBufferBit);
         }
 
+        public static void TranslateBuffers(string attributeName)
+        {
+            foreach (RenderData g in _renderData)
+                g.TranslateBuffer("aPos", Transform.GetGlobalTransform(g.id));
+        }
+
+        public static void Render()
+        {
+            _framebuffer.OpenBuffer();
+
+            foreach (string layer in _renderLayers)
+                foreach (RenderData renderData in _renderData.Where(x => x.Layer == layer))
+                    renderData.Render();
+
+            _framebuffer.CloseBuffer();
+            _framebuffer.Render();
+        }
         public static void Close()
         {
+            while (_renderData.Count > 0)
+                _renderData[0].Dispose();
+
+            ShaderProgram.DisposeShaders();
+            _framebuffer.Dispose();
+
             SDL.SDL_DestroyWindow(_window);
             SDL.SDL_GL_DeleteContext(_context);
             SDL.SDL_Quit();
             SDL_image.IMG_Quit();
             SDL_ttf.TTF_Quit();
         }
+
+        public static void CreateFramebuffer() => _framebuffer = new FramebufferTexture(_width, _height, 1, "Framebuffer.vert", "Framebuffer.frag");
+        public static void AddRenderData(RenderData value) => _renderData.Add(value);
+        public static void RemoveRenderData(RenderData value) => _renderData.Remove(value);
+        public static void AddLayer(string value, int index) => _renderLayers.Insert(index, value);
+        public static void AddLayers(params string[] value) => _renderLayers.AddRange(value);
+        public static void SetLineWidth(int value) => Gl.LineWidth(value);
+        public static void SetViewMatrix(Matrix4x4f value) => _view.Data = value;
+        /*
+        public static Vertex2f Scale(Vertex2f v)
+        {
+            Vertex4f temp = new Vertex4f(v.x, v.y, 0, 1);
+            temp = _view.Data * temp;
+            temp = _projection.Data * temp;
+
+            return new Vertex2f(temp.x, temp.y);
+        }
+
+        public static Vertex2f Scale(Vector2 v)
+        {
+            Vertex4f temp = new Vertex4f(v.X, v.Y, 0, 1);
+            temp = _view.Data * temp;
+            temp = _projection.Data * temp;
+
+            return new Vertex2f(temp.x, temp.y);
+        }
+
+        public static Vertex2f[] Scale(Vector2[] v)
+        {
+            Vertex2f[] vs = new Vertex2f[v.Length];
+
+            for (int i = 0; i < v.Length; i++)
+                vs[i] = Scale(v[i]);
+
+            return vs;
+        }
+
+        public static Vertex2f[] Scale(Vertex2f[] v)
+        {
+            Vertex2f[] vs = new Vertex2f[v.Length];
+
+            for (int i = 0; i < v.Length; i++)
+                vs[i] = Scale(v[i]);
+
+            return vs;
+        }*/
     }
 }

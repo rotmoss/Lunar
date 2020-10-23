@@ -37,6 +37,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\Lunar.IO\Lunar.IO.csproj" />
+    <ProjectReference Include="..\Lunar.Math\Lunar.Math.csproj" />
     <ProjectReference Include="..\Lunar.Scenes\Lunar.Scenes.csproj" />
   </ItemGroup>
 

@@ -16,9 +16,6 @@ namespace Lunar
 { 
     public class Lunar
     {
-        public static bool DrawColliders { get => _drawColliders; set => _drawColliders = value; }
-        private static bool _drawColliders = true;
-
         private const int MF_BYCOMMAND = 0x00000000;
         public const int SC_CLOSE = 0xF060;
 
@@ -60,11 +57,9 @@ namespace Lunar
             }
         }
 
-
         static void OnWindowClose(object sender, EventArgs eventArgs)
         {
             Mixer.Dispose();
-            RenderData.DisposeAll();
             Window.Close();
             Environment.Exit(0);
         }
@@ -72,14 +67,12 @@ namespace Lunar
         static void OnWindowSizeChanged(object sender, EventArgs eventArgs)
         {
             Window.UpdateWindowSize();
-            ShaderProgram.ForEachShader(x => x.SetUniformMatrix(Window.Scaling, "uProjection"));
         }
 
         static void Main(string[] args)
         {
-            DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
-
             Task task = Task.Run(() => LoadScene());
+            DeleteMenu(GetSystemMenu(GetConsoleWindow(), false), SC_CLOSE, MF_BYCOMMAND);
 
             if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
@@ -87,18 +80,17 @@ namespace Lunar
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
 
             Window.Init(1280, 720, false);
+
+            Window.AddLayers("Background", "Sprite", "Foreground", "Collider");
+            Window.SetLineWidth(2);
+            Window.CreateFramebuffer();
+
             Mixer.Init();
 
             task.Wait();
             GC.Collect();
 
-            RenderData.AddLayers("Background", "Sprite", "Foreground", "Collider");
-            RenderData.SetLineWidth(2);
-
             Script.InitScripts();
-
-            ShaderProgram.ForEachShader(x => x.SetUniformMatrix(Window.Scaling, "uProjection"));
-
             Script.LateInitScripts();
 
             while (true)
@@ -121,12 +113,12 @@ namespace Lunar
                 Script.LateUpdateScripts();
 
                 //Use Transfroms to Translate Graphics Data
-                RenderData.TranslateBuffers("aPos");
+                Window.TranslateBuffers("aPos");
 
                 AnimatedSprite.Animate(Time.FrameTime);
 
                 //Render Graphics
-                RenderData.RenderAll();
+                Window.Render();
 
                 //Update all scripts again
                 Script.PostRenderUpdateScripts();

@@ -13,7 +13,7 @@ namespace Lunar.Graphics
             id = 0;
         }
 
-        internal static bool CreateVertexArray(ShaderProgram shaderProgram, out VertexArray vertexArray, params BufferObject[] buffers)
+        internal static bool CreateVertexArray(ShaderProgram shaderProgram, out VertexArray vertexArray, params Buffer[] buffers)
         {
             if (shaderProgram == null) { vertexArray = null; return false; }
 
@@ -23,7 +23,7 @@ namespace Lunar.Graphics
 
             Gl.BindVertexArray(vertexArray.id);
 
-            foreach (BufferObject buffer in buffers)
+            foreach (Buffer buffer in buffers)
             {
                 if (buffer.id == 0) return false;
                 Gl.BindBuffer(BufferTarget.ArrayBuffer, buffer.id);
