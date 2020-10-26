@@ -33,6 +33,8 @@ namespace Lunar.Scripts
 
         public static void AddScripts(ScriptInfo[] scripts)
         {
+            if (scripts == null) return;
+
             foreach (ScriptInfo script in scripts) {
                 AddScript(script.id, script.className, script.vars);
             }
@@ -43,8 +45,10 @@ namespace Lunar.Scripts
             object script;
 
             if (Assembly == null) return;
-            try { script = Assembly.CreateInstance("Lunar." + className); }
-            catch { return; }
+            script = Assembly.CreateInstance("Lunar." + className); 
+
+            if(script == null)
+            { Console.WriteLine("Script " + className + ".cs could not be found"); return; }
 
             if (!script.GetType().IsSubclassOf(typeof(Script)))
             { Console.WriteLine("Script " + className + " does not inherit from script"); return; }
