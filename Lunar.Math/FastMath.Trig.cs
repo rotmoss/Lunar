@@ -6,51 +6,51 @@ namespace Lunar.Math
 {
     public static partial class FastMath
     {
-        const double DegreesToRadians = System.Math.PI / 180d;
+        const float DegreesToRadians = MathF.PI / 180f;
 
-        private static readonly Dictionary<double, double> SineLookup = CreateSineLookup();
-        private static readonly double[] SineLookupKeys = SineLookup.Keys.ToArray();
+        private static readonly Dictionary<float, float> SineLookup = CreateSineLookup();
+        private static readonly float[] SineLookupKeys = SineLookup.Keys.ToArray();
 
-        private static readonly Dictionary<double, double> CosLookup = CreateCosLookup();
-        private static readonly double[] CosLookupKeys = CosLookup.Keys.ToArray();
+        private static readonly Dictionary<float, float> CosLookup = CreateCosLookup();
+        private static readonly float[] CosLookupKeys = CosLookup.Keys.ToArray();
 
-        private static Dictionary<double, double> CreateSineLookup()
+        private static Dictionary<float, float> CreateSineLookup()
         {
-            Dictionary<double, double> result = new Dictionary<double, double>();
+            Dictionary<float, float> result = new Dictionary<float, float>();
 
             for (decimal i = -10; i < 10; i += 0.001m)
-                result.Add((double)i, System.Math.Sin((double)i));
+                result.Add((float)i, MathF.Sin((float)i));
 
             return result;
         }
 
-        private static Dictionary<double, double> CreateCosLookup()
+        private static Dictionary<float, float> CreateCosLookup()
         {
-            Dictionary<double, double> result = new Dictionary<double, double>();
+            Dictionary<float, float> result = new Dictionary<float, float>();
 
             for (decimal i = -10; i < 10; i += 0.001m)
-                result.Add((double)i, System.Math.Cos((double)i));
+                result.Add((float)i, MathF.Cos((float)i));
 
             return result;
         }
 
-        public static double Sin(double x)
+        public static float Sin(float x)
         {
             int index = Array.BinarySearch(SineLookupKeys, x);
 
             if (index < 0) index = ~index - 1;
-            else return System.Math.Sin(x);
+            else return MathF.Sin(x);
 
             try { return SineLookup[SineLookupKeys[index]]; }
             catch { return 0; }
         }
 
-        public static double Cos(double x)
+        public static float Cos(float x)
         {
             int index = Array.BinarySearch(CosLookupKeys, x);
 
             if (index < 0) index = ~index - 1;
-            else return System.Math.Cos(x);
+            else return MathF.Cos(x);
 
             try { return CosLookup[CosLookupKeys[index]]; }
             catch { return 0; }

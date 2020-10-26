@@ -22,34 +22,43 @@ namespace Lunar.Graphics
         public abstract void Render();
         public abstract void Dispose();
 
-        public void TranslateBuffer(string attributeName, Vertex2d pos, Vertex2d scale)
+        public void TranslateBuffer(string attributeName, Vertex2f position, Vertex2f scale)
         {
-            Vertex2d[] coords = new Vertex2d[(_positionBuffer.data.Length / _positionBuffer.size)];
-            double[] data = new double[_positionBuffer.data.Length];
+            Vertex2f[] coords = new Vertex2f[(_positionBuffer.data.Length / _positionBuffer.size)];
+            float[] data = new float[_positionBuffer.data.Length];
 
             for (int i = 0, j = 0; i < _positionBuffer.data.Length; j += 1, i += _positionBuffer.size) {
-                coords[j] = new Vertex2d(_positionBuffer.data[i], _positionBuffer.data[i + 1]).Multiply(scale) + pos;
+                coords[j] = new Vertex2f(_positionBuffer.data[i], _positionBuffer.data[i + 1]).Multiply(scale) + position;
             }
 
             for (int i = 0, j = 0; i < data.Length; i += _positionBuffer.size, j++) { 
                 data[i] = coords[j].x; data[i + 1] = coords[j].y; 
             }
 
+            for (int i = 0; i < data.Length; i++)
+                data[i] = MathF.Floor(data[i] * 0.5f) / 0.5f;
+
             _positionBuffer.UpdateBuffer(data);
         }
 
         public void TranslateBuffer(string attributeName, Transform transform)
         {
-            Vertex2d[] coords = new Vertex2d[(_positionBuffer.data.Length / _positionBuffer.size)];
-            double[] data = new double[_positionBuffer.data.Length];
+            Vertex2f pos = transform.position;
+            Vertex2f scale = transform.scale;
+
+            Vertex2f[] coords = new Vertex2f[(_positionBuffer.data.Length / _positionBuffer.size)];
+            float[] data = new float[_positionBuffer.data.Length];
 
             for (int i = 0, j = 0; i < _positionBuffer.data.Length; j += 1, i += _positionBuffer.size)  {
-                coords[j] = new Vertex2d(_positionBuffer.data[i], _positionBuffer.data[i + 1]).Multiply(transform.scale) + transform.position;
+                coords[j] = new Vertex2f(_positionBuffer.data[i], _positionBuffer.data[i + 1]).Multiply(scale) + pos;
             }
 
             for (int i = 0, j = 0; i < data.Length; i += _positionBuffer.size, j++) {
                 data[i] = coords[j].x; data[i + 1] = coords[j].y;
             }
+
+            for (int i = 0; i < data.Length; i++)
+                data[i] = MathF.Floor(data[i] * 0.5f) / 0.5f;
 
             _positionBuffer.UpdateBuffer(data);
         }

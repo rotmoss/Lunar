@@ -25,8 +25,8 @@ namespace Lunar.Graphics
             ShaderProgram.CreateShader(vs, fs, out _shaderProgram);
 
             VertexArray.CreateVertexArray(_shaderProgram, out _vertexArray,
-                new Buffer(new double[] { -1, -1, 1, -1, 1, 1, -1, 1 }, 2, "aPos"),
-                new Buffer(new double[] { 0, 0, 1, 0, 1, 1, 0, 1 }, 2, "aTexCoord")
+                new Buffer(new float[] { -1, -1, 1, -1, 1, 1, -1, 1 }, 2, "aPos"),
+                new Buffer(new float[] { 0, 0, 1, 0, 1, 1, 0, 1 }, 2, "aTexCoord")
             );
         }
 

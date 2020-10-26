@@ -16,9 +16,9 @@ namespace Lunar.Math
         {
             return (x - min) / (max - min);
         }
-        public static double Sigmoid(double value, double xMultiple = 1, double yMultiple = 1, double xOffset = 0, double yOffset = 0)
+        public static float Sigmoid(float value, float xMultiple = 1, float yMultiple = 1, float xOffset = 0, float yOffset = 0)
         {
-            double k = System.Math.Exp(value * xMultiple) * yMultiple;
+            float k = MathF.Exp(value * xMultiple) * yMultiple;
             return (k / (1 + xOffset + k)) + yOffset;
         }
     }

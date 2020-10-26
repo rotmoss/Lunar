@@ -19,8 +19,8 @@ namespace Lunar.Physics
         private uint id;
 
         private bool movable;
-        private Vertex2d offset;
-        private Vertex2d size;
+        private Vertex2f offset;
+        private Vertex2f size;
 
         private Polygon shape;
 
@@ -32,7 +32,7 @@ namespace Lunar.Physics
         public static bool DrawColliders { get => _drawColliders; set => _drawColliders = value; }
         private static bool _drawColliders = false;
 
-        public Collider(uint Id, Vertex2d offset, Vertex2d size, bool movable = false)
+        public Collider(uint Id, Vertex2f offset, Vertex2f size, bool movable = false)
         {
             id = Id;
             this.movable = movable;
@@ -43,7 +43,7 @@ namespace Lunar.Physics
             {
                 Transform t = new Transform(offset, size);
 
-                shape = new Polygon(Id, "Collider.vert", "Collider.frag", 2, true, new double[] {
+                shape = new Polygon(Id, "Collider.vert", "Collider.frag", 2, true, new float[] {
                 t.position.x - t.scale.x, t.position.y - t.scale.y,
                 t.position.x + t.scale.x, t.position.y - t.scale.y,
                 t.position.x + t.scale.x, t.position.y + t.scale.y,
@@ -57,23 +57,23 @@ namespace Lunar.Physics
             _colliders.Add(this);
         }
 
-        public static Vertex2d[] GetTransforms()
+        public static Vertex2f[] GetTransforms()
         {
-            Vertex2d[] v = new Vertex2d[_colliders.Count * 4];
+            Vertex2f[] v = new Vertex2f[_colliders.Count * 4];
 
             for (int i = 0, j = 0; i < v.Length; i += 4, j++) {
                 Transform t = new Transform(_colliders[j].offset, _colliders[j].size) + Transform.GetGlobalTransform(_colliders[j].id);
 
-                v[i + 0] = new Vertex2d(t.position.x - t.scale.x, t.position.y - t.scale.y);
-                v[i + 1] = new Vertex2d(t.position.x + t.scale.x, t.position.y - t.scale.y);
-                v[i + 2] = new Vertex2d(t.position.x + t.scale.x, t.position.y + t.scale.y);
-                v[i + 3] = new Vertex2d(t.position.x - t.scale.x, t.position.y + t.scale.y);
+                v[i + 0] = new Vertex2f(t.position.x - t.scale.x, t.position.y - t.scale.y);
+                v[i + 1] = new Vertex2f(t.position.x + t.scale.x, t.position.y - t.scale.y);
+                v[i + 2] = new Vertex2f(t.position.x + t.scale.x, t.position.y + t.scale.y);
+                v[i + 3] = new Vertex2f(t.position.x - t.scale.x, t.position.y + t.scale.y);
             }
 
             return v;
         }
 
-        public static void CheckColissions() => Parallel.ForEach(_colliders, x => x.CheckColission());
+        public static void CheckColissions() { foreach(Collider x in _colliders) x.CheckColission(); }
         
         public void CheckColission()
         {
@@ -109,15 +109,15 @@ namespace Lunar.Physics
             return false;
         }
 
-        private Side CalculateSide(Vertex2d pos, Vertex2d scale)
+        private Side CalculateSide(Vertex2f pos, Vertex2f scale)
         {
             //Calulate the angle from the center of b to each of its corners
-            double angleTopRight = new Vertex2d(scale.x, scale.y).Angle();
-            double angleTopLeft = new Vertex2d(-scale.x, scale.y).Angle();
-            double angleBottomRight = new Vertex2d(scale.x, -scale.y).Angle();
-            double angleBottomLeft = new Vertex2d(-scale.x, -scale.y).Angle();
+            float angleTopRight = new Vertex2f(scale.x, scale.y).Angle();
+            float angleTopLeft = new Vertex2f(-scale.x, scale.y).Angle();
+            float angleBottomRight = new Vertex2f(scale.x, -scale.y).Angle();
+            float angleBottomLeft = new Vertex2f(-scale.x, -scale.y).Angle();
 
-            double angleBetween = (offset - pos).Angle();
+            float angleBetween = (offset - pos).Angle();
 
             //Check between which corners a is located
 
@@ -160,7 +160,7 @@ namespace Lunar.Physics
         }
         public void MoveTransform(Side side, Transform global, Transform collider)
         {
-            double topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
+            float topA, bottomA, leftA, rightA, topB, bottomB, leftB, rightB;
 
             switch (side)
             {
@@ -168,28 +168,28 @@ namespace Lunar.Physics
                     bottomA = global.position.y - global.scale.y;
                     topB = collider.position.y + collider.scale.y;
 
-                    Transform.Translate(id, new Vertex2d(0, topB - bottomA));
+                    Transform.Translate(id, new Vertex2f(0, topB - bottomA));
                     break;
 
                 case Side.BOTTOM:
                     topA = global.position.y + global.scale.y;
                     bottomB = collider.position.y - collider.scale.y;
 
-                    Transform.Translate(id, new Vertex2d(0, bottomB - topA));
+                    Transform.Translate(id, new Vertex2f(0, bottomB - topA));
                     break;
 
                 case Side.LEFT:
                     rightA = global.position.x + global.scale.x;
                     leftB = collider.position.x - collider.scale.x;
 
-                    Transform.Translate(id, new Vertex2d(leftB - rightA, 0));
+                    Transform.Translate(id, new Vertex2f(leftB - rightA, 0));
                     break;
 
                 case Side.RIGHT:
                     leftA = global.position.x - global.scale.x;
                     rightB = collider.position.x + collider.scale.x;
 
-                    Transform.Translate(id, new Vertex2d(rightB - leftA, 0));
+                    Transform.Translate(id, new Vertex2f(rightB - leftA, 0));
                     break; 
             }
         }

@@ -17,8 +17,8 @@ namespace Lunar.Graphics
             if(!ShaderProgram.CreateShader(vertexShader, fragmentShader, out _shaderProgram)) { Dispose(); w = h = 0; return; }
             if (!Texture.CreateTextureFromText(fontFile, message, size, wrapped, r, g, b, a, out w, out h, out _texture)){ Dispose(); return; }
 
-            _positionBuffer = new Buffer(new double[] { -w, -h, w, -h, w, h, -w, h }, 2, "aPos");
-            _texCoordsBuffer = new Buffer(new double[] { 0, 1, 1, 1, 1, 0, 0, 0 }, 2, "aTexCoord");
+            _positionBuffer = new Buffer(new float[] { -w, -h, w, -h, w, h, -w, h }, 2, "aPos");
+            _texCoordsBuffer = new Buffer(new float[] { 0, 1, 1, 1, 1, 0, 0, 0 }, 2, "aTexCoord");
 
             if (!VertexArray.CreateVertexArray(_shaderProgram, out _vertexArray, _positionBuffer, _texCoordsBuffer)){ Dispose(); return; }
 

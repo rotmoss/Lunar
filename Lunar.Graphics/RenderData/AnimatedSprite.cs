@@ -36,8 +36,8 @@ namespace Lunar.Graphics
             _frameWidth = frameWidth / (float)w;
             _frameHeight = frameHeight / (float)h;
 
-            _positionBuffer = new Buffer(new double[] { -frameWidth, -frameHeight, frameWidth, -frameHeight, frameWidth, frameHeight, -frameWidth, frameHeight }, 2, "aPos");
-            _texCoordsBuffer = new Buffer(new double[] { 0, _frameHeight, _frameWidth, _frameHeight, _frameWidth, 0, 0, 0 }, 2, "aTexCoord");
+            _positionBuffer = new Buffer(new float[] { -frameWidth, -frameHeight, frameWidth, -frameHeight, frameWidth, frameHeight, -frameWidth, frameHeight }, 2, "aPos");
+            _texCoordsBuffer = new Buffer(new float[] { 0, _frameHeight, _frameWidth, _frameHeight, _frameWidth, 0, 0, 0 }, 2, "aTexCoord");
 
             if (!VertexArray.CreateVertexArray(_shaderProgram, out _vertexArray, _positionBuffer, _texCoordsBuffer)) { Dispose(); return; }
 
@@ -81,7 +81,7 @@ namespace Lunar.Graphics
             if (_timeSinceLastFrame < _timePerFrame) { _timeSinceLastFrame += frameTime; return; }
             else { _timeSinceLastFrame = 0; }
 
-            double[] data = _texCoordsBuffer.data;
+            float[] data = _texCoordsBuffer.data;
 
             if (data[0] + _frameWidth >= 1) ResetTextureCoords(ref data, ScrollDirection.Horizontal);
             else ScrollTextureCoords(ref data, ScrollDirection.Horizontal);
@@ -92,17 +92,17 @@ namespace Lunar.Graphics
             _texCoordsBuffer.UpdateBuffer(data);
         }
 
-        private void ScrollTextureCoords(ref double[] data, ScrollDirection scrollDirection)
+        private void ScrollTextureCoords(ref float[] data, ScrollDirection scrollDirection)
         {
             for (int i = scrollDirection == ScrollDirection.Horizontal ? 0 : 1; i < data.Length; i += 2)
                 data[i] += scrollDirection == ScrollDirection.Horizontal ? _frameWidth : _frameHeight;
         }
 
-        private void ResetTextureCoords(ref double[] data, ScrollDirection scrollDirection)
+        private void ResetTextureCoords(ref float[] data, ScrollDirection scrollDirection)
         {
             data = scrollDirection == ScrollDirection.Horizontal ? 
-                new double[] { 0, data[1], _frameWidth, data[3], _frameWidth, data[5], 0, data[7] } :
-                new double[] { data[0], _frameHeight, data[3], _frameHeight, data[4], 0, data[6], 0 } ;
+                new float[] { 0, data[1], _frameWidth, data[3], _frameWidth, data[5], 0, data[7] } :
+                new float[] { data[0], _frameHeight, data[3], _frameHeight, data[4], 0, data[6], 0 } ;
         }
 
         public static void Animate(double frameTime)

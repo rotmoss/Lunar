@@ -13,8 +13,8 @@ namespace Lunar.Graphics
         private static IntPtr _context;
         private static IntPtr _window;
 
-        public const double GameW = 1280;
-        public const double GameH = 720;
+        public const float GameW = 1280;
+        public const float GameH = 720;
 
         public static float Width { get => _width; set { _width = value > 0 ? (int)value : _width; } }
         private static int _width;
@@ -59,8 +59,8 @@ namespace Lunar.Graphics
             _projection = new ShaderStorageBuffer<Matrix4x4f>(0, Matrix4x4f.Identity);
             _view = new ShaderStorageBuffer<Matrix4x4f>(1, Matrix4x4f.Identity);
             _aspectRatio = new ShaderStorageBuffer<float>(2, ASPECT_RATIO);
-            _w = new ShaderStorageBuffer<float>(3, (float)GameW);
-            _h = new ShaderStorageBuffer<float>(4, (float)GameH);
+            _w = new ShaderStorageBuffer<float>(3, GameW);
+            _h = new ShaderStorageBuffer<float>(4, GameH);
 
             SetViewport();
         }
@@ -110,14 +110,14 @@ namespace Lunar.Graphics
             Gl.Viewport(0, 0, _width, _height);
 
             Matrix4x4d temp = Matrix4x4d.Identity;
-            double newRatio = Width / Height;
+            float newRatio = Width / Height;
             if (_stretch) { temp.Scale(1 / GameW, (1 / GameH), 1); }
             else { temp.Scale(1 / (GameW / (ASPECT_RATIO / newRatio)), 1 / GameH, 1); }
 
             _projection.Data = (Matrix4x4f)temp;
             _aspectRatio.Data = (float)newRatio;
-            _w.Data = (float)GameW;
-            _h.Data = (float)GameH;
+            _w.Data = GameW;
+            _h.Data = GameH;
 
 
             Framebuffer?.UpdateFrameSize(_width, _height);

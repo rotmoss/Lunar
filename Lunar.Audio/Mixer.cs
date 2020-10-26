@@ -34,7 +34,7 @@ namespace Lunar.Audio
         }
 
         
-        public static void SetPosition(this Sample sample, Vertex2d position)
+        public static void SetPosition(this Sample sample, Vertex2f position)
         {
             int index = _samples.FindIndex(x => x == sample);
             for (int i = 0; i < _channels.Length; i++)
@@ -48,14 +48,14 @@ namespace Lunar.Audio
             }
         }
 
-        private static byte FormatDistance(double distance, float falloff)
+        private static byte FormatDistance(float distance, float falloff)
         {
-            distance = System.Math.Log((distance / 4f) + 1) / (falloff / 10f);
+            distance = MathF.Log((distance / 4f) + 1) / (falloff / 10f);
             if (distance > 255) return 255;
             return (byte)distance;
         }
 
-        private static short FormatAngle(double angle, byte distance, float panStrength)
+        private static short FormatAngle(float angle, byte distance, float panStrength)
         {
             if (angle > 90) { angle = 90 + (90 - angle); }
             else if (angle < -90) { angle = -90 + (-90 - angle); }

@@ -56,7 +56,7 @@ namespace Lunar.Input
         public static bool GetKeyState(Key key) => _keyboard.ReadKeyState(key);
         public static bool GetKeyState(SDL_Keycode key) => _keyboard.ReadRawKeyState(key);
         public static bool GetButtonState(Button button, int id) => id < _gameControllers.Count ? _gameControllers[id].ReadButtonState(button) : false;
-        public static double GetAxisState(Axis axis, int id) => id < _gameControllers.Count ? _gameControllers[id].ReadAxisState(axis) : 0;
+        public static float GetAxisState(Axis axis, int id) => id < _gameControllers.Count ? _gameControllers[id].ReadAxisState(axis) : 0;
         public static void PollInputs()
         {
             GameController controller;

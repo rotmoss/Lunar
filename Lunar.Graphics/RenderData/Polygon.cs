@@ -10,7 +10,7 @@ namespace Lunar.Graphics
     public class Polygon : RenderData
     {
         bool _wireFrame;
-        public Polygon(uint Id, string vertexShader, string fragmentShader, int vertexSize, bool wireFrame, params double[] vertecies)
+        public Polygon(uint Id, string vertexShader, string fragmentShader, int vertexSize, bool wireFrame, params float[] vertecies)
         {
             id = Id;
             Visible = true;
