@@ -15,6 +15,7 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
@@ -22,6 +23,7 @@
     <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
     <DebugType>none</DebugType>
     <DebugSymbols>false</DebugSymbols>
+    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
   </PropertyGroup>
 
   <ItemGroup>

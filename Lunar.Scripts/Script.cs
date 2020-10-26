@@ -1,4 +1,5 @@
 ﻿using Lunar.Scenes;
+using Lunar.Math;
 using System.Linq;
 using Lunar.Input;
 using System.Collections.Generic;
@@ -86,7 +87,7 @@ namespace Lunar.Scripts
         public bool GetButtonState(Button button, int id) => InputController.GetButtonState(button, id);
         public float GetAxisState(Axis axsis, int id) => InputController.GetAxisState(axsis, id);
 
-        public Transform Transform { get => Transform.GetGlobalTransform(Id); set => Transform.SetTransform(Id, value); }
-        public Transform LocalTransform { get => Transform.GetLocalTransform(Id); set => Transform.SetTransform(Id, value); }
+        public Transform Transform { get => Scene.GetGlobalTransform(Id); set => Scene.SetTransform(Id, value); }
+        public Transform LocalTransform { get => Scene.GetLocalTransform(Id); set => Scene.SetTransform(Id, value); }
     }
 }

@@ -36,7 +36,7 @@ namespace Lunar.Physics
             _speed += _acceleration * Time.DeltaTime;
 
             //Calculate position from speed
-            Transform.Translate(_id, _speed * Time.DeltaTime);
+            Scene.MoveTransform(_id, _speed * Time.DeltaTime);
 
             //Apply friction force
             Vertex2f friction = FastMath.Normalize(-new Vertex2f(_speed.x, _speed.y)) * Time.DeltaTime * _frictionConstant;

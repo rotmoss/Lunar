@@ -132,7 +132,7 @@ namespace Lunar.Graphics
         public static void TranslateBuffers(string attributeName)
         {
             foreach (RenderData g in _renderData)
-                g.TranslateBuffer("aPos", Transform.GetGlobalTransform(g.id));
+                g.TranslateBuffer("aPos", Scene.GetGlobalTransform(g.id));
         }
 
         public static void Render()

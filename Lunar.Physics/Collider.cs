@@ -62,7 +62,7 @@ namespace Lunar.Physics
             Vertex2f[] v = new Vertex2f[_colliders.Count * 4];
 
             for (int i = 0, j = 0; i < v.Length; i += 4, j++) {
-                Transform t = new Transform(_colliders[j].offset, _colliders[j].size) + Transform.GetGlobalTransform(_colliders[j].id);
+                Transform t = new Transform(_colliders[j].offset, _colliders[j].size) + Scene.GetGlobalTransform(_colliders[j].id);
 
                 v[i + 0] = new Vertex2f(t.position.x - t.scale.x, t.position.y - t.scale.y);
                 v[i + 1] = new Vertex2f(t.position.x + t.scale.x, t.position.y - t.scale.y);
@@ -83,8 +83,8 @@ namespace Lunar.Physics
             {
                 if (IsParent(collider)) continue;
 
-                Transform a = new Transform(offset, size) + Transform.GetGlobalTransform(id);
-                Transform b = new Transform(collider.offset, collider.size) + Transform.GetGlobalTransform(collider.id);
+                Transform a = new Transform(offset, size) + Scene.GetGlobalTransform(id);
+                Transform b = new Transform(collider.offset, collider.size) + Scene.GetGlobalTransform(collider.id);
 
                 if (DoesOverlap(a, b))
                 {
@@ -168,28 +168,28 @@ namespace Lunar.Physics
                     bottomA = global.position.y - global.scale.y;
                     topB = collider.position.y + collider.scale.y;
 
-                    Transform.Translate(id, new Vertex2f(0, topB - bottomA));
+                    Scene.MoveTransform(id, new Vertex2f(0, topB - bottomA));
                     break;
 
                 case Side.BOTTOM:
                     topA = global.position.y + global.scale.y;
                     bottomB = collider.position.y - collider.scale.y;
 
-                    Transform.Translate(id, new Vertex2f(0, bottomB - topA));
+                    Scene.MoveTransform(id, new Vertex2f(0, bottomB - topA));
                     break;
 
                 case Side.LEFT:
                     rightA = global.position.x + global.scale.x;
                     leftB = collider.position.x - collider.scale.x;
 
-                    Transform.Translate(id, new Vertex2f(leftB - rightA, 0));
+                    Scene.MoveTransform(id, new Vertex2f(leftB - rightA, 0));
                     break;
 
                 case Side.RIGHT:
                     leftA = global.position.x - global.scale.x;
                     rightB = collider.position.x + collider.scale.x;
 
-                    Transform.Translate(id, new Vertex2f(rightB - leftA, 0));
+                    Scene.MoveTransform(id, new Vertex2f(rightB - leftA, 0));
                     break; 
             }
         }
