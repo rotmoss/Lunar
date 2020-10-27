@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace Lunar.Math
 {
-    public static partial class FastMath
+    public static partial class VertexExtentions
     {
         const float DegreesToRadians = MathF.PI / 180f;
 

@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -20,7 +20,13 @@
   </PropertyGroup>
 
   <ItemGroup>
+    <PackageReference Include="SDL2-CS-Rolling" Version="2018.11.1" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Lunar.Input\Lunar.Input.csproj" />
     <ProjectReference Include="..\Lunar.Scenes\Lunar.Scenes.csproj" />
+    <ProjectReference Include="..\Lunar.Transforms\Lunar.Transforms.csproj" />
   </ItemGroup>
 
 </Project>

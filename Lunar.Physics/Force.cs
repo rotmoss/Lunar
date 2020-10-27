@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Lunar.Math;
 using System.Threading.Tasks;
-using Lunar.Scenes;
+using Lunar.Transforms;
 using Lunar.Stopwatch;
 using OpenGL;
 
@@ -10,7 +10,7 @@ namespace Lunar.Physics
 {
     public class Force
     {
-        private uint _id;
+        private uint id;
 
         public Vertex2f Speed { get => _speed; set => _speed = value; }
         private Vertex2f _speed;
@@ -23,7 +23,7 @@ namespace Lunar.Physics
 
         public Force(uint id)
         {
-            _id = id;
+            this.id = id;
             _speed = new Vertex2f();
             _acceleration = new Vertex2f();
             _frictionConstant = 1;
@@ -36,10 +36,10 @@ namespace Lunar.Physics
             _speed += _acceleration * Time.DeltaTime;
 
             //Calculate position from speed
-            Scene.MoveTransform(_id, _speed * Time.DeltaTime);
+            Transform.MoveTransform(id, _speed * Time.DeltaTime);
 
             //Apply friction force
-            Vertex2f friction = FastMath.Normalize(-new Vertex2f(_speed.x, _speed.y)) * Time.DeltaTime * _frictionConstant;
+            Vertex2f friction = VertexExtentions.Normalize(-new Vertex2f(_speed.x, _speed.y)) * Time.DeltaTime * _frictionConstant;
             if (!float.IsNaN(friction.x) && !float.IsNaN(friction.y) && friction.Length() < _speed.Length()) { _speed += friction; }
             else { _speed = Vertex2f.Zero; }
         }

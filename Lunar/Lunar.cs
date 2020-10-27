@@ -38,7 +38,7 @@ namespace Lunar
             InputController.OnWindowSizeChanged += OnWindowSizeChanged;
             InputController.OnKeyDown += OnKeyDown;
 
-            Scene.LoadScene("start.xml", out ScriptInfo[] scripts);
+            Scene.LoadScene("start.xml", out List<ScriptInfo> scripts);
 
             assemblyAwaiter.Wait();
             Script.Assembly = assemblyAwaiter.Result;

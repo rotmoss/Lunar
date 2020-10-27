@@ -1,4 +1,4 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <TargetFramework>net5.0</TargetFramework>
@@ -20,13 +20,7 @@
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="OpenGL.Net.Math" Version="0.8.4" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Lunar.Input\Lunar.Input.csproj" />
     <ProjectReference Include="..\Lunar.IO\Lunar.IO.csproj" />
-    <ProjectReference Include="..\Lunar.Math\Lunar.Math.csproj" />
   </ItemGroup>
 
 </Project>

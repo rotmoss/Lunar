@@ -5,7 +5,7 @@ using OpenGL;
 
 namespace Lunar.Math
 {
-    public static partial class FastMath
+    public static partial class VertexExtentions
     {
         public static Vertex2f ToPolar(this Vertex2f v) => new Vertex2f(Cos(v.y * DegreesToRadians) * v.x, Sin(v.y * DegreesToRadians) * v.x);
 

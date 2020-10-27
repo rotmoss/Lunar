@@ -1,17 +1,13 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
+using System.Text;
+using System.Threading.Tasks;
 
 namespace Lunar.Math
 {
-    public static partial class FastMath
+    public static class Functions
     {
-        public static float[] Multiply(this float[] a, float b)
-        {
-            for (int i = 0; i < a.Length; i++)
-            { a[i] *= b; }
-
-            return a;
-        }
-
         public static float Normalize(float x, float min, float max)
         {
             return (x - min) / (max - min);

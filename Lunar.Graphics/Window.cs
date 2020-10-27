@@ -3,8 +3,8 @@ using SDL2;
 using OpenGL;
 using System.Collections.Generic;
 using System.Linq;
-using System.Numerics;
 using Lunar.Scenes;
+using Lunar.Transforms;
 
 namespace Lunar.Graphics
 {
@@ -132,7 +132,7 @@ namespace Lunar.Graphics
         public static void TranslateBuffers(string attributeName)
         {
             foreach (RenderData g in _renderData)
-                g.TranslateBuffer("aPos", Scene.GetGlobalTransform(g.id));
+                g.TranslateBuffer("aPos", Transform.GetGlobalTransform(g.id));
         }
 
         public static void Render()
@@ -162,49 +162,24 @@ namespace Lunar.Graphics
         }
 
         public static void CreateFramebuffer() => _framebuffer = new FramebufferTexture(_width, _height, 1, "Framebuffer.vert", "Framebuffer.frag");
-        public static void AddRenderData(RenderData value) => _renderData.Add(value);
+        public static void AddRenderData(RenderData value)
+        {
+            _renderData.Add(value);
+
+            Scene.GetScene(value.id).OnSceneDispose += OnSceneDispose;
+        }
         public static void RemoveRenderData(RenderData value) => _renderData.Remove(value);
         public static void AddLayer(string value, int index) => _renderLayers.Insert(index, value);
         public static void AddLayers(params string[] value) => _renderLayers.AddRange(value);
         public static void SetLineWidth(int value) => Gl.LineWidth(value);
         public static void SetViewMatrix(Matrix4x4f value) => _view.Data = value;
-        /*
-        public static Vertex2f Scale(Vertex2f v)
+        public static void OnSceneDispose(object sender, DisposedEventArgs e)
         {
-            Vertex4f temp = new Vertex4f(v.x, v.y, 0, 1);
-            temp = _view.Data * temp;
-            temp = _projection.Data * temp;
-
-            return new Vertex2f(temp.x, temp.y);
+            for (int i = 0; i < e.Ids.Count; i++)
+            {
+                IList<RenderData> data = _renderData.Where(x => x.id == e.Ids[i]).ToList();
+                foreach (RenderData d in data) { d.Dispose(); } 
+            }
         }
-
-        public static Vertex2f Scale(Vector2 v)
-        {
-            Vertex4f temp = new Vertex4f(v.X, v.Y, 0, 1);
-            temp = _view.Data * temp;
-            temp = _projection.Data * temp;
-
-            return new Vertex2f(temp.x, temp.y);
-        }
-
-        public static Vertex2f[] Scale(Vector2[] v)
-        {
-            Vertex2f[] vs = new Vertex2f[v.Length];
-
-            for (int i = 0; i < v.Length; i++)
-                vs[i] = Scale(v[i]);
-
-            return vs;
-        }
-
-        public static Vertex2f[] Scale(Vertex2f[] v)
-        {
-            Vertex2f[] vs = new Vertex2f[v.Length];
-
-            for (int i = 0; i < v.Length; i++)
-                vs[i] = Scale(v[i]);
-
-            return vs;
-        }*/
     }
 }

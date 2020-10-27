@@ -24,6 +24,7 @@
     <ProjectReference Include="..\Lunar.Math\Lunar.Math.csproj" />
     <ProjectReference Include="..\Lunar.Scenes\Lunar.Scenes.csproj" />
     <ProjectReference Include="..\Lunar.Stopwatch\Lunar.Stopwatch.csproj" />
+    <ProjectReference Include="..\Lunar.Transforms\Lunar.Transforms.csproj" />
   </ItemGroup>
 
 </Project>

@@ -1,7 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Numerics;
-using Lunar.Scenes;
 using OpenGL;
 
 namespace Lunar.Graphics

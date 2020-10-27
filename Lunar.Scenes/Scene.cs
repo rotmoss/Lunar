@@ -3,8 +3,6 @@ using System.Collections.Generic;
 using Lunar.IO;
 using System.IO;
 using System.Linq;
-using Lunar.Math;
-using OpenGL;
 
 namespace Lunar.Scenes
 {
@@ -13,6 +11,11 @@ namespace Lunar.Scenes
         public uint id;
         public (string, string)[] vars;
         public string className;
+    }
+
+    public class DisposedEventArgs
+    {
+        public List<uint> Ids;
     }
 
     public class Scene
@@ -24,16 +27,18 @@ namespace Lunar.Scenes
         private static Dictionary<uint, uint> ParentByID = new Dictionary<uint, uint>();
         private static Dictionary<uint, string> NameByID = new Dictionary<uint, string>();
         private static Dictionary<string, uint> IDByName = new Dictionary<string, uint>();
-        private static Dictionary<uint, Transform> TransformByID  = new Dictionary<uint, Transform>();
+
         private static IdCollection IDs = new IdCollection();
         private static List<Scene> Scenes = new List<Scene>();
+
+        public EventHandler<DisposedEventArgs> OnSceneDispose;
 
         public Scene()
         {
             _gameObjects = new List<uint>();
         }
 
-        public static void LoadScene(string file, out ScriptInfo[] scripts)
+        public static void LoadScene(string file, out List<ScriptInfo> scripts)
         {
             Scene scene = new Scene();
 
@@ -46,7 +51,7 @@ namespace Lunar.Scenes
             Scenes.Add(scene);
         }
 
-        internal void LoadEntites(string file, out ScriptInfo[] scripts)
+        internal void LoadEntites(string file, out List<ScriptInfo> scripts)
         {
             if (!File.Exists(FileManager.Path + "Scenes" + FileManager.Seperator + file))
             { Console.WriteLine("Could not find scene " + file); scripts = null; return; }
@@ -62,8 +67,6 @@ namespace Lunar.Scenes
                 IDByName.Add(entity.Name.ToLower(), gameObject);
                 SceneByID.Add(gameObject, this);
 
-                TransformByID.Add(gameObject, new Transform());
-
                 List<(string, string)> variables = new List<(string, string)>();
                 if (entity.Script.Vars != null)
                     foreach (XmlElementVar var in entity.Script.Vars) variables.Add((var.Name, var.Value));
@@ -72,7 +75,7 @@ namespace Lunar.Scenes
                 _gameObjects.Add(gameObject);
             }
 
-            scripts = scriptList.ToArray();
+            scripts = scriptList;
 
             foreach (XmlElementEntity entity in array)
             {
@@ -87,6 +90,8 @@ namespace Lunar.Scenes
 
         public void Dispose()
         {
+            OnSceneDispose.Invoke(this, new DisposedEventArgs { Ids = _gameObjects });
+
             foreach(uint id in _gameObjects)
             {
                 IDByName.Remove(NameByID[id]);
@@ -100,39 +105,24 @@ namespace Lunar.Scenes
             IDs.Remove(id);
         }
 
-        public static void DisposeAll()
-        {
-            foreach (Scene scene in Scenes)
-                scene.Dispose();
-        }
-
+        public void DestroyGameObject(uint id) { GetScene(id)._gameObjects.Remove(id); OnSceneDispose(this, new DisposedEventArgs { Ids = GetChildrenAndParent(id).ToList() }); }
         public string GetName(uint id) => NameByID.ContainsKey(id) ? _gameObjects.Contains(id) ? NameByID[id] : "" : "";
         public uint GetParent(uint id) => ParentByID.ContainsKey(id) ? _gameObjects.Contains(id) ? ParentByID[id] : 0 : 0;
         public uint[] GetParents(uint id) { List<uint> parents = new List<uint>(); while (id < 0) { id = GetParent(id); parents.Add(id); } return parents.ToArray(); }
+        public uint GetChild(uint id) => ParentByID.Keys.Where(x => ParentByID[x] == id).FirstOrDefault();
+        public uint[] GetChildren(uint id) { List<uint> children = new List<uint>(); while (id < 0) { id = GetChild(id); children.Add(id); } return children.ToArray(); }
+        public uint[] GetChildrenAndParent(uint id) { List<uint> children = new List<uint>(); id = GetChild(id); while (id < 0) { id = GetChild(id); children.Add(id); } return children.ToArray(); }
+
         public uint GetId(string name) =>  IDByName.ContainsKey(name.ToLower()) ? _gameObjects.Contains(IDByName[name.ToLower()]) ? IDByName[name.ToLower()] : 0: 0;
         public uint GetParent(string name) => GetParent(GetId(name));
-        public uint[] GetParents(string name) { List<uint> parents = new List<uint>(); id = GetParent(GetId(name)); while (id < 0) { parents.Add(id); id = GetParent(id); } return parents.ToArray(); }
+        public uint[] GetParents(string name) { List<uint> parents = new List<uint>(); uint id = GetId(name); while (id < 0) { id = GetParent(id); parents.Add(id); } return parents.ToArray(); }
+        public uint GetChild(string name) => GetChild(GetId(name));
+        public uint[] GetChildren(string name) { List<uint> children = new List<uint>(); uint id = GetId(name); while (id < 0) { id = GetChild(id); children.Add(id); } return children.ToArray(); }
+        public uint[] GetChildrenAndParent(string name) { List<uint> children = new List<uint>(); uint id = GetId(name); id = GetChild(id); while (id < 0) { id = GetChild(id); children.Add(id); } return children.ToArray(); }
 
         public void SetName(uint id, string value) { if (_gameObjects.Contains(id) && NameByID.ContainsKey(id)) NameByID[id] = value; }
-        public void SetParent(uint id, uint value) { if (_gameObjects.Contains(id) && NameByID.ContainsKey(id))  ParentByID[id] = value; }
-        public static Transform GetLocalTransform(uint id) => TransformByID.ContainsKey(id) ? TransformByID[id] : Transform.Zero;
-        public static Transform GetGlobalTransform(uint id)
-        {
-            Scene scene = GetScene(id);
+        public void SetParent(uint id, uint value) { if (_gameObjects.Contains(id) && NameByID.ContainsKey(id)) ParentByID[id] = value; }
 
-            if (scene == null)
-                return Transform.Zero;
-
-            Transform t = Transform.Zero;
-            foreach (uint parent in scene.GetParents(id))
-                t += GetLocalTransform(id);
-            
-            return t;
-        }
-        public static void SetTransform(uint id, Transform value) { if (TransformByID.ContainsKey(id)) TransformByID[id] = value; }
-        public static void MoveTransform(uint id, Vertex2f value) { if (TransformByID.ContainsKey(id)) TransformByID[id] += value; }
-        public static void ScaleTransform(uint id, Vertex2f value) { if (TransformByID.ContainsKey(id)) TransformByID[id] *= value; }
-        public static void ScaleTransform(uint id, float value) { if (TransformByID.ContainsKey(id)) TransformByID[id] *= value; }
         public static Scene GetScene(uint id) => SceneByID.ContainsKey(id) ? SceneByID[id] : null;
         public static Scene GetScene(string name) => GetScene(IDByName.ContainsKey(name) ? IDByName[name] : 0);
     }

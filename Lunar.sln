@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lunar.Math", "Lunar.Math\Lu
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Lunar.Scripts", "Lunar.Scripts\Lunar.Scripts.csproj", "{3ECB0730-5849-4FE0-8387-61A923FE28E4}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Lunar.Transforms", "Lunar.Transforms\Lunar.Transforms.csproj", "{36CE940D-8F81-464E-808E-8C906407394F}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|x64 = Debug|x64
@@ -111,6 +113,14 @@ Global
 		{3ECB0730-5849-4FE0-8387-61A923FE28E4}.Release|x64.Build.0 = Release|x64
 		{3ECB0730-5849-4FE0-8387-61A923FE28E4}.Release|x86.ActiveCfg = Release|x86
 		{3ECB0730-5849-4FE0-8387-61A923FE28E4}.Release|x86.Build.0 = Release|x86
+		{36CE940D-8F81-464E-808E-8C906407394F}.Debug|x64.ActiveCfg = Debug|x64
+		{36CE940D-8F81-464E-808E-8C906407394F}.Debug|x64.Build.0 = Debug|x64
+		{36CE940D-8F81-464E-808E-8C906407394F}.Debug|x86.ActiveCfg = Debug|x86
+		{36CE940D-8F81-464E-808E-8C906407394F}.Debug|x86.Build.0 = Debug|x86
+		{36CE940D-8F81-464E-808E-8C906407394F}.Release|x64.ActiveCfg = Release|x64
+		{36CE940D-8F81-464E-808E-8C906407394F}.Release|x64.Build.0 = Release|x64
+		{36CE940D-8F81-464E-808E-8C906407394F}.Release|x86.ActiveCfg = Release|x86
+		{36CE940D-8F81-464E-808E-8C906407394F}.Release|x86.Build.0 = Release|x86
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE

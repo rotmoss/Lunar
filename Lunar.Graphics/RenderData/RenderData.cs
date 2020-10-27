@@ -1,6 +1,7 @@
 ﻿using System;
 using Lunar.Math;
 using Lunar.Scenes;
+using Lunar.Transforms;
 using OpenGL;
 
 namespace Lunar.Graphics
@@ -35,9 +36,6 @@ namespace Lunar.Graphics
                 data[i] = coords[j].x; data[i + 1] = coords[j].y; 
             }
 
-            for (int i = 0; i < data.Length; i++)
-                data[i] = MathF.Floor(data[i] * 0.5f) / 0.5f;
-
             _positionBuffer.UpdateBuffer(data);
         }
 
@@ -56,9 +54,6 @@ namespace Lunar.Graphics
             for (int i = 0, j = 0; i < data.Length; i += _positionBuffer.size, j++) {
                 data[i] = coords[j].x; data[i + 1] = coords[j].y;
             }
-
-            for (int i = 0; i < data.Length; i++)
-                data[i] = MathF.Floor(data[i] * 0.5f) / 0.5f;
 
             _positionBuffer.UpdateBuffer(data);
         }
