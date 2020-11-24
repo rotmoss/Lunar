@@ -13,7 +13,7 @@ namespace Lunar.Editor
             MainWindow.HierarchyView.OnSelectedItemChanged += UpdateValues;
         }
 
-        public abstract void UpdateValues(object sender, SelectedItemEventArgs e);
+        public abstract void UpdateValues(object sender, SelectedItemChangedEventArgs e);
 
         public void InsertElement(UIElement element, int colum = 0, int row = 0, int cSpan = 1, int rSpan = 1)
         {

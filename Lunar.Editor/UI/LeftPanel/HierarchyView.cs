@@ -10,7 +10,7 @@ using OpenGL;
 
 namespace Lunar.Editor
 {
-    public class SelectedItemEventArgs
+    public class SelectedItemChangedEventArgs
     {
         public uint Id;
         public string Name;
@@ -20,7 +20,7 @@ namespace Lunar.Editor
     public class HierarchyView
     {
         TreeView _parent;
-        public EventHandler<SelectedItemEventArgs> OnSelectedItemChanged;
+        public EventHandler<SelectedItemChangedEventArgs> OnSelectedItemChanged;
         public HierarchyView(TreeView parent)
         {
             _parent = parent;
@@ -37,7 +37,7 @@ namespace Lunar.Editor
 
             Scene scene = Scene.GetScene((string)temp.Header);
 
-            OnSelectedItemChanged.Invoke(this, new SelectedItemEventArgs { Id = scene.GetGameObjectId((string)selectedItem.Header), Name = (string)selectedItem.Header, isScene = selectedItem.Header == temp.Header });
+            OnSelectedItemChanged.Invoke(this, new SelectedItemChangedEventArgs { Id = scene.GetGameObjectId((string)selectedItem.Header), Name = (string)selectedItem.Header, isScene = selectedItem.Header == temp.Header });
         }
 
         public void LoadGameObjects()

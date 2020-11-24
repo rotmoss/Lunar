@@ -18,7 +18,7 @@ namespace Lunar
 
         public string Layer { 
             get => _layer; 
-            set => _layer = Window.RenderLayers.Contains(value.ToLower()) ? value.ToLower() : "default"; 
+            set => _layer = Renderer.RenderLayers.Contains(value.ToLower()) ? value.ToLower() : "default"; 
         }
         private string _layer;
 

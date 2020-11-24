@@ -1,5 +1,4 @@
-﻿using Lunar.Scenes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -7,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace Lunar
 {
-    public abstract class Component<T> where T : Component<T>
+    public abstract class Component<T> : IDisposable where T : Component<T>
     {
         protected static Dictionary<uint, List<T>> _dictionary = new Dictionary<uint, List<T>>();
         protected static List<T> _components = new List<T>();
@@ -40,16 +39,10 @@ namespace Lunar
             _dictionary.Clear();
         }
 
-        public static void OnSceneDispose(object sender, DisposedEventArgs e)
+        public static void OnGameobjectDispose(object sender, uint id)
         {
-            foreach (uint key in e.Ids)
-                    _dictionary[key][^1].Dispose();
-        }
-
-        public static void OnGameObjectDispose(object sender, DisposedEventArgs e)
-        {
-            foreach (uint key in e.Ids)
-                _dictionary[key][^1].Dispose();
+            while(_dictionary[id].Count > 0)
+                _dictionary[id][^1].Dispose();
         }
 
         public static List<T> GetComponents(uint id) 

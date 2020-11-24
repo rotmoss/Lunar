@@ -96,11 +96,27 @@ namespace Lunar.IO
             }
         }
 
-        public static XmlScene Dezerialize(string file, string directory, string rootElement)
+        public static XmlScene Deserialize(string file, string directory)
         {
-            XmlSerializer serializer = new XmlSerializer(typeof(XmlScene), new XmlRootAttribute(rootElement));
+            if (!File.Exists(Path + "Scenes" + Seperator + file)) {
+                Console.WriteLine("Could not find scene " + file);
+                return default;
+            }
+
+            XmlSerializer serializer = new XmlSerializer(typeof(XmlScene), new XmlRootAttribute("scene"));
             using StreamReader reader = new StreamReader(Path + directory + Seperator + file);
             return (XmlScene)serializer.Deserialize(reader);
+        }
+
+
+        public static void Serialize(string file, string directory, XmlScene scene)
+        {
+            if (!File.Exists(Path + "Scenes" + Seperator + file)) 
+                return;
+
+            XmlSerializer serializer = new XmlSerializer(typeof(XmlScene), new XmlRootAttribute("scene"));
+            using StreamWriter reader = new StreamWriter(Path + directory + Seperator + file);
+            serializer.Serialize(reader, scene);
         }
     }
 }

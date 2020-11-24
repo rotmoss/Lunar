@@ -4,9 +4,6 @@ using static SDL2.SDL;
 using Lunar.Graphics;
 using System.Runtime.InteropServices;
 using OpenGL;
-using System.Windows;
-using System.Windows.Controls;
-using System.Diagnostics;
 
 namespace Lunar.Editor
 {
@@ -35,15 +32,8 @@ namespace Lunar.Editor
             _x = x;
             _y = y;
 
-            _stretch = false;
-
             CreateWindowAndContext(SDL_WindowFlags.SDL_WINDOW_OPENGL | SDL_WindowFlags.SDL_WINDOW_BORDERLESS);
-
-            _projection = new ShaderStorageBuffer<Matrix4x4f>(0, Matrix4x4f.Identity);
-            _view = new ShaderStorageBuffer<Matrix4x4f>(1, Matrix4x4f.Identity);
-            _aspectRatio = new ShaderStorageBuffer<float>(2, ASPECT_RATIO);
-            _w = new ShaderStorageBuffer<float>(3, GameW);
-            _h = new ShaderStorageBuffer<float>(4, GameH);
+            _renderer = new Renderer();
 
             SetViewport();
         }
@@ -90,17 +80,12 @@ namespace Lunar.Editor
             SetViewport();
         }
 
-        protected override void SetViewport()
+        public override void SetViewport()
         {
             Gl.LoadIdentity();
             Gl.Viewport(0, 0, _width, _height);
 
-            UpdateProjectionMatrix();
-
-            _w.Data = GameW;
-            _h.Data = GameH;
-
-            Framebuffer?.UpdateFrameSize(_width, _height);
+            _renderer.UpdateProjectionMatrix(_width, _height);
         }
     }
 }

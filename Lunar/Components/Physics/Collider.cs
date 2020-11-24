@@ -1,8 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
 using Lunar.Math;
-using Lunar.Scenes;
-using Lunar.Graphics;
 using OpenGL;
 
 namespace Lunar.Physics
@@ -59,7 +57,7 @@ namespace Lunar.Physics
 
             foreach (Collider collider in _colliders)
             {
-                if (Scene.IsParent(_id, collider._id)) continue;
+                if (Gameobject.IsParent(_id, collider._id)) continue;
 
                 Transform a = new Transform(_offset, _size) + Transform.GetGlobalTransform(_id);
                 Transform b = new Transform(collider._offset, collider._size) + Transform.GetGlobalTransform(collider._id);

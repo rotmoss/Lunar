@@ -1,18 +1,20 @@
 ﻿using System;
 using System.Threading.Tasks;
 using SDL2;
-using Lunar.Scenes;
 using Lunar.Physics;
+using Lunar.Graphics;
 using Lunar.Input;
 using Lunar.Scripts;
 using Lunar.Audio;
 using Lunar.Compiler;
+using System.Reflection;
 
 namespace Lunar
 { 
     public class Lunar
     {
         private static GameWindow _window;
+        private static Scene _scene;
 
         static void Main(string[] args)
         {
@@ -24,7 +26,7 @@ namespace Lunar
 
         public static void Init()
         {
-            Task<System.Reflection.Assembly> assembly = AssemblyCompiler.CompileScripts();
+            Task<Assembly> assembly = AssemblyCompiler.CompileScripts();
 
             if (SDL.SDL_Init(SDL.SDL_INIT_EVERYTHING) < 0 || SDL_image.IMG_Init(SDL_image.IMG_InitFlags.IMG_INIT_PNG | SDL_image.IMG_InitFlags.IMG_INIT_JPG) < 0 || SDL_ttf.TTF_Init() < 0) //Init SDL
             { Console.WriteLine("Couldn't initialize SDL: %s\n" + SDL.SDL_GetError()); SDL.SDL_Quit(); }
@@ -34,25 +36,36 @@ namespace Lunar
             Console.WriteLine("SDL Initiated!");
 
             _window = new GameWindow(1280, 720, false);
-            Window.CreateFramebuffer();
-            Window.AddLayers(new string[] { "background", "sprite"});
+            Renderer.AddLayers(new string[] { "background", "sprite"});
 
             Console.WriteLine("Window Created!");
 
-            InputController.OnWindowSizeChanged += _window.UpdateWindowSize;
-            InputController.OnKeyDown += _window.OnKeyDown;
-
+            InputController.Init();
             Mixer.Init();
 
-            InputController.Init();
-            InputController.OnWindowClose += OnWindowClose;
+            InitEvents();
 
             assembly.Wait();
             Script.Assembly = assembly.Result;
-            Scene.LoadScene("start.xml");
+            _scene = new Scene("start.xml");
 
             Script.InitScripts();
             Script.LateInitScripts();
+        }
+
+        public static void InitEvents()
+        {
+            InputController.OnWindowClose += OnWindowClose;
+            InputController.OnWindowSizeChanged += _window.UpdateSize;
+            InputController.OnKeyDown += _window.OnKeyDown;
+
+            Gameobject.OnDispose += Sample.OnGameobjectDispose;
+            Gameobject.OnDispose += Force.OnGameobjectDispose;
+            Gameobject.OnDispose += Collider.OnGameobjectDispose;
+            Gameobject.OnDispose += Script.OnGameobjectDispose;
+            Gameobject.OnDispose += Sprite.OnGameobjectDispose;
+            Gameobject.OnDispose += Text.OnGameobjectDispose;
+            Gameobject.OnDispose += Animation.OnGameobjectDispose;
         }
 
         public static void Update()
@@ -80,21 +93,22 @@ namespace Lunar
             Animation.Animate(Time.FrameTime);
 
             //Render Graphics
-            Window.Render();
+            Renderer.Render();
 
             //Update all scripts again
             Script.PostRenderUpdateScripts();
 
             //Present FrameBuffer
-            Window.SwapBuffer();
+            _window.SwapBuffer();
 
             Time.StopFrameTimer();
         }
 
         static void OnWindowClose(object sender, EventArgs eventArgs)
         {
+            _scene.Dispose();
+            _window.Dispose();
             Mixer.Dispose();
-            Window.Close();
             Environment.Exit(0);
         }
     }

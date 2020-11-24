@@ -1,9 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 
-namespace Lunar.Scenes
+namespace Lunar
 {
-    public class IdCollection : IEnumerable<uint>
+    public class IdCollection
     {
         public List<uint> Values { get; set; }
 
@@ -21,8 +21,5 @@ namespace Lunar.Scenes
 
         public void Remove(uint id) { Values.Remove(id); }
         public bool Contains(uint id) => Values.Contains(id);
-
-        public IEnumerator<uint> GetEnumerator() => ((IEnumerable<uint>)Values).GetEnumerator();
-        IEnumerator IEnumerable.GetEnumerator() => ((IEnumerable)Values).GetEnumerator();
     }
 }

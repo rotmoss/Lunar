@@ -8,11 +8,11 @@ using Lunar.Physics;
 
 namespace Lunar.IO
 {
-    [XmlRoot(ElementName = "entity")]
+    [XmlRoot(ElementName = "gameobject")]
     public class XmlScene
     {
-        [XmlElement("entity")]
-        public XmlGameObject[] entities { get; set; }
+        [XmlElement("gameobject")]
+        public XmlGameObject[] Gameobjects { get; set; }
     }
 
     [XmlRoot(ElementName = "entity")]

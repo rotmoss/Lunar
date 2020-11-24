@@ -1,13 +1,10 @@
-﻿using Lunar.Scenes;
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
 namespace Lunar
 {
-    public abstract class UniqueComponent<T> where T : UniqueComponent<T>
+    public abstract class UniqueComponent<T> : IDisposable where T : UniqueComponent<T>
     {
         protected static Dictionary<uint, T> _components = new Dictionary<uint, T>();
 
@@ -37,21 +34,14 @@ namespace Lunar
                 _components.Last().Value.Dispose();
         }
 
-        public static void OnSceneDispose(object sender, DisposedEventArgs e)
+        public static void OnGameobjectDispose(object sender, uint id)
         {
-            foreach (uint key in e.Ids)
-                    _components[key].Dispose();
-        }
-
-        public static void OnGameObjectDispose(object sender, DisposedEventArgs e)
-        {
-            foreach (uint key in e.Ids)
-                _components[key].Dispose();
+            _components[id].Dispose();
         }
 
         public static T GetComponent(uint id) 
         {
-           return _components.ContainsKey(id) ? _components[id] : default;
+            return _components.ContainsKey(id) ? _components[id] : default;
         }
 
         public static void AddComponent(uint id, T component)

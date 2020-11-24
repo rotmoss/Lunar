@@ -1,6 +1,4 @@
-﻿using Lunar.Scenes;
-using System.Collections.Generic;
-using OpenGL;
+﻿using OpenGL;
 
 namespace Lunar
 {
@@ -55,12 +53,8 @@ namespace Lunar
 
         public static Transform GetGlobalTransform(uint id)
         {
-            Scene scene = Scene.GetSceneFromGameObject(id);
-
-            if (scene == null) return Zero;
-
             Transform t = _components.ContainsKey(id) ? _components[id] : Zero;
-            foreach (uint parent in scene.GetParents(id))
+            foreach (uint parent in Gameobject.GetParents(id))
                 t += _components.ContainsKey(id) ? _components[id] : Zero;
 
             return t;

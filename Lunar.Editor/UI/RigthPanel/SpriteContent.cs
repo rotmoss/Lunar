@@ -13,7 +13,7 @@ namespace Lunar.Editor
             //InsertField(new Field("Shader", new Variable("Vertex shader", typeof(string)), new Variable("Fragment shader", typeof(float))));
         }
 
-        public override void UpdateValues(object sender, SelectedItemEventArgs e)
+        public override void UpdateValues(object sender, SelectedItemChangedEventArgs e)
         {
         }
     }

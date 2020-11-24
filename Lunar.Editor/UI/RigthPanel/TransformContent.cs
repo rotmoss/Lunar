@@ -46,7 +46,7 @@ namespace Lunar.Editor
             }
         }
 
-        public override void UpdateValues(object sender, SelectedItemEventArgs e)
+        public override void UpdateValues(object sender, SelectedItemChangedEventArgs e)
         {
             if (e.isScene) { Parent.RemoveFromListView(); return; }
             Parent.AddToListView();
