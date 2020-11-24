@@ -13,17 +13,17 @@
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x86'">
     <PlatformTarget>x86</PlatformTarget>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
-    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
+    <OutputPath></OutputPath>
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath></OutputPath>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <DebugType>none</DebugType>
@@ -32,8 +32,8 @@
   </PropertyGroup>
 
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x86'">
-    <AllowUnsafeBlocks>false</AllowUnsafeBlocks>
-    <OutputPath>C:\Users\Jonatan\Documents\GitHub\Grounded\Grounded\Lunar\</OutputPath>
+    <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
+    <OutputPath></OutputPath>
     <WarningLevel>4</WarningLevel>
     <GenerateSerializationAssemblies>Off</GenerateSerializationAssemblies>
     <DebugType>none</DebugType>
@@ -45,6 +45,12 @@
     <Reference Include="SDL2-CS">
       <HintPath>refrences\SDL2-CS.dll</HintPath>
     </Reference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <Content Include="GameData\**">
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
   <ItemGroup Condition="'$(Platform)'=='x64'">
@@ -205,18 +211,8 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.CodeAnalysis.CSharp" Version="3.7.0" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <ProjectReference Include="..\Lunar.Audio\Lunar.Audio.csproj" />
-    <ProjectReference Include="..\Lunar.Graphics\Lunar.Graphics.csproj" />
-    <ProjectReference Include="..\Lunar.Input\Lunar.Input.csproj" />
-    <ProjectReference Include="..\Lunar.IO\Lunar.IO.csproj" />
-    <ProjectReference Include="..\Lunar.Math\Lunar.Math.csproj" />
-    <ProjectReference Include="..\Lunar.Physics\Lunar.Physics.csproj" />
-    <ProjectReference Include="..\Lunar.Scenes\Lunar.Scenes.csproj" />
-    <ProjectReference Include="..\Lunar.Scripts\Lunar.Scripts.csproj" />
-    <ProjectReference Include="..\Lunar.Stopwatch\Lunar.Stopwatch.csproj" />
+    <PackageReference Include="OpenGL.Net" Version="0.8.4" />
+    <PackageReference Include="OpenGL.Net.Math" Version="0.8.4" />
   </ItemGroup>
 
 </Project>
