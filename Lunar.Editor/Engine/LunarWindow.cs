@@ -1,7 +1,7 @@
 ﻿using System;
 using SDL2;
 using static SDL2.SDL;
-using Lunar.Graphics;
+using Lunar.GL;
 using System.Runtime.InteropServices;
 using OpenGL;
 

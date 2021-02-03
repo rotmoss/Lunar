@@ -1,10 +1,9 @@
 ﻿using System;
 using System.Xml.Serialization;
-using Lunar.Graphics;
-using Lunar.Scripts;
+using Lunar.GL;
+using Lunar.ECS;
 using System.Linq;
-using Lunar.Audio;
-using Lunar.Physics;
+using Lunar.ECS.Components;
 
 namespace Lunar.IO
 {
@@ -39,7 +38,7 @@ namespace Lunar.IO
 
     public abstract class XmlComponent
     {
-        public abstract void CreateComponent(uint id);
+        public abstract void CreateComponent(Gameobject gameobject);
     }
 
     [XmlRoot(ElementName = "transform")]
@@ -54,9 +53,9 @@ namespace Lunar.IO
         [XmlAttribute(AttributeName = "h")]
         public float H { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Transform.AddComponent(id, new Transform(X, Y, W, H));
+            Transform.Collection.AddEntry(gameobject, new Transform(X, Y, W, H));
         }
     }
 
@@ -69,9 +68,9 @@ namespace Lunar.IO
         [XmlElement("var")]
         public XmlVar[] Vars { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Script.AddComponent(id, new Script(File, Vars?.ToDictionary(x => x.Name, x => x.Value)));
+            Script.Collection.AddEntry(gameobject, new Script(File, Vars?.ToDictionary(x => x.Name, x => x.Value)));
         }
     }
 
@@ -89,9 +88,9 @@ namespace Lunar.IO
         [XmlElement(ElementName = "texture")]
         public string[] Textures { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Sprite.AddComponent(id, new Sprite(VertexShader, FragmentShader, Textures));
+            Sprite.Collection.AddEntry(gameobject, new Sprite(VertexShader, FragmentShader, Textures));
         }
     }
 
@@ -108,9 +107,9 @@ namespace Lunar.IO
         [XmlElement(ElementName = "texture")]
         public string[] Textures { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Animation.AddComponent(id, new Animation(VertexShader, FragmentShader, Framerate, FrameWidth, FrameHeight, Textures));
+            Animation.Collection.AddEntry(gameobject, new Animation(VertexShader, FragmentShader, Framerate, FrameWidth, FrameHeight, Textures));
         }
     }
 
@@ -134,9 +133,9 @@ namespace Lunar.IO
         [XmlAttribute(AttributeName = "alpha")]
         public byte Alpha { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Text.AddComponent(id, new Text(VertexShader, FragmentShader, Font, Message, Size, Wrap, Red, Green, Blue, Alpha));
+            Text.Collection.AddEntry(gameobject, new Text(VertexShader, FragmentShader, Font, Message, Size, Wrap, Red, Green, Blue, Alpha));
         }
     }
 
@@ -150,9 +149,9 @@ namespace Lunar.IO
         [XmlAttribute(AttributeName = "pan")]
         public float Pan { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Sample.AddComponent(id, new Sample(File, Falloff, Pan));
+            Sample.Collection.AddEntry(gameobject, new Sample(File, Falloff, Pan));
         }
     }
 
@@ -161,9 +160,10 @@ namespace Lunar.IO
     {
         [XmlAttribute(AttributeName = "friction")]
         public float Friction { get; set; }
-        public override void CreateComponent(uint id)
+
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Force.AddComponent(id, new Force(Friction));
+            Force.Collection.AddEntry(gameobject, new Force(Friction));
         }
     }
 
@@ -181,9 +181,9 @@ namespace Lunar.IO
         [XmlAttribute(AttributeName = "h")]
         public float H { get; set; }
 
-        public override void CreateComponent(uint id)
+        public override void CreateComponent(Gameobject gameobject)
         {
-            Collider.AddComponent(id, new Collider(new OpenGL.Vertex2f(X, Y), new OpenGL.Vertex2f(W, H), Movable));
+            Collider.Collection.AddEntry(gameobject, new Collider(new OpenGL.Vertex2f(X, Y), new OpenGL.Vertex2f(W, H), Movable));
         }
     }
 
