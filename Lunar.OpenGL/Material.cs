@@ -20,7 +20,7 @@ namespace Lunar.OpenGL
         private static Dictionary<ShaderProgram, List<Material>> _materialsByShader = new Dictionary<ShaderProgram, List<Material>>();
 
         private Material(ShaderProgram shaderProgram, params Texture[] textures) 
-        {
+        {            
             _shaderProgram = shaderProgram;
             _textures = textures;
             _texIndex = null;
@@ -32,8 +32,10 @@ namespace Lunar.OpenGL
             _materials.Add(this);
         }
 
-        public static unsafe Material CreateMaterial(ShaderProgram shaderProgram, params Texture[] textures)
+        public static Material CreateMaterial(ShaderProgram shaderProgram, params Texture[] textures)
         {
+            if(shaderProgram == null) return null;
+
             foreach(Material m in _materials)
                 if (m.Textures.SequenceEqual(textures) && m.ShaderProgram == shaderProgram)
                     return m;

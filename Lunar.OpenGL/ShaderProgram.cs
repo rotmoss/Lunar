@@ -18,6 +18,8 @@ namespace Lunar.OpenGL
 
         private static Dictionary<string, ShaderProgram> _shaderProgramsByName = new Dictionary<string, ShaderProgram>();
         
+        private static string _path = Engine.Path + Engine.Seperator + "Shaders" + Engine.Seperator;
+
         private ShaderProgram(uint id)
         {
             _id = id;
@@ -30,7 +32,10 @@ namespace Lunar.OpenGL
 
             if (_shaderProgramsByName.ContainsKey(name)) { return _shaderProgramsByName[name]; }
             
-            program = new ShaderProgram(LoadShaderProgram(name));
+            uint id = LoadShaderProgram(name);
+            if(id == 0) return null;
+
+            program = new ShaderProgram(id);
 
             _shaderPrograms.Add(program);
             _shaderProgramsByName.Add(name, program);
@@ -42,14 +47,13 @@ namespace Lunar.OpenGL
         private static uint LoadShaderProgram(string name) 
         {
             uint program = 0;
+            string source;
 
-            string vsSource = Engine.ReadText(name + ".vs", "Shaders", out bool error);
-            if (error) return program;
-            string fsSource = Engine.ReadText(name + ".fs", "Shaders", out error);
-            if (error) return program;
+            try { source = System.IO.File.ReadAllText(_path + name); }
+            catch { return program; }
 
-            if(!CompileShader(vsSource, out uint vs, ShaderType.VertexShader)) return program;
-            if(!CompileShader(fsSource, out uint fs, ShaderType.FragmentShader)) return program;
+            if(!CompileShader(source, out uint vs, ShaderType.VertexShader)) return program;
+            if(!CompileShader(source, out uint fs, ShaderType.FragmentShader)) return program;
             if(!CompileProgram(vs, fs, out program)) return program;
 
             int[] samplers = new int[32];
@@ -63,8 +67,16 @@ namespace Lunar.OpenGL
 
         public static unsafe bool CompileShader(string shaderSource, out uint id, ShaderType type) 
         {
+            string define = "#version 450" + Environment.NewLine;
+            define += (type == ShaderType.VertexShader ? "#define VERTEX" : "#define FRAGMENT") + Environment.NewLine;
+            string[] source = { define, shaderSource };
+            int[] length = { define.Length, shaderSource.Length };
+
             id = Engine.GL.CreateShader(type);
-            Engine.GL.ShaderSource(id, shaderSource);
+
+            fixed (int* lengthPointer = &length[0]) {
+                Engine.GL.ShaderSource(id, 2, source, lengthPointer);
+            }
 
             Engine.GL.CompileShader(id);
             Engine.GL.GetShader(id, ShaderParameterName.CompileStatus, out int compiled);
@@ -107,6 +119,9 @@ namespace Lunar.OpenGL
             foreach (ShaderProgram shaderProgram in _shaderPrograms) {
                 Engine.GL.DeleteProgram(shaderProgram.Id);
             }
+
+            _shaderPrograms.Clear();
+            _shaderProgramsByName.Clear();
         }
 
         private static unsafe VertexFormat GetVertexFormat(uint program)

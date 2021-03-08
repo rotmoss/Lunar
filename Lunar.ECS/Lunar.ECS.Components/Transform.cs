@@ -22,6 +22,7 @@ namespace Lunar.ECS
             _position = new Vector3D<float>(x, y, z);
             _scale = new Vector3D<float>(w, h, d);
         }
+        
         public Transform(Vector3D<float> position, Vector3D<float> scale)
         {
             _position = position;

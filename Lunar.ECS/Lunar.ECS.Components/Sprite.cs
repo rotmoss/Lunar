@@ -9,8 +9,8 @@ namespace Lunar.ECS
 {
     public class Sprite : RenderData
     {
-        public override int VertexCount { get => _vertexCount; }
-        private int _vertexCount;
+        public override uint VertexCount { get => _vertexCount; }
+        private uint _vertexCount;
 
         public override float[] Vertices { get => _vertices; }
         private float[] _vertices;
@@ -26,6 +26,8 @@ namespace Lunar.ECS
 
         public Sprite(Material material) : base(material)
         {         
+            if(material == null) return;
+
             _width = material.Textures[0].Width;
             _height = material.Textures[0].Height;
 

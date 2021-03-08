@@ -4,7 +4,7 @@ using Silk.NET.OpenGL;
 
 namespace Lunar.OpenGL
 {
-    public interface IShaderStorageBuffer
+    public interface IShaderStorageBuffer : IDisposable
     {
         public object Data { get; set; }
         public void Update();
@@ -51,6 +51,11 @@ namespace Lunar.OpenGL
             Engine.GL.BufferSubData(BufferTargetARB.ShaderStorageBuffer, IntPtr.Zero, _size, _data);
 
             Engine.GL.BindBuffer(BufferTargetARB.ShaderStorageBuffer, 0);
+        }
+
+        public void Dispose() 
+        {
+            Engine.GL.DeleteBuffer(id);
         }
     }
 }
