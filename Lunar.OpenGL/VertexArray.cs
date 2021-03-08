@@ -7,14 +7,17 @@ namespace Lunar.OpenGL
 {
     public class VertexArrayObject
     {
-        private uint _id;
         private uint _arrayBuffer;
         private uint _indexBuffer;
+
+        public uint Id { get => _id; }
+        private uint _id;
 
         public static List<VertexArrayObject> VAOs { get => _vertexArrays; }
         private static List<VertexArrayObject> _vertexArrays = new List<VertexArrayObject>();
 
-        private static Dictionary<ShaderProgram, VertexArrayObject> _vertexArrayByShader = new Dictionary<ShaderProgram, VertexArrayObject>(); 
+        private static Dictionary<ShaderProgram, VertexArrayObject> _vertexArrayByShader = new Dictionary<ShaderProgram, VertexArrayObject>();
+        public static VertexArrayObject GetVAOByShader(ShaderProgram shaderProgram) => _vertexArrayByShader.ContainsKey(shaderProgram) ? _vertexArrayByShader[shaderProgram] : null;
 
         private unsafe VertexArrayObject(ShaderProgram shaderProgram)
         {
@@ -27,10 +30,10 @@ namespace Lunar.OpenGL
             uint bufferSize = shaderProgram.VertexFormat.TotalSize;
 
             Engine.GL.BindBuffer(BufferTargetARB.ArrayBuffer, _arrayBuffer);
-            Engine.GL.BufferData(BufferTargetARB.ArrayBuffer, bufferSize * 10000, null, BufferUsageARB.DynamicDraw);
+            Engine.GL.BufferData(BufferTargetARB.ArrayBuffer, bufferSize * 100000, null, BufferUsageARB.DynamicDraw);
             
             Engine.GL.BindBuffer(BufferTargetARB.ElementArrayBuffer, _indexBuffer);
-            Engine.GL.BufferData(BufferTargetARB.ElementArrayBuffer, 15000, null, BufferUsageARB.DynamicDraw);
+            Engine.GL.BufferData(BufferTargetARB.ElementArrayBuffer, 150000, null, BufferUsageARB.DynamicDraw);
 
             for (int i = 0; i < shaderProgram.VertexFormat.Count; i++) {
                 Engine.GL.EnableVertexArrayAttrib(_id, (uint)shaderProgram.VertexFormat.AttribLocation(i));
@@ -69,16 +72,13 @@ namespace Lunar.OpenGL
             Engine.GL.DrawElements(PrimitiveType.Triangles, (uint)indices.Length, GLEnum.UnsignedInt, null);
         }
 
-        public void Bind() 
+        public static void Dispose() 
         {
-            Engine.GL.BindVertexArray(_id);
-        }
+            foreach (VertexArrayObject VAO in _vertexArrays)
+                Engine.GL.DeleteVertexArray(VAO.Id);           
 
-        public void Dispose()
-        {
-            Engine.GL.DeleteVertexArray(_id);
+            _vertexArrays.Clear();
+            _vertexArrayByShader.Clear();
         }
-
-        public static VertexArrayObject GetVAOByShader(ShaderProgram shaderProgram) => _vertexArrayByShader.ContainsKey(shaderProgram) ? _vertexArrayByShader[shaderProgram] : null;
     }
 }
