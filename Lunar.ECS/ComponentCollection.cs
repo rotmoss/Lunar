@@ -20,7 +20,7 @@ namespace Lunar.ECS
             _itemByName = new Dictionary<string, T>();
         }
 
-        public void Add(T component, ITreeItem parent) 
+        public void Add(T component, ICollectionItem parent) 
         {
             component.Parent = parent;     
             component.Ancestor = parent.Ancestor;

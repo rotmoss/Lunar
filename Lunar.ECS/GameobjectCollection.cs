@@ -18,7 +18,7 @@ namespace Lunar.ECS
             _gameobjects = new List<Gameobject>();
         }
 
-        public void Add(Gameobject gameobject, ITreeItem parent) 
+        public void Add(Gameobject gameobject, ICollectionItem parent) 
         {
             gameobject.Parent = parent;
 

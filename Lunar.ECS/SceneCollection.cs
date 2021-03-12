@@ -18,7 +18,7 @@ namespace Lunar.ECS
             _itemByName = new Dictionary<string, Scene>();
         }
 
-        public void Add(Scene scene, ITreeItem parent = null) 
+        public void Add(Scene scene, ICollectionItem parent = null) 
         {
             scene.Parent = scene;
             scene.Ancestor = scene;

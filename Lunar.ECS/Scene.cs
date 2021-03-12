@@ -7,17 +7,17 @@ using Lunar.Xml;
 
 namespace Lunar.ECS
 {
-    public class Scene : ITreeItem
+    public class Scene : ICollectionItem
     {
         public static SceneCollection Collection = new SceneCollection();
 
         public event Action Disposed;
 
-        public ITreeItem Ancestor { get => _ancestor; set => _ancestor = value; }
-        private ITreeItem _ancestor;
+        public ICollectionItem Ancestor { get => _ancestor; set => _ancestor = value; }
+        private ICollectionItem _ancestor;
 
-        public ITreeItem Parent { get => _parent; set => _parent = value; }
-        private ITreeItem _parent;
+        public ICollectionItem Parent { get => _parent; set => _parent = value; }
+        private ICollectionItem _parent;
 
         public Guid Id { get => _id; set => _id = value; }
         private Guid _id;
@@ -45,7 +45,7 @@ namespace Lunar.ECS
             Disposed = null;
         }
         
-        public bool Equals(ITreeItem obj) => obj.GetType() == typeof(Scene) && obj.Id == _id;
+        public bool Equals(ICollectionItem obj) => obj.GetType() == typeof(Scene) && obj.Id == _id;
 
         public static void LoadScene(string fileName) 
         {
@@ -84,7 +84,7 @@ namespace Lunar.ECS
             //Lookup gameobject from parent name and add to collection
             foreach((Gameobject, string) gameobject in gameobjects) 
             {
-                ITreeItem parent = gameobjects.Where(x => x.Item1.Name == gameobject.Item2).FirstOrDefault().Item1;
+                ICollectionItem parent = gameobjects.Where(x => x.Item1.Name == gameobject.Item2).FirstOrDefault().Item1;
                 if(parent == null) parent = scene;
 
                 Gameobject.Collection.Add(gameobject.Item1, parent);

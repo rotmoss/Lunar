@@ -8,7 +8,7 @@ namespace Lunar.ECS
     /// 
     /// </summary>
     /// <typeparam name="T"> The item present in the collection </typeparam>
-    public interface ITree<T> where T : ITreeItem 
+    public interface ITree<T> where T : ICollectionItem 
     {
         public int Count { get; }
 
@@ -16,7 +16,7 @@ namespace Lunar.ECS
         /// Adds an item to the Collection
         /// </summary>
         /// <param name="item"></param>
-        void Add(T item, ITreeItem parent);
+        void Add(T item, ICollectionItem parent);
 
         /// <summary>
         /// Adds an Removes to the Collection

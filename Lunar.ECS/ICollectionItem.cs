@@ -4,18 +4,18 @@ using System.Collections.Generic;
 
 namespace Lunar.ECS
 {
-    public interface ITreeItem
+    public interface ICollectionItem
     {
         event Action Disposed;
 
-        ITreeItem Ancestor { get; set; }
-        ITreeItem Parent { get; set; }
+        ICollectionItem Ancestor { get; set; }
+        ICollectionItem Parent { get; set; }
 
         Guid Id { get; set; }
         string Name { get; set; }
         bool Enabled { get; set; }
 
         void Dispose();    
-        bool Equals(ITreeItem obj);
+        bool Equals(ICollectionItem obj);
     }
 }

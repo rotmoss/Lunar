@@ -3,17 +3,17 @@ using System.Collections.Generic;
 
 namespace Lunar.ECS
 {
-    public class Component<T> : ITreeItem where T : Component<T>
+    public class Component<T> : ICollectionItem where T : Component<T>
     {
         public static ComponentCollection<T> Collection = new ComponentCollection<T>();
        
         public event Action Disposed;
 
-        public ITreeItem Ancestor { get => _ancestor; set => _ancestor = value; }
-        private ITreeItem _ancestor;
+        public ICollectionItem Ancestor { get => _ancestor; set => _ancestor = value; }
+        private ICollectionItem _ancestor;
 
-        public ITreeItem Parent { get => _parent;  set => _parent = value; }
-        private ITreeItem _parent;
+        public ICollectionItem Parent { get => _parent;  set => _parent = value; }
+        private ICollectionItem _parent;
   
         public Guid Id { get => _parent.Id;  set => _parent.Id = value; }
 
@@ -35,6 +35,6 @@ namespace Lunar.ECS
             Disposed = null;
         }
         
-        public bool Equals(ITreeItem obj) => obj.GetType() == typeof(Component<T>) && obj.Id == Id;
+        public bool Equals(ICollectionItem obj) => obj.GetType() == typeof(Component<T>) && obj.Id == Id;
     }
 }

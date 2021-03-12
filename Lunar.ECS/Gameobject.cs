@@ -1,18 +1,20 @@
+using System.Runtime.InteropServices;
 using System;
+using System.Collections.Generic;
 
 namespace Lunar.ECS
 {
-    public class Gameobject : ITreeItem
+    public class Gameobject : ICollectionItem
     {
         public static GameobjectCollection Collection = new GameobjectCollection();
 
         public event Action Disposed;
 
-        public ITreeItem Ancestor { get => _ancestor; set => _ancestor = value; }
-        private ITreeItem _ancestor;
+        public ICollectionItem Ancestor { get => _ancestor; set => _ancestor = value; }
+        private ICollectionItem _ancestor;
 
-        public ITreeItem Parent { get => _parent; set => _parent = value; }
-        private ITreeItem _parent;
+        public ICollectionItem Parent { get => _parent; set => _parent = value; }
+        private ICollectionItem _parent;
 
         public Guid Id { get => _id; set => _id = value; }
         private Guid _id;
@@ -40,11 +42,20 @@ namespace Lunar.ECS
             Disposed = null;
         }
         
-        public bool Equals(ITreeItem obj) => obj.GetType() == typeof(Gameobject) && obj.Id == _id;
+        public bool Equals(ICollectionItem obj) => obj.GetType() == typeof(Gameobject) && obj.Id == _id;
         
-        public Guid[] GetParents() 
+        public List<Guid> GetParents() 
         {
-            return null;
+            List<Guid> parents = new List<Guid>();
+            ICollectionItem current = _parent;
+
+            while (current.GetType() == typeof(Gameobject)) 
+            {
+                parents.Add(current.Id);
+                current = current.Parent;
+            }
+
+            return parents;
         }
     }
 }
